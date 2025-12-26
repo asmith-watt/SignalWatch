@@ -11,6 +11,7 @@ import { analyzeSignal } from "./ai-analysis";
 import { generateArticleFromSignal, exportArticleForCMS } from "./article-generator";
 import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany, monitorUSPoultryCompanies, monitorCompaniesByCountry, monitorCompaniesByIndustry } from "./perplexity-monitor";
 import { importCompanies, getUSPoultryCompanies } from "./import-companies";
+import { importFeedCompanies } from "./import-feed-companies";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -570,6 +571,22 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error importing companies:", error);
       res.status(500).json({ error: "Failed to import companies" });
+    }
+  });
+
+  app.post("/api/companies/import-feed", async (req: Request, res: Response) => {
+    try {
+      console.log("Starting feed companies import...");
+      const result = await importFeedCompanies();
+      res.json({ 
+        success: true, 
+        message: `Import complete. Added ${result.imported} new feed companies, skipped ${result.skipped} existing.`,
+        imported: result.imported,
+        skipped: result.skipped
+      });
+    } catch (error) {
+      console.error("Error importing feed companies:", error);
+      res.status(500).json({ error: "Failed to import feed companies" });
     }
   });
 
