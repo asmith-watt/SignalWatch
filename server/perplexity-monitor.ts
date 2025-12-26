@@ -243,9 +243,6 @@ const industryGroups: Record<string, string[]> = {
   Poultry: ["Poultry", "Chicken", "Turkey", "Egg", "Duck", "Broiler", "Layer", "Hatchery"],
   Feed: ["Feed", "Nutrition", "Premix", "Compound"],
   "Pet Food": ["Pet Food", "Pet", "Dog Food", "Cat Food"],
-  Technology: ["SaaS", "AI/ML", "Cybersecurity", "Cloud", "Software", "Technology"],
-  Finance: ["Fintech", "Banking", "Insurance", "Payments", "Finance"],
-  Healthcare: ["Biotech", "Medtech", "Pharma", "Digital Health", "Healthcare"],
 };
 
 function matchesIndustryGroup(companyIndustry: string | null, groupName: string): boolean {

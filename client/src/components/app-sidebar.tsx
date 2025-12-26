@@ -56,9 +56,6 @@ const industryGroups: Record<string, string[]> = {
   Poultry: ["Poultry", "Chicken", "Turkey", "Egg", "Duck", "Broiler", "Layer", "Hatchery"],
   Feed: ["Feed", "Nutrition", "Premix", "Compound"],
   "Pet Food": ["Pet Food", "Pet", "Dog Food", "Cat Food"],
-  Technology: ["SaaS", "AI/ML", "Cybersecurity", "Cloud", "Software"],
-  Finance: ["Fintech", "Banking", "Insurance", "Payments"],
-  Healthcare: ["Biotech", "Medtech", "Pharma", "Digital Health"],
 };
 
 function getIndustryGroup(industry: string | null): string {
@@ -249,9 +246,6 @@ export function AppSidebar({
                   <div className="flex items-center justify-between w-full px-2 py-1.5 text-xs font-medium text-muted-foreground">
                     <CollapsibleTrigger className="flex items-center gap-2 flex-1 hover-elevate rounded-md py-1 -my-1 px-1 -mx-1">
                       <span className="flex items-center gap-2">
-                        {group === "Technology" && <Globe className="w-3 h-3" />}
-                        {group === "Finance" && <Briefcase className="w-3 h-3" />}
-                        {group === "Healthcare" && <TrendingUp className="w-3 h-3" />}
                         {group === "Poultry" && <Building2 className="w-3 h-3" />}
                         {group === "Feed" && <Building2 className="w-3 h-3" />}
                         {group === "Pet Food" && <Building2 className="w-3 h-3" />}
