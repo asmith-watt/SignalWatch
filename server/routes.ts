@@ -8,6 +8,7 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import { analyzeSignal } from "./ai-analysis";
+import { generateArticleFromSignal, exportArticleForCMS } from "./article-generator";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -313,6 +314,110 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error analyzing signal:", error);
       res.status(500).json({ error: "Failed to analyze signal" });
+    }
+  });
+
+  // Article Generation - Generate draft article from signal
+  app.post("/api/signals/:id/generate-article", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const style = (req.body.style as "news" | "analysis" | "brief") || "news";
+      
+      const signal = await storage.getSignal(id);
+      if (!signal) {
+        return res.status(404).json({ error: "Signal not found" });
+      }
+
+      const company = await storage.getCompany(signal.companyId);
+      const article = await generateArticleFromSignal(signal, company, style);
+      const exports = exportArticleForCMS(article, signal, company);
+
+      res.json({ article, exports });
+    } catch (error) {
+      console.error("Error generating article:", error);
+      res.status(500).json({ error: "Failed to generate article" });
+    }
+  });
+
+  // Export signal as article in various formats
+  app.get("/api/signals/:id/export/:format", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const format = req.params.format as "wordpress" | "contentful" | "markdown" | "json";
+      
+      const signal = await storage.getSignal(id);
+      if (!signal) {
+        return res.status(404).json({ error: "Signal not found" });
+      }
+
+      const company = await storage.getCompany(signal.companyId);
+      const article = await generateArticleFromSignal(signal, company, "news");
+      const exports = exportArticleForCMS(article, signal, company);
+
+      if (format === "markdown") {
+        res.setHeader("Content-Type", "text/markdown");
+        res.setHeader("Content-Disposition", `attachment; filename="article-${id}.md"`);
+        return res.send(exports.markdown);
+      }
+
+      if (format === "wordpress") {
+        res.json(exports.wordpress);
+      } else if (format === "contentful") {
+        res.json(exports.contentful);
+      } else {
+        res.json(exports.json);
+      }
+    } catch (error) {
+      console.error("Error exporting article:", error);
+      res.status(500).json({ error: "Failed to export article" });
+    }
+  });
+
+  // Webhook endpoint - push article to external CMS
+  app.post("/api/signals/:id/publish", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { webhookUrl, format = "json" } = req.body;
+      
+      if (!webhookUrl) {
+        return res.status(400).json({ error: "webhookUrl is required" });
+      }
+
+      const signal = await storage.getSignal(id);
+      if (!signal) {
+        return res.status(404).json({ error: "Signal not found" });
+      }
+
+      const company = await storage.getCompany(signal.companyId);
+      const article = await generateArticleFromSignal(signal, company, "news");
+      const exports = exportArticleForCMS(article, signal, company);
+
+      // Send to webhook
+      const payload = format === "wordpress" ? exports.wordpress 
+        : format === "contentful" ? exports.contentful 
+        : exports.json;
+
+      const webhookResponse = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!webhookResponse.ok) {
+        throw new Error(`Webhook failed: ${webhookResponse.status}`);
+      }
+
+      // Update signal status to published
+      await storage.updateSignal(id, { contentStatus: "published" });
+
+      res.json({ 
+        success: true, 
+        message: "Article published successfully",
+        article 
+      });
+    } catch (error) {
+      console.error("Error publishing article:", error);
+      res.status(500).json({ error: "Failed to publish article" });
     }
   });
 

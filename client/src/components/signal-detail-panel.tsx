@@ -15,6 +15,9 @@ import {
   MessageSquare,
   Sparkles,
   Loader2,
+  FileText,
+  Download,
+  Send,
 } from "lucide-react";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
@@ -64,6 +67,13 @@ export function SignalDetailPanel({
   const [notes, setNotes] = useState(signal.notes || "");
   const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [generatedArticle, setGeneratedArticle] = useState<{
+    headline: string;
+    subheadline: string;
+    body: string;
+    keyTakeaways: string[];
+    seoDescription: string;
+  } | null>(null);
 
   const analyzeSignalMutation = useMutation({
     mutationFn: async (signalId: number) => {
@@ -77,6 +87,47 @@ export function SignalDetailPanel({
       toast({ title: "Failed to analyze signal", variant: "destructive" });
     },
   });
+
+  const generateArticleMutation = useMutation({
+    mutationFn: async ({ signalId, style }: { signalId: number; style: string }) => {
+      const res = await apiRequest("POST", `/api/signals/${signalId}/generate-article`, { style });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      setGeneratedArticle(data.article);
+      toast({ title: "Article draft generated" });
+    },
+    onError: () => {
+      toast({ title: "Failed to generate article", variant: "destructive" });
+    },
+  });
+
+  const handleExportArticle = async (format: string) => {
+    try {
+      const response = await fetch(`/api/signals/${signal.id}/export/${format}`);
+      if (format === "markdown") {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `article-${signal.id}.md`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        const data = await response.json();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `article-${signal.id}-${format}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+      toast({ title: `Exported as ${format}` });
+    } catch {
+      toast({ title: "Export failed", variant: "destructive" });
+    }
+  };
 
   const handleSaveNotes = async () => {
     setIsSaving(true);
@@ -320,6 +371,124 @@ export function SignalDetailPanel({
               </div>
             </>
           )}
+
+          <Separator />
+
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Content Publishing
+            </h4>
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => generateArticleMutation.mutate({ signalId: signal.id, style: "news" })}
+                  disabled={generateArticleMutation.isPending}
+                  data-testid="button-generate-article"
+                >
+                  {generateArticleMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                  ) : (
+                    <FileText className="w-4 h-4 mr-1.5" />
+                  )}
+                  {generateArticleMutation.isPending ? "Generating..." : "Draft Article"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => generateArticleMutation.mutate({ signalId: signal.id, style: "brief" })}
+                  disabled={generateArticleMutation.isPending}
+                >
+                  Brief
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => generateArticleMutation.mutate({ signalId: signal.id, style: "analysis" })}
+                  disabled={generateArticleMutation.isPending}
+                >
+                  Analysis
+                </Button>
+              </div>
+
+              {generatedArticle && (
+                <div className="space-y-3 p-3 bg-muted/50 rounded-md">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                      Generated Headline
+                    </p>
+                    <p className="text-sm font-semibold">{generatedArticle.headline}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                      Subheadline
+                    </p>
+                    <p className="text-sm text-muted-foreground">{generatedArticle.subheadline}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                      Article Body
+                    </p>
+                    <p className="text-sm whitespace-pre-wrap max-h-40 overflow-y-auto">
+                      {generatedArticle.body}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                      Key Takeaways
+                    </p>
+                    <ul className="text-sm space-y-1">
+                      {generatedArticle.keyTakeaways.map((point, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 pt-2 border-t">
+                    <p className="text-xs text-muted-foreground w-full mb-1">Export for CMS:</p>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleExportArticle("wordpress")}
+                      data-testid="button-export-wordpress"
+                    >
+                      <Download className="w-3.5 h-3.5 mr-1.5" />
+                      WordPress
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleExportArticle("contentful")}
+                    >
+                      <Download className="w-3.5 h-3.5 mr-1.5" />
+                      Contentful
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleExportArticle("markdown")}
+                    >
+                      <Download className="w-3.5 h-3.5 mr-1.5" />
+                      Markdown
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleExportArticle("json")}
+                    >
+                      <Download className="w-3.5 h-3.5 mr-1.5" />
+                      JSON
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
           <Separator />
 

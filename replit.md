@@ -58,9 +58,11 @@ Core entities defined in `shared/schema.ts`:
 - **Drizzle Kit**: Schema migrations via `drizzle-kit push`
 
 ### AI Services
-- **OpenAI API**: Used for signal analysis and chat features
+- **OpenAI API**: Used for signal analysis, chat, and article generation
   - Configured via `AI_INTEGRATIONS_OPENAI_API_KEY` and `AI_INTEGRATIONS_OPENAI_BASE_URL`
-  - Supports text analysis and image generation (gpt-image-1)
+  - Signal analysis: entity extraction, sentiment, priority
+  - Article generation: news articles, briefs, analysis pieces from signals
+  - CMS export: WordPress, Contentful, Markdown, JSON formats
 
 ### Third-Party Libraries
 - **Radix UI**: Accessible component primitives (dialogs, dropdowns, tabs, etc.)
