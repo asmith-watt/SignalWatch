@@ -1,0 +1,685 @@
+2 Sisters Food Group	Europe	United Kingdom		10.500			Chicken, Turkey	
+3 Puglisi Brothers	North America	United States			1.20		Table Eggs	2025
+A'Saffa Foods S.A.O.G.	Middle East	Oman					Chicken	
+Abalıoğlu Group	Middle East	Türkiye			2.10		Chicken, Table Eggs	2024
+Acondesa	South America	Colombia					Chicken	
+Addoha Poultry Co.	Middle East	Saudi Arabia					Chicken	
+Agri Star Meat & Poultry	North America	United States		0.190			Chicken	
+Agrícol	South America	Colombia			1.27		Table Eggs	2024
+Agrícola Ariztía	South America	Chile					Chicken, Table Eggs, Turkey	
+Agrícola Santa Marta de Liray	South America	Chile			0.70		Table Eggs	2024
+Agrícola Santiago Yerkovic	South America	Chile			0.80		Table Eggs	2024
+Agricovial SA	South America	Chile			1.20		Egg Products, Table Eggs	2024
+Agro Holding Sibirskiy Premier	Europe	Russia					Chicken, Table Eggs	
+Agrofert Holding	Europe	Czech Republic			0.33		Chicken, Ducks, Table Eggs	2024
+Agrofirma Oktyabrskaya	Europe	Russia					Chicken, Table Eggs	
+Agroindustrial AAA	Central America	Dominican Republic					Chicken	
+Agroindustrias Quesada	North America	Mexico					Chicken	
+Agroinlaca	South America	Venezuela			0.40		Table Eggs	2024
+AgroKomplex	Europe	Russia			0.83		Chicken, Ducks, Table Eggs	2024
+Agrolucha	South America	Venezuela					Chicken	
+AgroNivar	South America	Venezuela			0.60		Table Eggs	2024
+Agropecuaria de Guissona	Europe	Spain			1.60		Chicken, Table Eggs, Turkey	2024
+Agropecuaria El Huizache	North America	Mexico			3.00		Table Eggs	2024
+Agropecuaria Jochy Polanco	Caribbean	Dominican Republic					Chicken	
+Agropecuaria Río Bravo	South America	Peru			4.80		Table Eggs	2024
+Agropecuaria Sanfandila	North America	Mexico			1.80		Table Eggs	2023
+Agropecuruaria Wilse	Caribbean	Dominican Republic			1.26		Table Eggs	2024
+Agropollito C.A.	South America	Venezuela					Chicken	
+Agrosul Foods	South America	Brazil					Chicken	
+Agrosuper Group	South America	Chile					Chicken, Table Eggs, Turkey	
+Aitas Kz	Europe	Kazakhstan					Chicken, Table Eggs	
+Ak Bars Holding Co. OJSC	Europe	Russia					Chicken	
+Akashevskaya	Europe	Russia					Chicken, Table Eggs	
+Al Ain Poultry Farm	Middle East	United Arab Emirates			4.20		Chicken, Table Eggs	2024
+Al Akhawain	Middle East	Saudi Arabia		1.050	0.11		Chicken, Table Eggs	2024
+Al Rawdah (Emirates Modern Poultry Co.)	Middle East	United Arab Emirates					Chicken, Table Eggs	
+Al Zain Farms LLC	Middle East	Oman			3.20		Chicken, Egg Products, Table Eggs	2024
+Al-Fakieh Poultry Farms	Middle East	Saudi Arabia			1.20		Chicken, Table Eggs	2024
+Al-Watania	Middle East	Saudi Arabia			1.87		Chicken, Table Eggs	2024
+Alema Farms	Africa	Ethiopia			0.40		Chicken, Table Eggs	2024
+Alf Sahel s.a.r.l.	Africa	Morocco					Chicken, Turkey	
+Alibue	South America	Argentina					Chicken	
+Allen Harim Foods	North America	United States		1.700			Chicken	
+Almarai Co.	Middle East	Saudi Arabia		5.700			Chicken	
+Amadori	Europe	Italy					Chicken, Egg Products, Table Eggs, Turkey	
+Ambar	Middle East	Israel					Chicken, Turkey	
+Amick Farms LLC	North America	United States		4.100			Chicken	
+Amigear Ventures (Pty) Ltd.	Africa	Botswana			0.26		Chicken, Table Eggs	2024
+AN Avícola Mélida, S.L.	Europe	Spain					Chicken	
+Anhui Shun'an Agricultural Development Co., Ltd.	Asia	China					Chicken	
+Animex	Europe	Poland					Chicken, Geese, Turkey	
+Aoxiang Poultry	Asia	China					Chicken	
+Arab Company for Livestock Development (ACOLID)	Middle East	Saudi Arabia			17.12		Chicken, Table Eggs	2024
+Arasco Foods	Middle East	Saudi Arabia					Chicken	
+Arawak	Caribbean	Trinidad and Tobago		0.380			Chicken	
+Arce Avícola	Central America	Panama			0.30		Chicken, Table Eggs	2024
+AS Ķekava Foods (JSC Putnu fabrika Ķekava)	Europe	Latvia					Chicken	
+Astillas de Plata SA/Huevos K s.r.l.	South America	Argentina			1.41		Table Eggs	2024
+Astral Foods	Africa	South Africa		5.400			Chicken	
+Atria	Europe	Finland					Chicken	
+Atyab Investments	Middle East	Oman			0.35		Chicken, Table Eggs	2024
+Aurora Alimentos	South America	Brazil					Chicken, Ducks, Egg Products, Turkey	
+Avangardco	Europe	Ukraine			13.30		Chicken, Egg Products, Table Eggs	2024
+Avara	Europe	United Kingdom		4.000			Chicken, Ducks, Turkey	
+Avex S.A.	South America	Argentina					Chicken	
+AVICA	Central America	Honduras			0.40		Table Eggs	2024
+Avícola AAA	South America	Colombia			2.00		Egg Products, Table Eggs	2024
+Avícola Agua Blanca	Central America	Guatemala			0.50		Table Eggs	2024
+Avícola Campestre	Central America	El Salvador					Chicken	
+Avícola El Chaparral	North America	Mexico			5.00		Table Eggs	2024
+Avícola El Ciprés	Central America	Guatemala			0.80		Table Eggs	2024
+Avícola El Guamito	South America	Colombia			2.52		Table Eggs	2024
+Avicola Frontini (Avícola del Oeste)	South America	Uruguay					Chicken	
+Avícola González y González	North America	Mexico			2.00		Table Eggs	2024
+Avícola Kakaraka	South America	Colombia			1.00		Table Eggs	2024
+Avícola Kikiriki	Central America	Guatemala					Chicken	
+Avícola Kikiriki de El Salvador	Central America	El Salvador					Chicken	
+Avícola Kikiriki de Nicaragua	Central America	Nicaragua					Chicken	
+Avícola La Barranca	Central America	Nicaragua			0.40		Table Eggs	2024
+Avícola La Blanca	South America	Paraguay					Chicken	
+Avícola La Calera	South America	Peru			9.40		Egg Products, Table Eggs	2024
+Avícola La Esperanza	South America	Bolivia			0.63		Table Eggs	2024
+Avícola La Guásima	South America	Venezuela		0.580			Chicken	
+Avícola Llombay S.A.	Europe	Spain			1.10		Table Eggs	2024
+Avícola Los Cambulos	South America	Colombia		1.630			Chicken	
+Avícola Modelo	South America	Bolivia			0.70		Egg Products, Table Eggs	2024
+Avícola Ricura	Central America	Costa Rica			0.20		Chicken	2022
+Avícola Rolón	South America	Bolivia			0.60		Table Eggs	2024
+Avícola Rosanda	Central America	Guatemala			1.00		Table Eggs	2024
+Avícola San Isidro	South America	Ecuador					Chicken, Table Eggs	
+Avícola San Juan	Central America	Honduras					Table Eggs	
+Avícola Santeel	South America	Ecuador			0.70		Table Eggs	2024
+Avícola Sofía	South America	Bolivia					Chicken	
+Avícola y Comercial El Toco Ltda.	South America	Chile			0.70		Table Eggs	2024
+Avícola y Porcícola de los Altos	North America	Mexico			7.00		Table Eggs	2024
+Avicultores Unidos Avuga SA	Central America	Costa Rica			0.30		Table Eggs	2024
+Avicultura Josidith	South America	Brazil			2.85		Table Eggs	2024
+Avigrupo	North America	Mexico					Chicken	
+Avigua SRL	South America	Bolivia					Chicken	
+Avimosa	Europe	Spain					Chicken, Table Eggs	
+Avinal	South America	Colombia			1.70		Egg Products, Table Eggs	2024
+Avinatur Producciones Avícolas, S.L.	Europe	Spain					Chicken	
+Avine Alimentos	South America	Brazil			2.00		Egg Products, Table Eggs	2024
+Avinka SA	South America	Peru					Chicken	
+Avipechichal SA	South America	Ecuador			2.00		Chicken, Table Eggs	2024
+Avitalsa (Avícola Vitaloa)	South America	Ecuador					Chicken, Table Eggs, Turkey	
+Avril Group	Europe	France			6.40			2022
+AVSA	South America	Colombia					Chicken	
+Baiada Poultry	Oceania	Australia					Chicken, Turkey	
+Balady Poultry Trading Co.	Middle East	Saudi Arabia					Chicken	
+Balticovo	Europe	Latvia			3.68		Chicken, Egg Products, Table Eggs	2024
+Banvit	Middle East	Türkiye					Chicken	
+Beijing Deqingyuan Agricultural Technology Co. Ltd.	Asia	China			20.60		Table Eggs	2024
+Bell Food Group	Europe	Switzerland					Chicken, Turkey	
+Berne Hi-Way Hatchery Inc.	North America	United States			1.46		Table Eggs	2025
+Betagro Group	Asia	Thailand					Chicken, Ducks, Table Eggs	
+Beypiliç	Middle East	Türkiye			0.63		Chicken, Ducks, Table Eggs	2024
+Bezrk-Belgrankorm	Europe	Russia					Chicken, Ducks	
+Boda Food	Asia	China					Chicken	
+Bohr Poultry	Europe	Russia			3.50		Egg Products, Table Eggs	2024
+Bonnín Hnos.	South America	Argentina					Chicken	
+Bounty Fresh Group	Asia	Philippines					Chicken, Table Eggs	
+Braswell Egg	North America	United States			2.27		Egg Products, Table Eggs	2025
+BRF	South America	Brazil					Chicken, Turkey	
+Bupiliç	Middle East	Türkiye					Chicken	
+Butterball	North America	United States				940.00	Turkey	
+C Vale - Cooperativa Agroindustrial	South America	Brazil					Chicken	
+Cairo Poultry Co. (CPC)	Africa	Egypt					Chicken	
+Caisy Ltda.	South America	Bolivia			0.84		Table Eggs	2024
+Cal-Maine Foods	North America	United States			50.86		Egg Products, Table Eggs	2025
+Camar Agroalimentaria	Europe	Spain			2.40		Table Eggs	2024
+Cargill	North America	United States			0.35		Chicken	2025
+Cargill China	Asia	China					Chicken	
+Cargill Honduras	Central America	Honduras						
+Cargill Meats Asia	Asia	Thailand					Chicken	
+Cargill Meats Europe	Europe	United Kingdom					Chicken, Table Eggs	
+Cargill Protein	North America	United States				643.85	Turkey	
+Cargill Proteína Latinoamérica	Central America	Honduras					Chicken, Turkey	
+Cargill Proteína Latinoamérica -- Colombia	South America	Colombia					Chicken, Table Eggs	
+Cargill Proteína Latinoamérica -- Honduras	Central America	Honduras					Chicken, Turkey	
+Case Foods Inc.	North America	United States		3.900			Chicken	
+CDPO	Europe	France			3.00		Table Eggs	2024
+Cedrob	Europe	Poland					Chicken, Ducks, Geese	
+Center Fresh Group	North America	United States			13.50		Egg Products, Table Eggs	2025
+Central Valley Eggs	North America	United States			1.98		Table Eggs	2025
+Centrum Valley Farms	North America	United States			2.40		Egg Products, Table Eggs	2025
+Chelny Broiler	Europe	Russia					Chicken	
+Cherkizovo Group	Europe	Russia			2.30		Chicken, Turkey	2024
+Chesterfield Poultry	Europe	United Kingdom		1.000			Chicken	
+Chi Farms Ltd.	Africa	Nigeria					Chicken	
+Chino Valley Ranchers/MCM Poultry	North America	United States			0.84		Table Eggs	2025
+Chubu Shiryo	Asia	Japan					Chicken, Table Eggs	
+CJ Cheil Jedang	Asia	South Korea					Chicken	
+Claxton Poultry Farms	North America	United States		2.270			Chicken	
+CMI - Corporación Multi Inversiones	Central America	Guatemala					Chicken	
+CMI - Corporación Multi Inversiones (Costa Rica)	Central America	Costa Rica					Chicken	
+CMI - Corporación Multi Inversiones (El Salvador)	Central America	El Salvador					Chicken, Table Eggs	
+CMI - Corporación Multi Inversiones (Guatemala)	Central America	Guatemala					Chicken	
+CMI - Corporación Multi Inversiones (Honduras)	Central America	Honduras					Chicken	
+CMI - Corporación Multi Inversiones (Toledano)	Central America	Panama			0.57		Chicken, Table Eggs	2024
+Coasul Cooperativa Agroindustrial		Brazil						
+Coave	Caribbean	Dominican Republic					Chicken, Table Eggs	
+Codigoro	Europe	Italy			1.20		Egg Products, Table Eggs	2024
+Colorado Eggs	North America	United States			0.25		Table Eggs	2025
+Coopavel	South America	Brazil					Chicken, Ducks	
+Cooper Farms	North America	United States			6.04	277.80	Egg Products, Table Eggs, Turkey	2025
+Copacol	South America	Brazil					Chicken	
+Coren	Europe	Spain			0.32		Chicken, Ducks, Egg Products, Table Eggs, Turkey	2024
+Corporación Avícola Dominicana	Caribbean	Dominican Republic					Chicken	
+Corporación Pipasa (Cargill)	Central America	Costa Rica			0.50		Chicken, Table Eggs, Turkey	2024
+Country Bird Holdings Ltd.	Africa	South Africa		1.500			Chicken	
+Country Charm Eggs	North America	United States			1.86		Table Eggs	2022
+CP China	Asia	China					Chicken	
+CP Group	Asia	Thailand			20.74		Chicken, Ducks, Egg Products, Table Eggs	2024
+CP Standart Gida Sanayi Ve Ticaret (CP Turkey)	Middle East	Türkiye			11.00		Chicken, Table Eggs	2024
+Cranswick	Europe	United Kingdom		1.400			Chicken	
+Creighton Brothers LLC	North America	United States			3.33		Table Eggs	2025
+DaChan Food (Asia) Ltd.	Asia	China					Chicken	
+DACSA	Central America	Honduras			0.83		Table Eggs	2024
+Dafa Animal Husbandry	Asia	China					Chicken	
+Dakahlia Poultry Co.	Africa	Egypt					Chicken	
+Dakota Layers LLP	North America	United States			1.49		Table Eggs	2025
+Dakota Provisions	North America	United States				150.19	Turkey	
+DANÆG A/S	Europe	Denmark			4.50		Egg Products, Table Eggs	2024
+Darko Farms	Africa	Ghana			0.12		Chicken, Table Eggs	2024
+DAVA Foods Holding A/S	Europe	Denmark			7.40		Egg Products, Table Eggs	2024
+Daybreak Farms	Africa	South Africa		1.000			Chicken	
+Daybreak Foods Inc.	North America	United States			24.00		Egg Products, Table Eggs	2025
+Dekang Animal Husbandry Group Co.	Asia	China					Chicken	
+Delmon Poultry Co.	Middle East	Bahrain		0.130			Chicken	
+Demler Brothers LLC	North America	United States			1.70		Table Eggs	2025
+Demler Enterprises	North America	United States			1.70		Table Eggs	2025
+Demler Farms	North America	United States			1.50		Table Eggs	2025
+Deveci Broyler	Middle East	Azerbaijan					Chicken	
+Dexin Group	Asia	China					Chicken	
+Diplomata	South America	Brazil					Chicken	
+Distraves S.A.	South America	Colombia					Chicken	
+Domvil, SA	South America	Argentina					Chicken	
+Don Pollo (Chile)	South America	Chile			0.70		Chicken, Table Eggs	2024
+Don Pollo (Colombia)	South America	Colombia					Chicken	
+Dongwoo Co. Ltd.	Asia	South Korea					Chicken, Ducks	
+Drobex	Europe	Poland					Chicken	
+Druzhba Narodov	Europe	Russia					Chicken, Table Eggs	
+Dutchland Farms	North America	United States			1.83		Table Eggs	2025
+Dutt & Wagner	North America	United States			1.83		Table Eggs	2025
+Easy Holdings Co. Ltd.	Asia	South Korea					Chicken, Ducks	
+Ecoptitsa	Europe	Russia					Chicken	
+El Calvario	North America	Mexico			10.00		Table Eggs	2024
+El Cortijo	Central America	Honduras					Chicken	
+El Granjero	Central America	El Salvador			0.90		Table Eggs	2024
+El Rocio	South America	Peru					Chicken	
+El Vasquito Ltd	South America	Uruguay					Chicken	
+Elinar	Europe	Russia					Chicken	
+Emilio Silva e Hijos (Avícola Santa Elvira)	South America	Chile			0.80		Table Eggs	2024
+Empire Kosher Poultry Inc. (broiler)	North America	United States		0.240			Chicken	
+Empire Kosher Poultry Inc. (turkey)	North America	United States				26.00	Turkey	
+Empresas Guadalupe	North America	Mexico			8.00		Table Eggs	2024
+Endy Agroindustrial	Caribbean	Dominican Republic			1.62		Table Eggs	2024
+Erpiliç	Middle East	Türkiye					Chicken, Turkey	
+Esbenshade Farms	North America	United States			2.00		Table Eggs	2022
+Eureden	Europe	France			4.56		Egg Products, Table Eggs	2024
+Eurovo	Europe	Italy			10.00		Egg Products, Table Eggs	2024
+Exceldor Cooperative Avicole	North America	Canada					Chicken, Turkey	
+Fadel SA	South America	Argentina					Chicken	
+Farbest Foods	North America	United States				602.00	Turkey	
+Farmers Hen House	North America	United States			1.15		Table Eggs	2024
+Farmers Pride Inc.	North America	United States		1.600			Chicken	
+Fassio Egg Farms	North America	United States			1.07		Table Eggs	2022
+Fengji Food Group Co.	Asia	China			6.00		Table Eggs	2024
+FEPASA (Frigorífico Entrerriano de Productores Avícolas SA)	South America	Argentina					Chicken	
+FFM Berhad	Asia	Malaysia			0.86		Chicken, Table Eggs	2024
+Fieldale Farms	North America	United States		3.150			Chicken	
+Flamboia	South America	Brazil		0.840			Chicken	
+Forsman Farms	North America	United States			3.80		Table Eggs	2025
+Foster Farms (broiler)	North America	United States		5.300			Chicken	
+Foster Farms (turkey)	North America	United States				24.70	Turkey	
+FreeBird Chicken	North America	United States		0.400			Chicken	
+Fremont Farms of Iowa	North America	United States			7.00		Egg Products	2025
+Frigorífico Soychú SA	South America	Argentina					Chicken	
+Frinavur S.A.	South America	Uruguay					Chicken	
+FRISA (Areca)	Central America	Guatemala					Chicken, Table Eggs	
+Fufeng Group	Asia	China					Chicken	
+Fujian Sunner Development Co. Ltd.	Asia	China					Chicken	
+G.M. Farms	North America	Mexico			2.80		Table Eggs	2024
+GAAS	South America	Brazil			2.00		Table Eggs	2024
+Galliance	Europe	France					Chicken, Ducks, Turkey	
+Galline Frais	Europe	France			0.90		Table Eggs	2024
+Gemperle Family Farms	North America	United States			9.50		Egg Products, Table Eggs	2025
+Gena Agropecuaria	North America	Mexico			10.00		Table Eggs	2024
+George's Inc.	North America	United States		6.570			Chicken	
+Gerber's Poultry	North America	United States		0.600			Chicken	
+GFPT	Asia	Thailand					Chicken, Table Eggs	
+Giroux's Poultry Farm	North America	United States			2.50		Table Eggs	2025
+Global Eggs	Europe	Luxembourg			43.00		Table Eggs	2024
+Global Eggs (U.S. Division)	North America	United States			21.00		Egg Products, Table Eggs	2025
+GNP Company	North America	United States					Chicken	
+Godrej Agrovet	Asia	India					Chicken	
+Golden Chicken	Middle East	Saudi Arabia					Chicken	
+Golden-Rod Broilers Inc.	North America	United States		1.100			Chicken	
+Gornet SA	South America	Uruguay					Chicken	
+Gran Tijuca	South America	Brazil					Table Eggs	
+Granja Almeida	South America	Brazil			4.20		Table Eggs	2024
+Granja Avícola Arizona	South America	Chile			0.70		Egg Products, Table Eggs	2024
+Granja Avícola del Campo S.R.L	South America	Uruguay					Chicken	
+Granja Bailon	Europe	Spain			1.50		Table Eggs	2024
+Granja Catalana	Central America	El Salvador			1.00		Table Eggs	2024
+Granja Faria	South America	Brazil			20.50		Table Eggs	2024
+Granja Joselyn	Caribbean	Dominican Republic			2.16		Table Eggs	2024
+Granja Kunitomo	South America	Brazil						
+Granja Mantiqueira	South America	Brazil			17.60		Egg Products, Table Eggs	2024
+Granja Maxi Pollo	South America	Venezuela						
+Granja Pinilla	Europe	Spain			1.10		Egg Products, Table Eggs	2024
+Granja San Miguel	Europe	Spain			2.20		Table Eggs	2024
+Granja Sumaré	South America	Brazil			0.60		Table Eggs	2023
+Granja Tres Arroyos	South America	Argentina		3.750			Chicken	
+Granja Tres Arroyos Uruguay	South America	Uruguay					Chicken	
+Granja Virgen Del Rosario	Europe	Spain			2.20		Egg Products, Table Eggs	2024
+Granja Yabuta	South America	Brazil			11.00		Table Eggs	2024
+Granjas Avícolas Rancho Grande	North America	Mexico			5.00		Table Eggs	2024
+Granjas Carnave	South America	Argentina		0.150	0.76		Table Eggs	2024
+Granjas Kaki	North America	Mexico			2.40		Table Eggs	2024
+Granjazul (Proavisa)	Central America	Guatemala			1.10		Egg Products, Table Eggs	2024
+Granjita El Progreso	Central America	El Salvador			0.40		Table Eggs	2024
+Grenja Vciola del Camp S.R.L.	South America	Uruguay						
+Groupe Cocorette	Europe	France			2.10		Table Eggs	2024
+Grupo Agropecuario Don Julio	Caribbean	Dominican Republic			0.63		Chicken, Table Eggs	2024
+Grupo Avícola Rujamar	Europe	Spain			1.20		Table Eggs	2024
+Grupo Avimarca	North America	Mexico					Chicken	
+Grupo Buenaventura	North America	Mexico					Chicken	
+Grupo CAC	Europe	Portugal			3.40		Egg Products, Table Eggs	2024
+Grupo Crío	North America	Mexico			6.50		Chicken, Table Eggs	2024
+Grupo Don Pollo	South America	Peru					Chicken	
+Grupo Ebenezer	South America	Venezuela			1.20		Chicken	2024
+Grupo El Tunal	South America	Venezuela			3.80		Table Eggs	2024
+Grupo Huevos Guillén	Europe	Spain			6.00		Egg Products, Table Eggs	2024
+Grupo Industrial El Granjero	Central America	Nicaragua			0.80		Egg Products, Table Eggs	2024
+Grupo Katayama	South America	Brazil			3.00		Egg Products, Table Eggs	2022
+Grupo La Caridad	South America	Venezuela			1.20		Chicken, Table Eggs	2024
+Grupo Melo	Central America	Panama			0.90		Chicken, Table Eggs	2024
+Grupo Motta (CALISA)	South America	Argentina					Chicken	
+Grupo MRB (Sr. Huevo)	North America	Mexico			2.00		Table Eggs	2024
+Grupo Oro	South America	Ecuador			0.36		Table Eggs, Turkey	2024
+Grupo Pecuario San Antonio	North America	Mexico					Chicken	
+Grupo Proa (Avicola Andina)	South America	Chile			2.06		Table Eggs	2024
+Grupo Sada	Europe	Spain					Chicken	
+Grupo San Benito	Central America	El Salvador			0.25		Table Eggs	2024
+Grupo Santa Elena	South America	Peru					Chicken, Table Eggs	
+Grupo Sierra Fértil (Velastegui)	South America	Ecuador			1.75		Table Eggs	2024
+Grupo Superalba	Caribbean	Dominican Republic					Chicken	
+Grupo Vall Companys	Europe	Spain					Chicken, Ducks, Turkey	
+Grupo VMR	Europe	Spain					Chicken	
+Gruppo Veronesi	Europe	Italy					Chicken, Egg Products, Table Eggs, Turkey	
+GTFoods Group	South America	Brazil					Chicken	
+Guadalupe	South America	Ecuador			0.76		Table Eggs	2024
+Guangdong Evergreen Feed Industry Co. Ltd.	Asia	China						
+Guangdong Tiannong Food Ltd.	Asia	China					Chicken	
+Guangdong Yihao Foodstuff Co.	Asia	China			7.00		Table Eggs	2024
+Guangxi Jinling Farming And Animal Husbandry Group	Asia	China					Chicken	
+Guilin Liyuan	Asia	China					Chicken, Ducks, Table Eggs	
+Guldfågeln AB	Europe	Sweden					Chicken	
+Hamilton Eggs Holdings LLC	North America	United States			2.00		Table Eggs	2025
+Hammoudeh Group	Middle East	Jordan			0.52		Chicken, Table Eggs	2021
+Handsome Brook Farms	North America	United States					Table Eggs	
+Hanwei Group	Asia	China			8.00		Table Eggs	2024
+Harim Group	Asia	South Korea					Chicken, Ducks	
+Harrison Poultry Inc.	North America	United States		0.900			Chicken	
+Hazeldene's	Oceania	Australia					Chicken	
+Hebei Jiuxing Food Co. Ltd.	Asia	China					Chicken	
+Hebei Luanping Huadu Foodstuff Co Ltd	Asia	China					Chicken	
+Heilongjiang Beisanxia Foods Co.	Asia	China					Chicken	
+Henan Liujiang Ecological Animal Husbandry Co.	Asia	China			4.00		Table Eggs	2024
+Henan Shuanghui Investment & Development Co., Ltd.	Asia	China					Chicken	
+Henan Tianzhonghe Agriculture and Animal Husbandry Co., Ltd.	Asia	China					Chicken	
+Herbruck's Poultry Ranch	North America	United States			14.32		Table Eggs	2025
+Heritage PMS/LaValle Egg Farms	North America	United States			1.57		Table Eggs	2025
+Hertzfeld Poultry Farms Inc.	North America	United States			1.74		Table Eggs	2025
+Hesheng Food Group Co., Ltd.	Asia	China					Chicken	
+Hevo Group	Europe	Spain			4.00		Table Eggs	2024
+Hidden Villa Ranch	North America	United States			3.00		Egg Products, Table Eggs	2025
+Hillside Poultry Farms Inc.	North America	United States			0.68		Table Eggs	2025
+HKFoods	Europe	Finland					Chicken, Ducks, Turkey	
+Holmes Foods	North America	United States		0.810			Chicken	
+Houde Foods Co. Ltd	Asia	China			8.00		Egg Products, Table Eggs	2024
+House of Raeford Farms Inc. (broiler)	North America	United States		4.500			Chicken	
+Huadu Group	Asia	China					Chicken	
+Huadu Yukou Poultry Industry	Asia	China					Table Eggs	
+Huat Lai Resources Berhad	Asia	Malaysia			1.20		Chicken, Table Eggs	2024
+Huawei Group	Asia	China					Chicken	
+Huaying Agricultural Development Co. Ltd.	Asia	China					Ducks	
+Hubei Yuxiang Poultry Co.	Asia	China			5.00		Table Eggs	2024
+Huevo Avícola Tehuacán	North America	Mexico			4.50		Egg Products, Table Eggs	2024
+Huevos de Talca (Avícola Las Rastras)	South America	Chile			1.10		Table Eggs	2024
+Huevos Kikes	South America	Colombia			7.00		Egg Products, Table Eggs	2024
+Huevos Santa Reyes	South America	Colombia			1.62		Egg Products, Table Eggs	2024
+Hunan Xiangjia Animal Husbandry Co.	Asia	China					Chicken	
+HyFresh	Asia	Malaysia					Chicken	
+Ianovo Granjas Avícolas	South America	Uruguay			0.30		Table Eggs	2024
+IKO	Europe	Poland					Chicken	
+Impulsora Agropecuaria Santa Rosa	North America	Mexico			3.00		Table Eggs	2024
+Inacruz	South America	Bolivia			1.17		Table Eggs	2024
+Inavih	Central America	Honduras			1.10		Table Eggs	2024
+Indavisa	South America	Argentina					Chicken	
+Indian Broiler Group	Asia	India			1.50		Chicken, Table Eggs	2024
+Industria Avikiri	Central America	Costa Rica					Chicken	
+Industrias Bachoco	North America	Mexico			12.50		Chicken, Egg Products, Table Eggs, Turkey	2024
+Industrias Pollos Premium 5.8	South America	Venezuela					Chicken	
+Inghams Enterprises Pty. Ltd.	Oceania	Australia					Chicken, Turkey	
+Inner Mongolia Runhaiyuan Industrial Co.,	Asia	China					Chicken	
+Interovo Ibérica SL	Europe	Spain			1.50		Table Eggs	2024
+Interpec San Marcos	North America	Mexico					Chicken, Table Eggs	
+Inveravica	South America	Venezuela					Chicken	
+Iowa Cage Free	North America	United States			5.50		Egg Products, Table Eggs	2025
+Irvine's Zimbabwe	Africa	Zimbabwe		0.280	1.19		Chicken, Table Eggs	2024
+ISE America	North America	United States			4.70		Egg Products, Table Eggs	2023
+Ismailia-Misr Poultry Co.	Africa	Egypt					Chicken	
+Italcol	South America	Colombia			2.16		Table Eggs, Turkey	2024
+J.S. West Milling	North America	United States			1.30		Table Eggs	2025
+JA Zen-Noh	Asia	Japan					Chicken, Table Eggs	
+Jaguafrangos	South America	Brazil					Chicken	
+Jaindl Turkey Sales Inc.	North America	United States				12.75	Turkey	
+Jamaica Broilers Group Ltd.	Caribbean	Jamaica		1.680	1.24		Chicken, Table Eggs	2024
+Japfa Ltd.	Asia	Singapore					Chicken	
+JBS S.A.	South America	Brazil					Chicken, Turkey	
+JBS S.A. (Latin America)	South America	Brazil					Chicken, Turkey	
+Jennie-O Turkey Store	North America	United States				930.00	Turkey	
+Jiangsu Ecolovo Food Co. Ltd. (Yike Group)	Asia	China					Chicken, Ducks	
+Jiangsu Lihua Animal Husbandry	Asia	China					Chicken, Ducks, Geese, Table Eggs	
+Jiangsu Tiancheng Egg Industry Co.	Asia	China			5.00		Table Eggs	2024
+Jining Hongrun Food Co,	Asia	China					Chicken, Ducks	
+Jordan Poultry Processing and Marketing Co.	Middle East	Jordan			0.51		Chicken	2024
+Kasemchai Farm Group	Asia	Thailand			2.00		Chicken, Egg Products, Table Eggs	2024
+Kaxim	Central America	Guatemala			0.80		Table Eggs	2024
+Kazi Farms Group	Asia	Bangladesh			2.30		Chicken, Egg Products, Table Eggs	2024
+Kenchic Limited	Africa	Kenya					Chicken	
+KerOvos Alimentos	South America	Brazil			5.80		Egg Products, Table Eggs	2024
+Keskinoğlu	Middle East	Türkiye			4.90		Chicken, Egg Products, Table Eggs	2024
+KG Group	Europe	Lithuania					Chicken	
+Koch Foods Inc.	North America	United States		13.400			Chicken	
+Koch’s Turkey Farm	North America	United States				45.00	Turkey	
+Koka	Europe	Croatia					Chicken, Turkey	
+Kraft Heinz Company	North America	United States					Turkey	
+Krasnodonskoe	Europe	Russia					Chicken	
+Kreher's Farm Fresh Eggs LLC	North America	United States			2.43		Table Eggs	2025
+Kreider Farms	North America	United States			9.20		Table Eggs	2025
+Kruczyn Mariusz Pachura	Europe	Poland			2.63		Table Eggs	2024
+Kula Yağ ve Emek Yem Sanayi Tic.	Middle East	Türkiye			0.30		Table Eggs	2024
+L'Œuf de Nos Villages	Europe	France			4.50		Table Eggs	2024
+La Naturaleza	South America	Uruguay			0.40		Table Eggs	2024
+La Ponderosa	South America	Venezuela					Chicken	
+La Unión Tepatitlán (Huevo Alteño)	North America	Mexico			4.00		Table Eggs	2024
+La Virtud	Central America	Honduras			0.45		Table Eggs	2024
+La Yema Dorada (Monserrat)	Central America	Costa Rica			0.60		Table Eggs	2024
+Laemthong Corp. Group	Asia	Thailand			0.83		Chicken, Table Eggs	2024
+Lar Cooperativa Agroindustrial	South America	Brazil			1.20		Chicken	2023
+Las Camelias	South America	Argentina					Chicken	
+Las Delicias	Central America	Honduras			1.00		Table Eggs	2024
+Las Tacuaras (Nutrihuevos)	South America	Paraguay			1.30		Egg Products, Table Eggs	2024
+Lathem Farms	North America	United States			1.55		Table Eggs	2025
+Lauro Morishita	South America	Brazil			2.50		Table Eggs	2024
+Lay Hong Bhd	Asia	Malaysia			4.20		Chicken, Egg Products, Table Eggs	2024
+LDC	Europe	France		0.900	2.70		Chicken, Ducks, Geese, Table Eggs, Turkey	2021
+Le Gouessant	Europe	France			3.52		Chicken, Table Eggs, Turkey	2024
+Leong Hup International Bhd	Asia	Malaysia			7.23		Chicken, Ducks, Egg Products, Table Eggs, Turkey	2024
+Liaoning Haoming Food Group Co. Ltd.	Asia	China					Chicken	
+Liaoning Yingde Food Group Co.	Asia	China					Chicken	
+Lincoln Premium Poultry	North America	United States		2.000			Chicken	
+Longhai Co. Ltd.	Asia	China					Chicken	
+LTKM Bhd.	Asia	Malaysia			2.00		Table Eggs	2024
+Lusiaves Grupo	Europe	Portugal					Chicken, Turkey	
+Malayan Flour Mills	Asia	Malaysia					Chicken	
+Malindo Feedmill	Asia	Indonesia					Chicken, Ducks, Table Eggs	
+Mansoura Poultry	Africa	Egypt					Chicken	
+Mantiqueira Brasil	South America	Brazil			14.81		Table Eggs	2024
+Mantiqueira USA	North America	United States			0.90		Egg Products, Table Eggs	2025
+Maple Lodge Farms Ltd.	North America	Canada					Chicken, Turkey	
+Mar-Jac Poultry	North America	United States		4.500			Chicken	
+Mar-Jac Poultry Inc.	North America	United States		2.100			Chicken	
+Mar-Jac Poultry LLC	North America	United States		2.400			Chicken	
+Marcopolo Comercio SL	Europe	Spain			2.20		Egg Products, Table Eggs	2024
+Marubeni Nisshin Feed Co.	Asia	Japan			5.00		Egg Products, Table Eggs	2024
+Matli	Middle East	Türkiye			2.15		Table Eggs	2024
+Mauricea Alimentos	South America	Brazil					Chicken, Table Eggs	
+Mercer Landmark	North America	United States			2.61		Table Eggs	2025
+MHP	Europe	Ukraine					Chicken	
+Michael Foods	North America	United States			10.72		Egg Products, Table Eggs	2025
+Michigan Turkey Producers	North America	United States				178.95	Turkey	
+Mid-States Specialty Eggs	North America	United States			20.25		Table Eggs	2025
+Miller Poultry	North America	United States		1.450			Chicken	
+Milouof Agricultural Cooperative, Ltd.	Middle East	Israel		0.540			Chicken, Turkey	
+Minnich Eggs	North America	United States			2.73		Table Eggs	2025
+Miralejos	South America	Argentina					Chicken, Ducks, Turkey	
+Miratorg	Europe	Russia			0.55		Chicken	2024
+Mizgier Poultry Farms	Europe	Poland			1.67		Table Eggs	2024
+Modern Poultry Farms	Middle East	Oman			0.64		Table Eggs	2024
+Molino La Perla	South America	Peru					Chicken	
+Molino San Juan SRL (Pollo Don Juan)	South America	Paraguay					Chicken	
+Molinos de Nicaragua (Monisa)	Central America	Nicaragua					Chicken	
+Morning Fresh Farms	North America	United States			1.35		Table Eggs	2025
+Mountaire Farms Inc.	North America	United States		8.130			Chicken	
+Moy Park Ltd.	Europe	United Kingdom					Chicken	
+MPS Egg Farms	North America	United States			13.60		Table Eggs	2025
+Murray's Chicken	North America	United States		0.275			Chicken	
+N & N Agriculture Ltd.	Asia	Singapore			0.50		Egg Products, Table Eggs	2024
+Namib Poultry Industries	Africa	Namibia					Chicken	
+Nanda Group	Asia	India					Chicken	
+Nanyang Food Co. Ltd.	Asia	China					Chicken	
+Naturovos	South America	Brazil			2.80		Egg Products, Table Eggs	2024
+Nesma Ommat	Africa	Egypt					Chicken, Table Eggs	
+New Hope Group	Asia	China					Chicken, Ducks	
+New Hope Liuhe	Asia	China					Chicken, Ducks, Table Eggs	
+Noble Foods	Europe	United Kingdom			7.00		Chicken, Egg Products, Table Eggs	2024
+Noelma	South America	Argentina					Chicken	
+Norbest LLC	North America	United States					Turkey	
+Northern Pride Inc.	North America	United States				50.00	Turkey	
+Nuestra Huella SA	South America	Argentina			0.76		Table Eggs	2024
+Nutréa Nutrition Animale (NNA)	Europe	France			3.50		Chicken, Ducks, Table Eggs, Turkey	2024
+Nutriavícola SA	South America	Colombia			3.50		Table Eggs	2024
+Nutriproductos Santa Ana	South America	Peru					Chicken	
+Oakdell Egg Farms	North America	United States			3.50		Table Eggs	2025
+Obasanjo Farms Nigeria Ltd.	Africa	Nigeria			0.60		Chicken, Table Eggs	2024
+Of Tov Group	Middle East	Israel		0.600	0.20		Chicken, Turkey	2025
+Ojai Alimentos	North America	Mexico			2.20		Table Eggs	2024
+OK Foods Inc.	North America	United States		2.700			Chicken	
+Olam Agri Nigeria	Africa	Nigeria					Chicken	
+Opal Foods	North America	United States			12.36		Table Eggs	2025
+Operadora Avicola Opav (Grupo Bios)	South America	Colombia					Chicken	
+OSI Group	North America	United States			1.81		Chicken	2024
+Otto & Sons Weihai	Asia	China					Chicken	
+Ovobrand SA	South America	Argentina			1.63		Egg Products, Table Eggs	2024
+Ovostar Union	Europe	Ukraine			6.12		Egg Products, Table Eggs	2024
+P H Van Den Brink	Oceania	New Zealand					Chicken	
+Pace Farm	Oceania	Australia			3.07		Egg Products, Table Eggs	2024
+Padesa	Europe	Spain					Chicken, Turkey	
+Pampr’œuf	Europe	France			2.10		Table Eggs	2024
+Paragon Group	Asia	Bangladesh			1.50		Chicken, Table Eggs	2024
+PATSA	North America	Mexico					Chicken	
+Pearl Valley Eggs	North America	United States			1.92		Egg Products, Table Eggs	2025
+Peco Foods	North America	United States		5.160			Chicken	
+PEP	Europe	France			7.40		Egg Products, Table Eggs	2024
+Perdue Farms	North America	United States					Chicken, Table Eggs, Turkey	
+Perdue Foods (broiler)	North America	United States		12.080			Chicken	
+Perdue Foods (turkey)	North America	United States				249.00	Turkey	
+PHW Group	Europe	Germany					Chicken, Ducks, Turkey	
+Pif Paf Alimentos	South America	Brazil					Chicken	
+Pilgrim's de México	North America	Mexico					Chicken	
+Pilgrim's Pride Corp.	North America	United States		30.580			Chicken	
+PIPASA (Nicaragua)	Central America	Nicaragua					Chicken, Turkey	
+Pitman Family Farms	North America	United States				118.00	Ducks, Turkey	
+Pixal S.A.	South America	Uruguay					Chicken	
+Plainville Farms	North America	United States				240.00	Turkey	
+Plukon Food Group	Europe	Netherlands		9.750			Chicken, Turkey	
+Pollo Andino SA	South America	Colombia					Chicken	
+Pollo Cibao	Caribbean	Dominican Republic					Chicken	
+Pollo Favorito SA (Pofasa)	South America	Ecuador					Chicken, Turkey	
+Pollo Industrializado de México	North America	Mexico					Chicken	
+Pollolín	South America	Argentina					Chicken	
+Pollos Eccus	Caribbean	Dominican Republic					Chicken, Table Eggs	
+Pollos El Bucanero	South America	Colombia					Chicken	
+Pollos Savicol	South America	Colombia					Chicken	
+Pollpar	South America	Paraguay					Chicken	
+Prairie Star Farms	North America	United States			12.20		Egg Products, Table Eggs	2025
+Prestage Farms	North America	United States				420.00	Table Eggs, Turkey	
+Prioskolie	Europe	Russia			4.00		Chicken, Egg Products, Table Eggs, Turkey	2024
+Prodhin	South America	Uruguay			0.60		Egg Products, Table Eggs	2024
+Prodo Group	Europe	Russia			0.90		Chicken, Table Eggs	2024
+Producciones Avícolas El Granjero S.L.	Europe	Spain			0.90		Table Eggs	2024
+Productora de Huevo Gigantes	North America	Mexico					Table Eggs	
+Pronaca	South America	Ecuador			0.45		Chicken, Table Eggs, Turkey	2024
+Proteína Animal (PROAN)	North America	Mexico			41.00		Egg Products, Table Eggs	2024
+Proteinsa	South America	Argentina					Chicken	
+Protinal-Proagro CA	South America	Venezuela					Chicken	
+Puro Pollo	South America	Colombia					Chicken	
+Purolomo - Alibal	South America	Venezuela			1.85		Chicken, Table Eggs	2024
+Pyramid Poultry Co.	Africa	Egypt					Chicken, Ducks, Turkey	
+Qingdao Nine-Alliance Group	Asia	China					Chicken	
+QL Resources Berhad	Asia	Malaysia			11.35		Chicken, Table Eggs	2024
+QSR Brands (M) Holdings Sdn Bhd	Asia	Malaysia					Chicken	
+Quantum Foods	Africa	South Africa			1.86		Chicken, Egg Products, Table Eggs	2024
+Qué Rico	South America	Argentina					Chicken	
+Radwah Chicken Poultry & Fine Food	Middle East	Saudi Arabia			0.32		Chicken, Table Eggs	2024
+Ravis	Europe	Russia					Chicken	
+RCL Foods Ltd.	Africa	South Africa					Chicken	
+Redondos SA	South America	Peru					Chicken, Turkey	
+Reftinskaya Poultry Farm	Europe	Russia					Chicken	
+Rembrandt Enterprises	North America	United States			2.00		Egg Products, Table Eggs	2025
+Resource Agribusiness Group	Europe	Russia					Chicken, Egg Products, Table Eggs	
+Rico Pollo	South America	Peru					Chicken, Table Eggs	
+Rongrat	South America	Venezuela			0.40		Table Eggs	2024
+Rose Acre Farms	North America	United States			25.97		Egg Products, Table Eggs	2025
+Roskar	Europe	Russia			4.90		Chicken, Egg Products, Table Eggs	2024
+Roth SRL	South America	Argentina			1.10		Table Eggs	2024
+Rothex SA	South America	Argentina			0.87		Table Eggs	2024
+Rothkötter-Unternehmensgruppe	Europe	Germany					Chicken	
+Rusgrain Holding	Europe	Russia			2.74		Chicken, Table Eggs	2024
+S&R Egg Farm	North America	United States			4.85		Table Eggs	2024
+Sadiq Brothers	Asia	Pakistan			2.10		Chicken, Table Eggs	2024
+Saha Farms	Asia	Thailand					Chicken	
+Sakku Group	Asia	India			8.00		Chicken, Egg Products, Table Eggs	2024
+San Fernando	South America	Peru			0.50		Chicken, Ducks, Table Eggs, Turkey	2024
+San Miguel Foods	Asia	Philippines					Chicken, Table Eggs	
+Sanderson Farms Inc.	North America	United States		12.700			Chicken	
+Santa Anita Nápoles	South America	Colombia			4.00		Table Eggs	2024
+Santa Maria, C.A.	South America	Venezuela			0.40			2024
+Santiago Eichhorn e Hijos SRL	South America	Argentina					Chicken	
+São Salvador Alimentos	South America	Brazil					Chicken	
+Sasti Kumar Poultry Farm	Asia	India			0.75		Table Eggs	2024
+Sauder’s Eggs	North America	United States			6.16		Egg Products, Table Eggs	2025
+Savel	Europe	France					Chicken	
+Scandi Standard	Europe	Sweden			0.60		Chicken, Table Eggs	2024
+Schipper Eggs LLC	North America	United States			1.82		Table Eggs	2022
+Seara	South America	Brazil					Chicken, Turkey	
+Sede América (FABA)	South America	Argentina					Chicken	
+Sedima	Africa	Senegal			1.00		Chicken, Table Eggs	2024
+Segrasa	Central America	Guatemala			0.70		Table Eggs	2024
+Sello de Oro	Central America	El Salvador					Chicken	
+Seng Choon Farm	Asia	Singapore			0.80		Egg Products, Table Eggs	2024
+Şenpiliç Gıda Sanayi	Middle East	Türkiye					Chicken	
+Sensheng Food Co. Ltd.	Asia	China					Chicken	
+Sepidmakian	Middle East	Iran					Chicken	
+Servolux	Europe	Belarus					Chicken, Table Eggs	
+Severnaya	Europe	Russia					Chicken	
+Shalimar Group	Asia	India			5.00		Chicken, Table Eggs	2024
+Shandong Asia Pacific Zhonghui Group	Asia	China					Chicken	
+Shandong Backbone Group	Asia	China						
+Shandong Chohe Group	Asia	China					Chicken	
+Shandong Fengxiang Group	Asia	China					Chicken	
+Shandong Hemei Group	Asia	China					Chicken	
+Shandong Minhe Animal Husbandry Co.	Asia	China					Chicken	
+Shandong Qianhu Tianyikong Food Co. Ltd.	Asia	China					Chicken	
+Shandong Ronghua Food Co. Ltd.	Asia	China					Chicken	
+Shandong Springsnow Food Co. Ltd.	Asia	China					Chicken	
+Shandong Taihe Group	Asia	China					Chicken, Ducks	
+Shandong Xiantan Co. Ltd.	Asia	China					Chicken	
+Shandong Xinhe Shengxiang Food Group Co.	Asia	China					Chicken	
+Shandong Xinsheng Food Co., Ltd.	Asia	China					Chicken	
+Shandong Zhongxin Food Group	Asia	China					Chicken, Ducks	
+Shanthi Feeds Pvt Ltd	Asia	India					Chicken	
+Shanxi Daxiang Group Co. Ltd.	Asia	China					Chicken	
+Shanxi Jinlong Breeding Co.	Asia	China			20.80		Table Eggs	2024
+Shenandoah Valley Organic LLC	North America	United States		0.650			Chicken	
+Shendan Healthy Food	Asia	China			5.00		Egg Products, Table Eggs	2024
+Shendi Agricultural Branch Trade Co	Asia	China			5.00		Egg Products, Table Eggs	2024
+ShenHuang Group	Asia	China					Chicken	
+Shigueno	South America	Brazil			2.00		Table Eggs	2024
+Sichuan Houquan Ecological Food Co.	Asia	China			7.00		Egg Products, Table Eggs	2024
+Sichuan Sundaily Farm Ecological Food Co.	Asia	China			15.00		Chicken, Table Eggs	2024
+Sigma Supplies (Isinya Feeds Limited)	Africa	Kenya			1.00		Chicken, Table Eggs	2024
+Simmons Foods Inc.	North America	United States		4.000			Chicken	
+Simpson's Eggs	North America	United States			1.63		Table Eggs	2025
+Sinyavskaya Poultry Farm	Europe	Russia			5.80		Chicken, Egg Products, Table Eggs	2024
+Sitno	Europe	Russia					Chicken, Egg Products, Table Eggs	
+SKM Egg Products	Asia	India			0.60		Egg Products, Table Eggs	2024
+Skylark Group	Asia	India					Chicken	
+Sollio Cooperative Group	North America	Canada			1.00		Chicken, Turkey	2025
+Somai Nordeste	South America	Brazil			3.20		Egg Products, Table Eggs	2024
+Sopraval	South America	Chile					Turkey	
+Sovereign Food Investments	Africa	South Africa					Chicken	
+Sparboe Farms	North America	United States			3.24		Table Eggs	2023
+Sprehe Gruppe	Europe	Germany					Chicken, Turkey	
+Suguna Foods	Asia	India					Chicken, Table Eggs	
+Sunrise Acres Inc.	North America	United States			2.37		Table Eggs	2025
+Sunrise Farms Inc.	North America	United States			5.00		Egg Products, Table Eggs	2025
+Sunrise Farms LLC	North America	United States			0.24		Table Eggs	2023
+Supreme Poultry (South Africa)	Africa	South Africa					Chicken	
+Sverdlovsk	Europe	Russia			2.92		Chicken, Egg Products, Table Eggs	2024
+Talentis Agro Zrt	Europe	Hungary			0.30		Table Eggs, Turkey	2024
+Tamago & Co. Inc. (Ise Inc.)	Asia	Japan			14.00		Chicken, Egg Products, Table Eggs	2024
+Tanmiah Food Group	Middle East	Saudi Arabia					Chicken	
+Técnica Avícola	South America	Peru					Chicken	
+Tegel Foods	Oceania	New Zealand					Chicken, Turkey	
+Telos SA	South America	Argentina			0.87		Table Eggs	2024
+Teo Seng Capital Bhd.	Asia	Malaysia			6.40		Table Eggs	2024
+Terrena	Europe	France			5.26		Chicken, Ducks, Table Eggs, Turkey	2024
+Thai Foods Group	Asia	Thailand		2.750			Chicken	
+The Arab Qatari Co. for Poultry Production	Middle East	Qatar			0.21		Chicken, Table Eggs	2024
+The Best Dressed Chicken	North America	United States		0.640			Chicken	
+The Golden Cockerel Group	Oceania	Australia					Chicken	
+The Happy Egg Co.	North America	United States			1.07		Table Eggs	2025
+The Union for Agricultural Development and Slaughtering	Middle East	Jordan		0.660			Chicken	
+Tileo S.A. (Avícola El Poyote)	South America	Uruguay					Chicken	
+Tip-Top Industrial	Central America	Nicaragua					Chicken	
+Trillium Farm Holdings	North America	United States			11.50		Egg Products, Table Eggs	2025
+TRUST Ptitsevodcheskiy Aktivi	Europe	Russia					Chicken	
+Turkey Valley Farms	North America	United States				154.00	Turkey	
+Turosi	Oceania	Australia			0.48		Chicken	2024
+Tyson China	Asia	China					Chicken	
+Tyson Foods (broiler)	North America	United States		36.700			Chicken	
+Tyson Foods (turkey)	North America	United States				382.69	Turkey	
+Tyson Foods Inc.	North America	United States		37.653			Chicken, Turkey	
+Udmurt Poultry Factory	Europe	Russia					Chicken	
+UK Russian Field	Europe	Russia			1.28		Chicken, Ducks, Table Eggs	2024
+Uvesa	Europe	Spain		1.730			Chicken	
+Venky's India Ltd.	Asia	India					Chicken, Table Eggs	
+Versova Holdings LLP	North America	United States			18.45		Egg Products, Table Eggs	2023
+Villa Rose Egg Farm	North America	United States			0.20		Table Eggs	2023
+Virginia Poultry Growers Cooperative Inc.	North America	United States				281.23	Turkey	
+Vital Farms	North America	United States			9.00		Egg Products, Table Eggs	2025
+Vodňanská Drůbež	Europe	Czech Republic		1.154			Chicken, Ducks	
+Volovsky Broiler	Europe	Russia					Chicken	
+Wabash Valley Produce	North America	United States			4.97		Egg Products, Table Eggs	2025
+Wadi Group	Africa	Egypt			10.00		Chicken, Table Eggs	2024
+Wagner Shinoda	South America	Brazil			2.20		Egg Products, Table Eggs	2024
+Waldemiro Berger	South America	Brazil			2.30		Table Eggs	2024
+Wayne-Sanderson Farms	North America	United States		21.100			Chicken	
+Weaver Brothers	North America	United States			5.22		Egg Products, Table Eggs	2025
+Weber Family Farms	North America	United States			0.91		Table Eggs	2025
+Wellhope Agri-Tech	Asia	China					Chicken	
+Wens Food Group	Asia	China			4.00		Chicken, Ducks, Geese, Table Eggs	2024
+West Liberty Foods LLC	North America	United States				200.09	Turkey	
+White Water Processing Co.	North America	United States				30.00	Turkey	
+Wilco	Middle East	Lebanon					Chicken	
+Wilcox Farms	North America	United States			0.83		Egg Products, Table Eggs	2025
+Willamette Egg Farm	North America	United States			1.85		Table Eggs	2025
+Wipasz	Europe	Poland					Chicken	
+Wozniak Poultry Farms	Europe	Poland			11.50		Table Eggs	2024
+Yaroslavl Broiler	Europe	Russia					Chicken	
+Yo Kuku	Africa	Uganda		0.150			Chicken	
+Yonekyu Corp. Inc.	Asia	Japan					Chicken	
+Yongda Food Industry	Asia	China					Chicken	
+Yu Jiang Nan Agriculture Group Co.	Asia	China			7.00			2024
+Yunken Group Co. Ltd.	Asia	China					Chicken	
+Zambeef Products PLC	Africa	Zambia			0.28		Chicken, Table Eggs	2024
+Zêzerovo	Europe	Portugal			2.00		Egg Products, Table Eggs	2024
+Zhonghong Sanrong Group Co., Ltd.	Asia	China					Chicken	
+Zhucheng Waimao Co. Ltd	Asia	China					Chicken, Ducks	
