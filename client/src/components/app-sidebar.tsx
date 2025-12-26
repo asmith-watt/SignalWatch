@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useMutation } from "@tanstack/react-query";
 import {
   Building2,
   Radio,
@@ -12,7 +13,10 @@ import {
   Globe,
   Briefcase,
   TrendingUp,
+  RefreshCw,
 } from "lucide-react";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import {
   Sidebar,
   SidebarContent,
@@ -88,6 +92,65 @@ export function AppSidebar({
     Technology: true,
     Finance: true,
     Healthcare: true,
+  });
+  const [updatingGroup, setUpdatingGroup] = useState<string | null>(null);
+  const [updatingCompany, setUpdatingCompany] = useState<number | null>(null);
+  const { toast } = useToast();
+
+  const updateGroupMutation = useMutation({
+    mutationFn: async (industry: string) => {
+      setUpdatingGroup(industry);
+      return apiRequest("POST", `/api/monitor/industry/${encodeURIComponent(industry)}`);
+    },
+    onSuccess: (data: any, industry: string) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
+      const companiesChecked = data.companiesMonitored || 0;
+      const totalSignals = data.results?.reduce((sum: number, r: any) => sum + r.signalsCreated, 0) || 0;
+      if (companiesChecked === 0) {
+        toast({
+          title: `No ${industry} companies`,
+          description: "No companies found to monitor in this group",
+        });
+      } else {
+        toast({
+          title: `${industry} update complete`,
+          description: `Checked ${companiesChecked} companies, found ${totalSignals} new signals`,
+        });
+      }
+      setUpdatingGroup(null);
+    },
+    onError: () => {
+      toast({
+        title: "Update failed",
+        description: "Could not update signals. Please try again.",
+        variant: "destructive",
+      });
+      setUpdatingGroup(null);
+    },
+  });
+
+  const updateCompanyMutation = useMutation({
+    mutationFn: async (companyId: number) => {
+      setUpdatingCompany(companyId);
+      return apiRequest("POST", `/api/monitor/company/${companyId}`);
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      toast({
+        title: "Company updated",
+        description: `Found ${data.signalsCreated || 0} new signals for ${data.company}`,
+      });
+      setUpdatingCompany(null);
+    },
+    onError: () => {
+      toast({
+        title: "Update failed",
+        description: "Could not update company signals.",
+        variant: "destructive",
+      });
+      setUpdatingCompany(null);
+    },
   });
 
   const filteredCompanies = companies.filter((company) =>
@@ -181,15 +244,15 @@ export function AppSidebar({
                   open={expandedGroups[group]}
                   onOpenChange={() => toggleGroup(group)}
                 >
-                  <CollapsibleTrigger className="flex items-center justify-between w-full px-2 py-1.5 text-xs font-medium text-muted-foreground hover-elevate rounded-md">
-                    <span className="flex items-center gap-2">
-                      {group === "Technology" && <Globe className="w-3 h-3" />}
-                      {group === "Finance" && <Briefcase className="w-3 h-3" />}
-                      {group === "Healthcare" && <TrendingUp className="w-3 h-3" />}
-                      {group === "Poultry" && <Building2 className="w-3 h-3" />}
-                      {group}
-                    </span>
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between w-full px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                    <CollapsibleTrigger className="flex items-center gap-2 flex-1 hover-elevate rounded-md py-1 -my-1 px-1 -mx-1">
+                      <span className="flex items-center gap-2">
+                        {group === "Technology" && <Globe className="w-3 h-3" />}
+                        {group === "Finance" && <Briefcase className="w-3 h-3" />}
+                        {group === "Healthcare" && <TrendingUp className="w-3 h-3" />}
+                        {group === "Poultry" && <Building2 className="w-3 h-3" />}
+                        {group}
+                      </span>
                       <Badge variant="secondary" className="h-5 px-1.5 text-xs">
                         {groupCompanies.length}
                       </Badge>
@@ -198,12 +261,25 @@ export function AppSidebar({
                           expandedGroups[group] ? "rotate-180" : ""
                         }`}
                       />
-                    </div>
-                  </CollapsibleTrigger>
+                    </CollapsibleTrigger>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 ml-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateGroupMutation.mutate(group);
+                      }}
+                      disabled={updatingGroup === group}
+                      data-testid={`button-update-${group.toLowerCase()}`}
+                    >
+                      <RefreshCw className={`w-3 h-3 ${updatingGroup === group ? "animate-spin" : ""}`} />
+                    </Button>
+                  </div>
                   <CollapsibleContent>
                     <SidebarMenu className="mt-1">
                       {groupCompanies.map((company) => (
-                        <SidebarMenuItem key={company.id}>
+                        <SidebarMenuItem key={company.id} className="group/company relative">
                           <SidebarMenuButton
                             isActive={selectedCompanyId === company.id}
                             onClick={() => onSelectCompany(company.id)}
@@ -231,6 +307,19 @@ export function AppSidebar({
                               </Badge>
                             )}
                           </SidebarMenuButton>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/company:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateCompanyMutation.mutate(company.id);
+                            }}
+                            disabled={updatingCompany === company.id}
+                            data-testid={`button-update-company-${company.id}`}
+                          >
+                            <RefreshCw className={`w-3 h-3 ${updatingCompany === company.id ? "animate-spin" : ""}`} />
+                          </Button>
                         </SidebarMenuItem>
                       ))}
                     </SidebarMenu>

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import {
   Building2,
   Radio,
@@ -6,9 +8,12 @@ import {
   Bell,
   Bookmark,
   FileEdit,
-  Users,
+  RefreshCw,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface DashboardStatsProps {
   companyCount: number;
@@ -79,45 +84,84 @@ export function DashboardStats({
   inProgressCount,
   signalTrend,
 }: DashboardStatsProps) {
+  const { toast } = useToast();
+
+  const updateAllMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/monitor/all");
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
+      const totalSignals = data.results?.reduce((sum: number, r: any) => sum + r.signalsCreated, 0) || 0;
+      toast({
+        title: "Monitoring complete",
+        description: `Checked ${data.companiesMonitored || 0} companies, found ${totalSignals} new signals`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Monitoring failed",
+        description: "Could not update signals. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-      <StatCard
-        title="Companies"
-        value={companyCount}
-        icon={Building2}
-        description="Monitored"
-      />
-      <StatCard
-        title="Signals"
-        value={signalCount}
-        icon={Radio}
-        trend={signalTrend}
-        description="Total collected"
-      />
-      <StatCard
-        title="Unread"
-        value={unreadSignalCount}
-        icon={Bell}
-        description="Need review"
-      />
-      <StatCard
-        title="Bookmarked"
-        value={bookmarkedCount}
-        icon={Bookmark}
-        description="Saved for later"
-      />
-      <StatCard
-        title="In Progress"
-        value={inProgressCount}
-        icon={FileEdit}
-        description="Content work"
-      />
-      <StatCard
-        title="Alerts"
-        value={alertCount}
-        icon={Bell}
-        description="Active rules"
-      />
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="text-lg font-semibold">Overview</h2>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => updateAllMutation.mutate()}
+          disabled={updateAllMutation.isPending}
+          data-testid="button-update-all-signals"
+        >
+          <RefreshCw className={`w-4 h-4 mr-2 ${updateAllMutation.isPending ? "animate-spin" : ""}`} />
+          {updateAllMutation.isPending ? "Updating..." : "Update All Signals"}
+        </Button>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <StatCard
+          title="Companies"
+          value={companyCount}
+          icon={Building2}
+          description="Monitored"
+        />
+        <StatCard
+          title="Signals"
+          value={signalCount}
+          icon={Radio}
+          trend={signalTrend}
+          description="Total collected"
+        />
+        <StatCard
+          title="Unread"
+          value={unreadSignalCount}
+          icon={Bell}
+          description="Need review"
+        />
+        <StatCard
+          title="Bookmarked"
+          value={bookmarkedCount}
+          icon={Bookmark}
+          description="Saved for later"
+        />
+        <StatCard
+          title="In Progress"
+          value={inProgressCount}
+          icon={FileEdit}
+          description="Content work"
+        />
+        <StatCard
+          title="Alerts"
+          value={alertCount}
+          icon={Bell}
+          description="Active rules"
+        />
+      </div>
     </div>
   );
 }

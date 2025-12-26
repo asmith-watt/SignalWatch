@@ -9,7 +9,7 @@ import {
 import { z } from "zod";
 import { analyzeSignal } from "./ai-analysis";
 import { generateArticleFromSignal, exportArticleForCMS } from "./article-generator";
-import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany, monitorUSPoultryCompanies, monitorCompaniesByCountry } from "./perplexity-monitor";
+import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany, monitorUSPoultryCompanies, monitorCompaniesByCountry, monitorCompaniesByIndustry } from "./perplexity-monitor";
 import { importCompanies, getUSPoultryCompanies } from "./import-companies";
 
 export async function registerRoutes(
@@ -474,6 +474,7 @@ export async function registerRoutes(
       const totalSignals = results.reduce((sum, r) => sum + r.signalsCreated, 0);
       res.json({ 
         success: true, 
+        companiesMonitored: results.length,
         message: `Monitoring complete. Created ${totalSignals} new signals.`,
         results 
       });
@@ -533,6 +534,24 @@ export async function registerRoutes(
       });
     } catch (error) {
       console.error("Error monitoring companies by country:", error);
+      res.status(500).json({ error: "Failed to monitor companies" });
+    }
+  });
+
+  app.post("/api/monitor/industry/:industry", async (req: Request, res: Response) => {
+    try {
+      const industry = decodeURIComponent(req.params.industry);
+      console.log(`Starting ${industry} industry monitoring...`);
+      const results = await monitorCompaniesByIndustry(industry);
+      const totalSignals = results.reduce((sum, r) => sum + r.signalsCreated, 0);
+      res.json({ 
+        success: true, 
+        companiesMonitored: results.length,
+        message: `Monitoring complete. Created ${totalSignals} new signals from ${results.length} ${industry} companies.`,
+        results 
+      });
+    } catch (error) {
+      console.error("Error monitoring companies by industry:", error);
       res.status(500).json({ error: "Failed to monitor companies" });
     }
   });

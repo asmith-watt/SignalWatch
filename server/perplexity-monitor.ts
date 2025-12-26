@@ -238,3 +238,42 @@ export async function monitorAllCompanies(): Promise<{ company: string; signalsC
   console.log(`Monitoring complete! Processed ${results.length} companies.`);
   return results;
 }
+
+const industryGroups: Record<string, string[]> = {
+  Poultry: ["Poultry", "Chicken", "Turkey", "Egg", "Duck", "Broiler", "Layer", "Hatchery"],
+  Technology: ["SaaS", "AI/ML", "Cybersecurity", "Cloud", "Software", "Technology"],
+  Finance: ["Fintech", "Banking", "Insurance", "Payments", "Finance"],
+  Healthcare: ["Biotech", "Medtech", "Pharma", "Digital Health", "Healthcare"],
+};
+
+function matchesIndustryGroup(companyIndustry: string | null, groupName: string): boolean {
+  if (!companyIndustry) return false;
+  const groupKeywords = industryGroups[groupName] || [groupName];
+  return groupKeywords.some(keyword => 
+    companyIndustry.toLowerCase().includes(keyword.toLowerCase())
+  );
+}
+
+export async function monitorCompaniesByIndustry(industry: string): Promise<{ company: string; signalsCreated: number }[]> {
+  const companies = await storage.getAllCompanies();
+  const industryCompanies = companies.filter(c => matchesIndustryGroup(c.industry, industry));
+
+  console.log(`Monitoring ${industryCompanies.length} ${industry} companies...`);
+  
+  if (industryCompanies.length === 0) {
+    console.log(`No companies found for industry group: ${industry}`);
+    return [];
+  }
+  
+  const results: { company: string; signalsCreated: number }[] = [];
+  
+  for (const company of industryCompanies) {
+    console.log(`[${results.length + 1}/${industryCompanies.length}] Monitoring ${company.name}...`);
+    const count = await monitorCompany(company);
+    results.push({ company: company.name, signalsCreated: count });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  console.log(`${industry} monitoring complete! Processed ${results.length} companies.`);
+  return results;
+}
