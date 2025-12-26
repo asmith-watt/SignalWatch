@@ -9,7 +9,8 @@ import {
 import { z } from "zod";
 import { analyzeSignal } from "./ai-analysis";
 import { generateArticleFromSignal, exportArticleForCMS } from "./article-generator";
-import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany } from "./perplexity-monitor";
+import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany, monitorUSPoultryCompanies, monitorCompaniesByCountry } from "./perplexity-monitor";
+import { importCompanies, getUSPoultryCompanies } from "./import-companies";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -490,6 +491,66 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error monitoring company:", error);
       res.status(500).json({ error: "Failed to monitor company" });
+    }
+  });
+
+  app.post("/api/monitor/us", async (req: Request, res: Response) => {
+    try {
+      console.log("Starting US poultry company monitoring...");
+      const results = await monitorUSPoultryCompanies();
+      const totalSignals = results.reduce((sum, r) => sum + r.signalsCreated, 0);
+      res.json({ 
+        success: true, 
+        message: `Monitoring complete. Created ${totalSignals} new signals from ${results.length} US companies.`,
+        results 
+      });
+    } catch (error) {
+      console.error("Error monitoring US companies:", error);
+      res.status(500).json({ error: "Failed to monitor US companies" });
+    }
+  });
+
+  app.post("/api/monitor/country/:country", async (req: Request, res: Response) => {
+    try {
+      const country = req.params.country;
+      console.log(`Starting ${country} company monitoring...`);
+      const results = await monitorCompaniesByCountry(country);
+      const totalSignals = results.reduce((sum, r) => sum + r.signalsCreated, 0);
+      res.json({ 
+        success: true, 
+        message: `Monitoring complete. Created ${totalSignals} new signals from ${results.length} ${country} companies.`,
+        results 
+      });
+    } catch (error) {
+      console.error("Error monitoring companies by country:", error);
+      res.status(500).json({ error: "Failed to monitor companies" });
+    }
+  });
+
+  app.post("/api/companies/import", async (req: Request, res: Response) => {
+    try {
+      console.log("Starting company import from file...");
+      const result = await importCompanies();
+      res.json({ 
+        success: true, 
+        message: `Import complete. Added ${result.imported} new companies, updated ${result.skipped} existing companies.`,
+        imported: result.imported,
+        skipped: result.skipped,
+        usCompanies: result.usCompanies
+      });
+    } catch (error) {
+      console.error("Error importing companies:", error);
+      res.status(500).json({ error: "Failed to import companies" });
+    }
+  });
+
+  app.get("/api/companies/us", async (req: Request, res: Response) => {
+    try {
+      const usCompanies = await getUSPoultryCompanies();
+      res.json(usCompanies);
+    } catch (error) {
+      console.error("Error fetching US companies:", error);
+      res.status(500).json({ error: "Failed to fetch US companies" });
     }
   });
 

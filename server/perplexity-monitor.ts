@@ -183,6 +183,43 @@ export async function monitorPoultryCompanies(): Promise<{ company: string; sign
   return results;
 }
 
+export async function monitorUSPoultryCompanies(): Promise<{ company: string; signalsCreated: number }[]> {
+  const companies = await storage.getAllCompanies();
+  const usPoultryCompanies = companies.filter(c => 
+    (c.country === "United States" || c.location?.includes("United States") || c.location?.match(/,\s*[A-Z]{2}$/)) &&
+    (c.industry === "Poultry" || c.tags?.some(t => t.toLowerCase().includes("poultry") || t.toLowerCase().includes("eggs") || t.toLowerCase().includes("chicken") || t.toLowerCase().includes("turkey")))
+  );
+
+  console.log(`Found ${usPoultryCompanies.length} US poultry companies to monitor`);
+  
+  const results: { company: string; signalsCreated: number }[] = [];
+  
+  for (const company of usPoultryCompanies) {
+    const count = await monitorCompany(company);
+    results.push({ company: company.name, signalsCreated: count });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  return results;
+}
+
+export async function monitorCompaniesByCountry(country: string): Promise<{ company: string; signalsCreated: number }[]> {
+  const companies = await storage.getAllCompanies();
+  const filteredCompanies = companies.filter(c => c.country === country && c.isActive);
+
+  console.log(`Found ${filteredCompanies.length} ${country} companies to monitor`);
+  
+  const results: { company: string; signalsCreated: number }[] = [];
+  
+  for (const company of filteredCompanies) {
+    const count = await monitorCompany(company);
+    results.push({ company: company.name, signalsCreated: count });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  return results;
+}
+
 export async function monitorAllCompanies(): Promise<{ company: string; signalsCreated: number }[]> {
   const companies = await storage.getAllCompanies();
   const activeCompanies = companies.filter(c => c.isActive && c.industry !== "Data Source");
