@@ -12,6 +12,8 @@ import { generateArticleFromSignal, exportArticleForCMS } from "./article-genera
 import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany, monitorUSPoultryCompanies, monitorCompaniesByCountry, monitorCompaniesByIndustry } from "./perplexity-monitor";
 import { importCompanies, getUSPoultryCompanies } from "./import-companies";
 import { importFeedCompanies } from "./import-feed-companies";
+import { importPetfoodCompanies } from "./import-petfood-companies";
+import { generateRssFeed, generateAllSignalsRssFeed, getAvailableFeeds } from "./rss-feeds";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -587,6 +589,53 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error importing feed companies:", error);
       res.status(500).json({ error: "Failed to import feed companies" });
+    }
+  });
+
+  app.post("/api/companies/import-petfood", async (req: Request, res: Response) => {
+    try {
+      console.log("Starting pet food companies import...");
+      const result = await importPetfoodCompanies();
+      res.json({ 
+        success: true, 
+        message: `Import complete. Added ${result.imported} new pet food companies, skipped ${result.skipped} existing.`,
+        imported: result.imported,
+        skipped: result.skipped
+      });
+    } catch (error) {
+      console.error("Error importing pet food companies:", error);
+      res.status(500).json({ error: "Failed to import pet food companies" });
+    }
+  });
+
+  app.get("/api/rss", (req: Request, res: Response) => {
+    const feeds = getAvailableFeeds();
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const feedsWithUrls = feeds.map(f => ({
+      ...f,
+      url: `${baseUrl}/api/rss/${f.slug}`,
+    }));
+    res.json(feedsWithUrls);
+  });
+
+  app.get("/api/rss/:group", async (req: Request, res: Response) => {
+    try {
+      const group = decodeURIComponent(req.params.group);
+      const baseUrl = `${req.protocol}://${req.get("host")}`;
+      
+      let xml: string;
+      if (group === "all") {
+        xml = await generateAllSignalsRssFeed(baseUrl);
+      } else {
+        const groupName = group.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        xml = await generateRssFeed(groupName, baseUrl);
+      }
+      
+      res.set("Content-Type", "application/rss+xml; charset=utf-8");
+      res.send(xml);
+    } catch (error) {
+      console.error("Error generating RSS feed:", error);
+      res.status(500).json({ error: "Failed to generate RSS feed" });
     }
   });
 

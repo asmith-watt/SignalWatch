@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -110,6 +111,23 @@ export function AddCompanyDialog({
       rssFeedUrl: company?.rssFeedUrl || "",
     },
   });
+
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        name: company?.name || "",
+        website: company?.website || "",
+        industry: company?.industry || "",
+        description: company?.description || "",
+        location: company?.location || "",
+        size: company?.size || "",
+        founded: company?.founded || "",
+        linkedinUrl: company?.linkedinUrl || "",
+        twitterHandle: company?.twitterHandle || "",
+        rssFeedUrl: company?.rssFeedUrl || "",
+      });
+    }
+  }, [open, company, form]);
 
   const handleSubmit = (data: FormData) => {
     const cleanData: InsertCompany = {

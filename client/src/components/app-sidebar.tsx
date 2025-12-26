@@ -55,6 +55,7 @@ const navigationItems = [
 const industryGroups: Record<string, string[]> = {
   Poultry: ["Poultry", "Chicken", "Turkey", "Egg", "Duck", "Broiler", "Layer", "Hatchery"],
   Feed: ["Feed", "Nutrition", "Premix", "Compound"],
+  "Pet Food": ["Pet Food", "Pet", "Dog Food", "Cat Food"],
   Technology: ["SaaS", "AI/ML", "Cybersecurity", "Cloud", "Software"],
   Finance: ["Fintech", "Banking", "Insurance", "Payments"],
   Healthcare: ["Biotech", "Medtech", "Pharma", "Digital Health"],
@@ -253,6 +254,7 @@ export function AppSidebar({
                         {group === "Healthcare" && <TrendingUp className="w-3 h-3" />}
                         {group === "Poultry" && <Building2 className="w-3 h-3" />}
                         {group === "Feed" && <Building2 className="w-3 h-3" />}
+                        {group === "Pet Food" && <Building2 className="w-3 h-3" />}
                         {group}
                       </span>
                       <Badge variant="secondary" className="h-5 px-1.5 text-xs">
