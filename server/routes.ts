@@ -7,7 +7,7 @@ import {
   insertAlertSchema,
 } from "@shared/schema";
 import { z } from "zod";
-import { analyzeSignal } from "./ai-analysis";
+import { analyzeSignal, enrichSignal, batchEnrichSignals } from "./ai-analysis";
 import { generateArticleFromSignal, exportArticleForCMS } from "./article-generator";
 import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany, monitorUSPoultryCompanies, monitorCompaniesByCountry, monitorCompaniesByIndustry } from "./perplexity-monitor";
 import { importCompanies, getUSPoultryCompanies } from "./import-companies";
@@ -329,6 +329,101 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error analyzing signal:", error);
       res.status(500).json({ error: "Failed to analyze signal" });
+    }
+  });
+
+  // Deep Signal Enrichment - Extract entities and AI insights
+  app.post("/api/signals/:id/enrich", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const signal = await storage.getSignal(id);
+      if (!signal) {
+        return res.status(404).json({ error: "Signal not found" });
+      }
+
+      const company = await storage.getCompany(signal.companyId);
+      
+      const enrichment = await enrichSignal({
+        title: signal.title,
+        summary: signal.summary,
+        content: signal.content,
+        type: signal.type,
+        companyName: company?.name,
+        industry: company?.industry || undefined,
+      });
+
+      const updated = await storage.updateSignal(id, {
+        entities: enrichment.entities,
+        aiAnalysis: enrichment.aiAnalysis,
+      });
+
+      res.json({ signal: updated, enrichment });
+    } catch (error) {
+      console.error("Error enriching signal:", error);
+      res.status(500).json({ error: "Failed to enrich signal" });
+    }
+  });
+
+  // Batch enrich multiple signals
+  app.post("/api/signals/enrich-batch", async (req: Request, res: Response) => {
+    try {
+      const { signalIds, limit } = req.body;
+      let signalsToEnrich: any[] = [];
+
+      if (signalIds && Array.isArray(signalIds)) {
+        for (const id of signalIds) {
+          const signal = await storage.getSignal(id);
+          if (signal) {
+            const company = await storage.getCompany(signal.companyId);
+            signalsToEnrich.push({
+              id: signal.id,
+              title: signal.title,
+              summary: signal.summary,
+              content: signal.content,
+              type: signal.type,
+              companyName: company?.name,
+              industry: company?.industry,
+            });
+          }
+        }
+      } else {
+        const allSignals = await storage.getAllSignals();
+        const unenriched = allSignals.filter(s => !s.aiAnalysis);
+        const toProcess = unenriched.slice(0, limit || 10);
+        
+        for (const signal of toProcess) {
+          const company = await storage.getCompany(signal.companyId);
+          signalsToEnrich.push({
+            id: signal.id,
+            title: signal.title,
+            summary: signal.summary,
+            content: signal.content,
+            type: signal.type,
+            companyName: company?.name,
+            industry: company?.industry,
+          });
+        }
+      }
+
+      const enrichments = await batchEnrichSignals(signalsToEnrich);
+      
+      let updatedCount = 0;
+      for (const [id, enrichment] of Array.from(enrichments.entries())) {
+        await storage.updateSignal(id, {
+          entities: enrichment.entities,
+          aiAnalysis: enrichment.aiAnalysis,
+        });
+        updatedCount++;
+      }
+
+      res.json({ 
+        success: true, 
+        enrichedCount: updatedCount,
+        message: `Enriched ${updatedCount} signals with entities and AI insights`
+      });
+    } catch (error) {
+      console.error("Error batch enriching signals:", error);
+      res.status(500).json({ error: "Failed to batch enrich signals" });
     }
   });
 
