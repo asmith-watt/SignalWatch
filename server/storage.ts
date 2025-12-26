@@ -83,7 +83,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllCompanies(): Promise<Company[]> {
-    return db.select().from(companies).where(eq(companies.isActive, true)).orderBy(companies.name);
+    return db.select().from(companies).orderBy(companies.name);
   }
 
   async createCompany(company: InsertCompany): Promise<Company> {
