@@ -27,6 +27,16 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/companies/us", async (req: Request, res: Response) => {
+    try {
+      const usCompanies = await getUSPoultryCompanies();
+      res.json(usCompanies);
+    } catch (error) {
+      console.error("Error fetching US companies:", error);
+      res.status(500).json({ error: "Failed to fetch US companies" });
+    }
+  });
+
   app.get("/api/companies/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
@@ -541,16 +551,6 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error importing companies:", error);
       res.status(500).json({ error: "Failed to import companies" });
-    }
-  });
-
-  app.get("/api/companies/us", async (req: Request, res: Response) => {
-    try {
-      const usCompanies = await getUSPoultryCompanies();
-      res.json(usCompanies);
-    } catch (error) {
-      console.error("Error fetching US companies:", error);
-      res.status(500).json({ error: "Failed to fetch US companies" });
     }
   });
 
