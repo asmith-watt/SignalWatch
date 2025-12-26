@@ -230,42 +230,52 @@ export function SignalCard({
           )}
 
           {/* AI Insights Section */}
-          {signal.aiAnalysis && typeof signal.aiAnalysis === 'object' && (
-            <div className="mt-2 p-2 rounded-md bg-muted/50 space-y-2">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-3 h-3 text-primary" />
-                <span className="text-xs font-medium">AI Insights</span>
-                {(signal.aiAnalysis as any).relevanceScore && (
-                  <Badge variant="outline" className="text-xs h-5 px-1.5">
-                    Score: {(signal.aiAnalysis as any).relevanceScore}
-                  </Badge>
+          {signal.aiAnalysis && typeof signal.aiAnalysis === 'object' && (() => {
+            const analysis = signal.aiAnalysis as any;
+            const takeaways = analysis.keyTakeaways || analysis.keyPoints || [];
+            return (
+              <div className="mt-2 p-2 rounded-md bg-muted/50 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-3 h-3 text-primary" />
+                  <span className="text-xs font-medium">AI Insights</span>
+                  {analysis.relevanceScore && (
+                    <Badge variant="outline" className="text-xs h-5 px-1.5">
+                      Score: {analysis.relevanceScore}
+                    </Badge>
+                  )}
+                </div>
+                {takeaways.length > 0 && (
+                  <ul className="text-xs text-muted-foreground space-y-0.5 pl-4">
+                    {(takeaways as string[]).slice(0, 2).map((takeaway, i) => (
+                      <li key={i} className="list-disc">{takeaway}</li>
+                    ))}
+                  </ul>
+                )}
+                {signal.entities && typeof signal.entities === 'object' && (
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {(signal.entities as any).companies?.map((c: any, i: number) => (
+                      <Badge key={i} variant="secondary" className="text-xs h-5 px-1.5 gap-1">
+                        <Building2 className="w-2.5 h-2.5" />
+                        {c.name}
+                      </Badge>
+                    ))}
+                    {(signal.entities as any).organizations?.map((org: string, i: number) => (
+                      <Badge key={`org-${i}`} variant="secondary" className="text-xs h-5 px-1.5 gap-1">
+                        <Building2 className="w-2.5 h-2.5" />
+                        {org}
+                      </Badge>
+                    ))}
+                    {(signal.entities as any).locations?.slice(0, 2).map((loc: string, i: number) => (
+                      <Badge key={`loc-${i}`} variant="outline" className="text-xs h-5 px-1.5 gap-1">
+                        <MapPin className="w-2.5 h-2.5" />
+                        {loc}
+                      </Badge>
+                    ))}
+                  </div>
                 )}
               </div>
-              {(signal.aiAnalysis as any).keyTakeaways && (
-                <ul className="text-xs text-muted-foreground space-y-0.5 pl-4">
-                  {((signal.aiAnalysis as any).keyTakeaways as string[]).slice(0, 2).map((takeaway, i) => (
-                    <li key={i} className="list-disc">{takeaway}</li>
-                  ))}
-                </ul>
-              )}
-              {signal.entities && typeof signal.entities === 'object' && (
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {(signal.entities as any).companies?.map((c: any, i: number) => (
-                    <Badge key={i} variant="secondary" className="text-xs h-5 px-1.5 gap-1">
-                      <Building2 className="w-2.5 h-2.5" />
-                      {c.name}
-                    </Badge>
-                  ))}
-                  {(signal.entities as any).locations?.slice(0, 2).map((loc: string, i: number) => (
-                    <Badge key={`loc-${i}`} variant="outline" className="text-xs h-5 px-1.5 gap-1">
-                      <MapPin className="w-2.5 h-2.5" />
-                      {loc}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+            );
+          })()}
 
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary" className={`text-xs ${typeConfig.color}`}>
