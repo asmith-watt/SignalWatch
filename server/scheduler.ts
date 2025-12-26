@@ -63,15 +63,16 @@ export function initializeScheduler() {
     await runDailyMonitoring();
   });
   
-  cron.schedule("0 3 * * 0", async () => {
-    console.log("[Scheduler] Running weekly signal cleanup...");
-    await cleanupOldSignals();
-  });
+  // Cleanup disabled - keeping signals forever
+  // To re-enable cleanup, uncomment below:
+  // cron.schedule("0 3 * * 0", async () => {
+  //   console.log("[Scheduler] Running weekly signal cleanup...");
+  //   await cleanupOldSignals();
+  // });
   
   console.log("[Scheduler] Scheduled tasks initialized:");
   console.log("  - Daily monitoring: 6:00 AM UTC");
-  console.log("  - Weekly cleanup: Sundays at 3:00 AM UTC");
-  console.log(`  - Signal retention: ${RETENTION_DAYS} days`);
+  console.log("  - Signal retention: Forever (no automatic cleanup)");
 }
 
 export { runDailyMonitoring, cleanupOldSignals };
