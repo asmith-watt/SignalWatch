@@ -321,7 +321,14 @@ export async function registerRoutes(
   app.post("/api/signals/:id/generate-article", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const style = (req.body.style as "news" | "analysis" | "brief") || "news";
+      const requestedStyle = req.body.style || "news";
+      const validStyles = ["news", "analysis", "brief"];
+      
+      if (!validStyles.includes(requestedStyle)) {
+        return res.status(400).json({ error: `Invalid style. Must be one of: ${validStyles.join(", ")}` });
+      }
+      
+      const style = requestedStyle as "news" | "analysis" | "brief";
       
       const signal = await storage.getSignal(id);
       if (!signal) {
@@ -343,7 +350,14 @@ export async function registerRoutes(
   app.get("/api/signals/:id/export/:format", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const format = req.params.format as "wordpress" | "contentful" | "markdown" | "json";
+      const requestedFormat = req.params.format;
+      const validFormats = ["wordpress", "contentful", "markdown", "json"];
+      
+      if (!validFormats.includes(requestedFormat)) {
+        return res.status(400).json({ error: `Invalid format. Must be one of: ${validFormats.join(", ")}` });
+      }
+      
+      const format = requestedFormat as "wordpress" | "contentful" | "markdown" | "json";
       
       const signal = await storage.getSignal(id);
       if (!signal) {
@@ -360,6 +374,9 @@ export async function registerRoutes(
         return res.send(exports.markdown);
       }
 
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Content-Disposition", `attachment; filename="article-${id}-${format}.json"`);
+      
       if (format === "wordpress") {
         res.json(exports.wordpress);
       } else if (format === "contentful") {
