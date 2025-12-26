@@ -13,6 +13,8 @@ export interface GeneratedArticle {
   keyTakeaways: string[];
   seoDescription: string;
   suggestedTags: string[];
+  sourceAttribution: string;
+  sourceUrl: string | null;
 }
 
 export async function generateArticleFromSignal(
@@ -30,25 +32,32 @@ export async function generateArticleFromSignal(
     brief: "Write a concise market brief (2-3 paragraphs) suitable for a newsletter or quick update.",
   };
 
+  const sourceInfo = signal.sourceUrl 
+    ? `Source: ${signal.sourceName || "Industry sources"} (${signal.sourceUrl})`
+    : `Source: ${signal.sourceName || "Industry sources"}`;
+
   const prompt = `You are a B2B business journalist. Generate a professional article based on this business signal.
 
 Signal Type: ${signal.type}
 Title: ${signal.title}
 Summary: ${signal.summary || ""}
 Content: ${signal.content || ""}
-Source: ${signal.sourceName || "Industry sources"}
+${sourceInfo}
 ${companyContext}
 
 Style: ${styleInstructions[style]}
+
+IMPORTANT: The article body MUST include a natural reference to the original source with attribution. For example: "According to ${signal.sourceName || "industry sources"}..." or "As reported by ${signal.sourceName || "sources"}..."
 
 Respond in JSON format:
 {
   "headline": "Compelling, SEO-friendly headline",
   "subheadline": "Supporting context in 1-2 sentences",
-  "body": "Full article body with multiple paragraphs. Use professional business journalism style.",
+  "body": "Full article body with multiple paragraphs. Include natural source attribution within the text.",
   "keyTakeaways": ["3-5 bullet points summarizing key points"],
   "seoDescription": "150-160 character meta description for SEO",
-  "suggestedTags": ["relevant", "tags", "for", "categorization"]
+  "suggestedTags": ["relevant", "tags", "for", "categorization"],
+  "sourceAttribution": "A formal attribution line like: Originally reported by [Source Name]"
 }`;
 
   const response = await openai.chat.completions.create({
@@ -63,7 +72,11 @@ Respond in JSON format:
     throw new Error("No response from AI");
   }
 
-  return JSON.parse(content) as GeneratedArticle;
+  const parsed = JSON.parse(content);
+  return {
+    ...parsed,
+    sourceUrl: signal.sourceUrl || null,
+  } as GeneratedArticle;
 }
 
 export interface CMSExportFormat {
@@ -74,6 +87,7 @@ export interface CMSExportFormat {
     post_status: string;
     tags_input: string[];
     categories: string[];
+    source_url: string | null;
   };
   contentful: {
     fields: {
@@ -81,6 +95,7 @@ export interface CMSExportFormat {
       body: { "en-US": string };
       excerpt: { "en-US": string };
       tags: { "en-US": string[] };
+      sourceUrl: { "en-US": string | null };
     };
   };
   markdown: string;
@@ -92,6 +107,14 @@ export function exportArticleForCMS(
   signal: Signal,
   company: Company | null
 ): CMSExportFormat {
+  const sourceLink = signal.sourceUrl 
+    ? `[${signal.sourceName || "Original Source"}](${signal.sourceUrl})`
+    : signal.sourceName || "Industry sources";
+  
+  const sourceHtml = signal.sourceUrl
+    ? `<a href="${signal.sourceUrl}" target="_blank" rel="noopener noreferrer">${signal.sourceName || "Original Source"}</a>`
+    : signal.sourceName || "Industry sources";
+
   const markdown = `# ${article.headline}
 
 *${article.subheadline}*
@@ -104,26 +127,32 @@ ${article.keyTakeaways.map((t) => `- ${t}`).join("\n")}
 
 ---
 
-*Source: ${signal.sourceName || "Industry sources"}*
-*Company: ${company?.name || "N/A"}*
-*Signal Type: ${signal.type}*
+**Source:** ${sourceLink}
+**Company:** ${company?.name || "N/A"}
+**Signal Type:** ${signal.type}
 `;
+
+  const wordpressContent = `${article.body}
+
+<p><strong>Source:</strong> ${sourceHtml}</p>`;
 
   return {
     wordpress: {
       post_title: article.headline,
-      post_content: article.body,
+      post_content: wordpressContent,
       post_excerpt: article.seoDescription,
       post_status: "draft",
       tags_input: article.suggestedTags,
       categories: [signal.type, company?.industry || "Business"].filter(Boolean),
+      source_url: signal.sourceUrl || null,
     },
     contentful: {
       fields: {
         title: { "en-US": article.headline },
-        body: { "en-US": article.body },
+        body: { "en-US": `${article.body}\n\nSource: ${signal.sourceName || "Industry sources"}${signal.sourceUrl ? ` (${signal.sourceUrl})` : ""}` },
         excerpt: { "en-US": article.seoDescription },
         tags: { "en-US": article.suggestedTags },
+        sourceUrl: { "en-US": signal.sourceUrl || null },
       },
     },
     markdown,

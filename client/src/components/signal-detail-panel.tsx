@@ -73,6 +73,8 @@ export function SignalDetailPanel({
     body: string;
     keyTakeaways: string[];
     seoDescription: string;
+    sourceAttribution?: string;
+    sourceUrl?: string | null;
   } | null>(null);
 
   const analyzeSignalMutation = useMutation({
@@ -448,6 +450,29 @@ export function SignalDetailPanel({
                       ))}
                     </ul>
                   </div>
+                  {(signal.sourceUrl || generatedArticle.sourceAttribution) && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                        Source
+                      </p>
+                      <p className="text-sm">
+                        {signal.sourceUrl ? (
+                          <a 
+                            href={signal.sourceUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline flex items-center gap-1"
+                            data-testid="link-article-source"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            {signal.sourceName || "Original Source"}
+                          </a>
+                        ) : (
+                          generatedArticle.sourceAttribution
+                        )}
+                      </p>
+                    </div>
+                  )}
 
                   <div className="flex flex-wrap gap-2 pt-2 border-t">
                     <p className="text-xs text-muted-foreground w-full mb-1">Export for CMS:</p>
