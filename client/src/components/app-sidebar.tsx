@@ -226,9 +226,9 @@ export function AppSidebar({
                               )}
                             </div>
                             {signalCounts[company.id] > 0 && (
-                              <SidebarMenuBadge>
-                                {signalCounts[company.id]}
-                              </SidebarMenuBadge>
+                              <Badge variant="default" className="h-5 px-1.5 text-xs bg-primary text-primary-foreground">
+                                {signalCounts[company.id]} new
+                              </Badge>
                             )}
                           </SidebarMenuButton>
                         </SidebarMenuItem>
