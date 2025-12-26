@@ -9,6 +9,7 @@ import {
 import { z } from "zod";
 import { analyzeSignal } from "./ai-analysis";
 import { generateArticleFromSignal, exportArticleForCMS } from "./article-generator";
+import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany } from "./perplexity-monitor";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -435,6 +436,60 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error publishing article:", error);
       res.status(500).json({ error: "Failed to publish article" });
+    }
+  });
+
+  // Monitoring endpoints
+  app.post("/api/monitor/poultry", async (req: Request, res: Response) => {
+    try {
+      console.log("Starting poultry company monitoring...");
+      const results = await monitorPoultryCompanies();
+      const totalSignals = results.reduce((sum, r) => sum + r.signalsCreated, 0);
+      res.json({ 
+        success: true, 
+        message: `Monitoring complete. Created ${totalSignals} new signals.`,
+        results 
+      });
+    } catch (error) {
+      console.error("Error monitoring poultry companies:", error);
+      res.status(500).json({ error: "Failed to monitor companies" });
+    }
+  });
+
+  app.post("/api/monitor/all", async (req: Request, res: Response) => {
+    try {
+      console.log("Starting full company monitoring...");
+      const results = await monitorAllCompanies();
+      const totalSignals = results.reduce((sum, r) => sum + r.signalsCreated, 0);
+      res.json({ 
+        success: true, 
+        message: `Monitoring complete. Created ${totalSignals} new signals.`,
+        results 
+      });
+    } catch (error) {
+      console.error("Error monitoring companies:", error);
+      res.status(500).json({ error: "Failed to monitor companies" });
+    }
+  });
+
+  app.post("/api/monitor/company/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const company = await storage.getCompany(id);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      
+      console.log(`Starting monitoring for ${company.name}...`);
+      const signalsCreated = await monitorCompany(company);
+      res.json({ 
+        success: true, 
+        message: `Created ${signalsCreated} new signals for ${company.name}`,
+        signalsCreated 
+      });
+    } catch (error) {
+      console.error("Error monitoring company:", error);
+      res.status(500).json({ error: "Failed to monitor company" });
     }
   });
 
