@@ -18,6 +18,10 @@ import {
   ExternalLink,
   MoreHorizontal,
   FileEdit,
+  Sparkles,
+  MapPin,
+  Users,
+  Calendar,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -223,6 +227,44 @@ export function SignalCard({
             <p className="text-sm text-muted-foreground line-clamp-2">
               {signal.summary}
             </p>
+          )}
+
+          {/* AI Insights Section */}
+          {signal.aiAnalysis && typeof signal.aiAnalysis === 'object' && (
+            <div className="mt-2 p-2 rounded-md bg-muted/50 space-y-2">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-3 h-3 text-primary" />
+                <span className="text-xs font-medium">AI Insights</span>
+                {(signal.aiAnalysis as any).relevanceScore && (
+                  <Badge variant="outline" className="text-xs h-5 px-1.5">
+                    Score: {(signal.aiAnalysis as any).relevanceScore}
+                  </Badge>
+                )}
+              </div>
+              {(signal.aiAnalysis as any).keyTakeaways && (
+                <ul className="text-xs text-muted-foreground space-y-0.5 pl-4">
+                  {((signal.aiAnalysis as any).keyTakeaways as string[]).slice(0, 2).map((takeaway, i) => (
+                    <li key={i} className="list-disc">{takeaway}</li>
+                  ))}
+                </ul>
+              )}
+              {signal.entities && typeof signal.entities === 'object' && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {(signal.entities as any).companies?.map((c: any, i: number) => (
+                    <Badge key={i} variant="secondary" className="text-xs h-5 px-1.5 gap-1">
+                      <Building2 className="w-2.5 h-2.5" />
+                      {c.name}
+                    </Badge>
+                  ))}
+                  {(signal.entities as any).locations?.slice(0, 2).map((loc: string, i: number) => (
+                    <Badge key={`loc-${i}`} variant="outline" className="text-xs h-5 px-1.5 gap-1">
+                      <MapPin className="w-2.5 h-2.5" />
+                      {loc}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
 
           <div className="flex flex-wrap items-center gap-2">

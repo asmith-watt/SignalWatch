@@ -1,5 +1,6 @@
 import type { Company, InsertSignal } from "@shared/schema";
 import { storage } from "./storage";
+import { enrichSignal } from "./ai-analysis";
 
 const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
 
@@ -155,8 +156,28 @@ export async function monitorCompany(company: Company): Promise<number> {
       hash,
     };
 
-    await storage.createSignal(signalData);
+    const createdSignal = await storage.createSignal(signalData);
     console.log(`  Created signal: ${signal.title}`);
+    
+    // Auto-enrich new signals with AI analysis
+    try {
+      const enrichment = await enrichSignal({
+        title: signal.title,
+        summary: signal.summary,
+        type: signal.type,
+        companyName: company.name,
+        industry: company.industry || undefined,
+      });
+      
+      await storage.updateSignal(createdSignal.id, {
+        entities: enrichment.entities,
+        aiAnalysis: enrichment.aiAnalysis,
+      });
+      console.log(`  Enriched signal with AI analysis (score: ${enrichment.aiAnalysis.relevanceScore})`);
+    } catch (enrichError) {
+      console.error(`  Failed to enrich signal:`, enrichError);
+    }
+    
     createdCount++;
   }
 
