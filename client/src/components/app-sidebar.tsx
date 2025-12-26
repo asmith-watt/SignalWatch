@@ -49,20 +49,20 @@ const navigationItems = [
 ];
 
 const industryGroups: Record<string, string[]> = {
+  Poultry: ["Poultry", "Chicken", "Turkey", "Egg", "Duck", "Broiler", "Layer", "Hatchery"],
   Technology: ["SaaS", "AI/ML", "Cybersecurity", "Cloud", "Software"],
   Finance: ["Fintech", "Banking", "Insurance", "Payments"],
   Healthcare: ["Biotech", "Medtech", "Pharma", "Digital Health"],
-  Other: [],
 };
 
 function getIndustryGroup(industry: string | null): string {
-  if (!industry) return "Other";
+  if (!industry) return "Poultry";
   for (const [group, industries] of Object.entries(industryGroups)) {
     if (industries.some((i) => industry.toLowerCase().includes(i.toLowerCase()))) {
       return group;
     }
   }
-  return "Other";
+  return "Poultry";
 }
 
 function getCompanyInitials(name: string): string {
@@ -84,10 +84,10 @@ export function AppSidebar({
   const [location] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
+    Poultry: true,
     Technology: true,
     Finance: true,
     Healthcare: true,
-    Other: true,
   });
 
   const filteredCompanies = companies.filter((company) =>
@@ -186,7 +186,7 @@ export function AppSidebar({
                       {group === "Technology" && <Globe className="w-3 h-3" />}
                       {group === "Finance" && <Briefcase className="w-3 h-3" />}
                       {group === "Healthcare" && <TrendingUp className="w-3 h-3" />}
-                      {group === "Other" && <Building2 className="w-3 h-3" />}
+                      {group === "Poultry" && <Building2 className="w-3 h-3" />}
                       {group}
                     </span>
                     <div className="flex items-center gap-2">
