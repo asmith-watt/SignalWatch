@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { seedDatabase } from "./seed";
+import { initializeScheduler } from "./scheduler";
 
 const app = express();
 const httpServer = createServer(app);
@@ -65,6 +66,9 @@ app.use((req, res, next) => {
   
   // Seed database with sample data if empty
   await seedDatabase();
+  
+  // Initialize scheduled tasks (daily monitoring, cleanup)
+  initializeScheduler();
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
