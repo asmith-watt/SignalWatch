@@ -2,7 +2,7 @@ import cron from "node-cron";
 import { monitorAllCompanies } from "./perplexity-monitor";
 import { storage } from "./storage";
 
-const RETENTION_DAYS = 90;
+const RETENTION_DAYS = 365;
 
 async function cleanupOldSignals() {
   console.log("[Scheduler] Starting signal cleanup...");
