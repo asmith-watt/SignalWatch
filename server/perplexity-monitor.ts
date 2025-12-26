@@ -222,17 +222,19 @@ export async function monitorCompaniesByCountry(country: string): Promise<{ comp
 
 export async function monitorAllCompanies(): Promise<{ company: string; signalsCreated: number }[]> {
   const companies = await storage.getAllCompanies();
-  const activeCompanies = companies.filter(c => c.isActive && c.industry !== "Data Source");
+  const poultryCompanies = companies.filter(c => c.industry === "Poultry");
 
-  console.log(`Monitoring ${activeCompanies.length} active companies...`);
+  console.log(`Monitoring all ${poultryCompanies.length} poultry companies...`);
   
   const results: { company: string; signalsCreated: number }[] = [];
   
-  for (const company of activeCompanies) {
+  for (const company of poultryCompanies) {
+    console.log(`[${results.length + 1}/${poultryCompanies.length}] Monitoring ${company.name}...`);
     const count = await monitorCompany(company);
     results.push({ company: company.name, signalsCreated: count });
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
+  console.log(`Monitoring complete! Processed ${results.length} companies.`);
   return results;
 }
