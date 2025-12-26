@@ -282,9 +282,12 @@ export function SignalCard({
             
             return (
               <div className="mt-2 p-2.5 rounded-md bg-primary/5 border border-primary/10 space-y-2">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-3.5 h-3.5 text-primary" />
-                  <span className="text-xs font-semibold text-primary">AI Analysis</span>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-primary" />
+                    <span className="text-xs font-semibold text-primary">AI Analysis</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">Powered by Perplexity</span>
                 </div>
                 
                 {/* Key Takeaways */}
