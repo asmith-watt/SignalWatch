@@ -279,47 +279,49 @@ export function AppSidebar({
                   <CollapsibleContent>
                     <SidebarMenu className="mt-1">
                       {groupCompanies.map((company) => (
-                        <SidebarMenuItem key={company.id} className="group/company relative">
-                          <SidebarMenuButton
-                            isActive={selectedCompanyId === company.id}
-                            onClick={() => onSelectCompany(company.id)}
-                            className="h-auto py-2"
-                            data-testid={`company-item-${company.id}`}
-                          >
-                            <Avatar className="h-8 w-8 rounded-md">
-                              <AvatarFallback className="rounded-md text-xs bg-muted">
-                                {getCompanyInitials(company.name)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium truncate">
-                                {company.name}
-                              </div>
-                              {company.industry && (
-                                <div className="text-xs text-muted-foreground truncate">
-                                  {company.industry}
+                        <SidebarMenuItem key={company.id} className="group/company">
+                          <div className="flex items-center w-full">
+                            <SidebarMenuButton
+                              isActive={selectedCompanyId === company.id}
+                              onClick={() => onSelectCompany(company.id)}
+                              className="h-auto py-2 flex-1"
+                              data-testid={`company-item-${company.id}`}
+                            >
+                              <Avatar className="h-8 w-8 rounded-md flex-shrink-0">
+                                <AvatarFallback className="rounded-md text-xs bg-muted">
+                                  {getCompanyInitials(company.name)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-medium truncate">
+                                  {company.name}
                                 </div>
+                                {company.industry && (
+                                  <div className="text-xs text-muted-foreground truncate">
+                                    {company.industry}
+                                  </div>
+                                )}
+                              </div>
+                              {signalCounts[company.id] > 0 && (
+                                <Badge variant="default" className="h-5 px-1.5 text-xs bg-primary text-primary-foreground flex-shrink-0">
+                                  {signalCounts[company.id]} new
+                                </Badge>
                               )}
-                            </div>
-                            {signalCounts[company.id] > 0 && (
-                              <Badge variant="default" className="h-5 px-1.5 text-xs bg-primary text-primary-foreground">
-                                {signalCounts[company.id]} new
-                              </Badge>
-                            )}
-                          </SidebarMenuButton>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover/company:opacity-100 transition-opacity"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateCompanyMutation.mutate(company.id);
-                            }}
-                            disabled={updatingCompany === company.id}
-                            data-testid={`button-update-company-${company.id}`}
-                          >
-                            <RefreshCw className={`w-3 h-3 ${updatingCompany === company.id ? "animate-spin" : ""}`} />
-                          </Button>
+                            </SidebarMenuButton>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 flex-shrink-0 opacity-0 group-hover/company:opacity-100 transition-opacity"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateCompanyMutation.mutate(company.id);
+                              }}
+                              disabled={updatingCompany === company.id}
+                              data-testid={`button-update-company-${company.id}`}
+                            >
+                              <RefreshCw className={`w-3 h-3 ${updatingCompany === company.id ? "animate-spin" : ""}`} />
+                            </Button>
+                          </div>
                         </SidebarMenuItem>
                       ))}
                     </SidebarMenu>

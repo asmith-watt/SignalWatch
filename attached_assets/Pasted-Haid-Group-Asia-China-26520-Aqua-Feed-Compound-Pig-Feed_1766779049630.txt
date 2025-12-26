@@ -1,0 +1,189 @@
+Haid Group	Asia	China	26520	Aqua Feed, Compound, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+New Hope Group	Asia	China	25960	Compound, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Muyuan Foodstuff	Asia	China	25319	Compound, Pig Feed			2024
+Cargill	North America	United States	17500	Additive, Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+CP Group	Asia	Thailand	17500	Aqua Feed, Compound, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Wens Food Group	Asia	China	16000	Compound, Pig Feed, Poultry Feed			2024
+Shuangbaotai Group (Twins Group)	Asia	China	15500	Compound, Pig Feed			2024
+Guilin Liyuan	Asia	China	14500	Aqua Feed, Compound, Pig Feed, Poultry Feed		-	2024
+Land O'Lakes	North America	United States	14500	Aqua Feed, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Chia Tai Investment	Asia	China	13000	Pig Feed, Poultry Feed	-	-	2024
+Tyson Foods (broiler)	North America	United States	12800	Compound, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed		-	2024
+JBS S.A.	South America	Brazil	12300	Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+De Heus	Europe	Netherlands	12000	Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed	-		2024
+BRF	South America	Brazil	10800	Compound, Pet Feed, Pig Feed, Poultry Feed, Premix			2024
+Wellhope Agri-Tech	Asia	China	9020	Additive, Compound, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+ForFarmers N.V.	Europe	Netherlands	9000	Additive, Aqua Feed, Compound, Horse Feed, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Nutreco	Europe	Netherlands	9000	Additive, Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Arab Company for Livestock Development (ACOLID)	Middle East	Saudi Arabia	7568	Compound, Poultry Feed, Ruminant Feed		-	2024
+Wayne-Sanderson Farms	North America	United States	7563	Poultry Feed		-	2024
+Tongwei Group	Asia	China	6884	Aqua Feed, Compound, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+JA Zen-Noh	Asia	Japan	6880	Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Alltech	North America	United States	6500	Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed	-		2024
+Tangrenshen Group (TRS)	Asia	China	6280	Aqua Feed, Compound, Pig Feed, Poultry Feed, Premix			2024
+Harim Group	Asia	South Korea	6212	Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+WH Group	Asia	China	5800	Compound, Pig Feed, Premix			2024
+Smithfield Foods	North America	United States	5471	Compound, Pig Feed		-	2024
+Dabeinong Group	Asia	China	5406	Aqua Feed, Compound, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Industrias Bachoco	North America	Mexico	4397	Aqua Feed, Compound, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Japfa Ltd.	Asia	Singapore	4200	Aqua Feed, Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+East Hope Group	Asia	China	4100	Aqua Feed, Compound, Pig Feed, Poultry Feed, Premix, Ruminant Feed	-		2024
+Easy Holdings Co. Ltd.	Asia	South Korea	4100	Additive, Compound, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed		-	2024
+Betagro Group	Asia	Thailand	4000	Aqua Feed, Compound, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+CJ Cheil Jedang	Asia	South Korea	4000	Additive, Aqua Feed, Compound, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Gold Coin	Asia	Singapore	4000	Additive, Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Sanderson Farms Inc.	North America	United States	4000	Compound, Poultry Feed		-	2021
+Jiangsu Lihua Animal Husbandry	Asia	China	3800	Compound, Pig Feed, Poultry Feed		-	2024
+Shandong Asia Pacific Zhonghui Group	Asia	China	3800	Aqua Feed, Compound, Pig Feed, Poultry Feed, Premix, Ruminant Feed		-	2024
+Feed One	Asia	Japan	3790	Aqua Feed, Compound, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Grupo Vall Companys	Europe	Spain	3650	Compound, Pig Feed, Poultry Feed, Ruminant Feed		-	2024
+Agrosuper Group	South America	Chile	3630	Aqua Feed, Compound, Pig Feed, Poultry Feed		-	2024
+ADM Animal Nutrition	North America	United States	3500	Additive, Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed	-		2024
+Anyou Biotechnology Group Co.	Asia	China	3200	Additive, Aqua Feed, Compound, Pig Feed, Poultry Feed, Premix, Ruminant Feed	-	-	2024
+Huaxi Hope Group	Asia	China	3200	Aqua Feed, Pig Feed, Poultry Feed	-	-	2024
+San Miguel Foods	Asia	Philippines	3200	Aqua Feed, Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Veronesi	Europe	Italy	3200	Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Amul	Asia	India	3170	Compound, Ruminant Feed			2024
+Cherkizovo Group	Europe	Russia	3022	Compound, Pig Feed, Poultry Feed		-	2024
+Chubu Shiryo	Asia	Japan	3020	Aqua Feed, Compound, Pig Feed, Poultry Feed, Ruminant Feed	-	-	2024
+AGRAVIS Raiffeisen	Europe	Germany	3000	Aqua Feed, Compound, Horse Feed, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Matli	Middle East	Türkiye	3000	Compound, Poultry Feed, Ruminant Feed			2024
+Miratorg	Europe	Russia	2978	Compound, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed		-	2024
+Koch Foods Inc.	North America	United States	2976	Poultry Feed		-	2024
+Proteína Animal (PROAN)	North America	Mexico	2900	Compound, Poultry Feed		-	2024
+Royal Agrifirm Group	Europe	Netherlands	2860	Additive, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed	-		2024
+Xinjiang Tiankang	Asia	China	2828	Additive, Aqua Feed, Compound, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Mountaire Farms Inc.	North America	United States	2812	Poultry Feed		-	2024
+DLG Group	Europe	Denmark	2800	Compound, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Guangxi Yangxiang Co.	Asia	China	2800	Pig Feed, Poultry Feed		-	2024
+Shandong Backbone Group	Asia	China	2800	Additive, Compound, Pig Feed, Poultry Feed, Premix			2024
+Avril Group	Europe	France	2736	Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Leong Hup International Bhd	Asia	Malaysia	2652	Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed		-	2024
+NongHyup Feed Inc.	Asia	South Korea	2650	Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Marubeni Nisshin Feed Co.	Asia	Japan	2620	Aqua Feed, Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Shandong Hemei Group	Asia	China	2600	Pig Feed, Poultry Feed	-	-	2024
+Sichuan Tequ Group	Asia	China	2600	Aqua Feed, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Danish Agro Group	Europe	Denmark	2500	Additive, Compound, Horse Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed	-		2024
+Perdue Farms	North America	United States	2500	Compound, Pig Feed, Poultry Feed, Ruminant Feed		-	2024
+Suguna Foods	Asia	India	2500	Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Italcol	South America	Colombia	2380	Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+AB Agri	Europe	United Kingdom	2320	Additive, Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+DTC Deutsche Tiernahrung Cremer	Europe	Germany	2250	Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Nosan Corp.	Asia	Japan	2240	Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Arvesta	Europe	Belgium	2225	Additive, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed		-	2024
+Guangdong Nanbao Group	Asia	China	2200	Pig Feed, Poultry Feed	-	-	2024
+JDH	North America	United States	2200	Compound, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Abalıoğlu Group	Middle East	Türkiye	2170	Aqua Feed, Compound, Poultry Feed, Ruminant Feed			2024
+San Fernando	South America	Peru	2160	Poultry Feed		-	2024
+Rose Acre Farms	North America	United States	2070	Compound, Poultry Feed		-	2024
+Ridley AgriProducts	Oceania	Australia	2040	Additive, Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Arasco Feed	Middle East	Saudi Arabia	2000	Additive, Aqua Feed, Compound, Horse Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Bröring Unternehmensgruppe	Europe	Germany	2000	Compound, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Fujian Sunner Development Co. Ltd.	Asia	China	2000	Compound, Poultry Feed			2024
+GreenFeed	Asia	Vietnam	2000	Aqua Feed, Compound, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+GTFoods Group	South America	Brazil	2000	Compound, Poultry Feed			2024
+Kent Nutrition Group	North America	United States	2000	Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Seaboard Foods	North America	United States	1988	Pig Feed	-	-	2024
+Thai Foods Group	Asia	Thailand	1959	Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+MHP	Europe	Ukraine	1935	Compound, Poultry Feed		-	2024
+Peco Foods	North America	United States	1830	Poultry Feed		-	2024
+Al-Watania	Middle East	Saudi Arabia	1800	Compound, Poultry Feed			2024
+Cal-Maine Foods	North America	United States	1800	Compound, Poultry Feed		-	2024
+Terrena	Europe	France	1800	Additive, Aqua Feed, Compound, Horse Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+OSI Group	North America	United States	1730	Compound, Pig Feed, Poultry Feed, Ruminant Feed		-	2024
+Fujian Aonong Group	Asia	China	1722	Aqua Feed, Pig Feed, Poultry Feed	-	-	2024
+Aurora Alimentos	South America	Brazil	1682	Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Resource Agribusiness Group	Europe	Russia	1647	Poultry Feed		-	2024
+Versova Holdings LLP	North America	United States	1642	Poultry Feed		-	2024
+Eureden	Europe	France	1600	Aqua Feed, Compound, Horse Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Tieqilisi Group	Asia	China	1600	Aqua Feed, Compound, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Hillandale Farms	North America	United States	1556	Poultry Feed		-	2024
+Amadori	Europe	Italy	1500	Compound, Poultry Feed		-	2023
+Godrej Agrovet	Asia	India	1500	Aqua Feed, Compound, Poultry Feed, Ruminant Feed			2024
+Jiada Group	Asia	China	1500	Pig Feed, Premix	-	-	2024
+George's Inc.	North America	United States	1446	Poultry Feed		-	2024
+Koka	Europe	Croatia	1445	Compound, Poultry Feed, Ruminant Feed		-	2024
+Inghams Enterprises Pty. Ltd.	Oceania	Australia	1400	Compound, Horse Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Foster Farms (broiler)	North America	United States	1376	Poultry Feed		-	2024
+BioMar Group	Europe	Denmark	1372	Aqua Feed, Compound	-		2024
+Masan MEATLife	Asia	Vietnam	1350	Aqua Feed, Compound, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+House of Raeford Farms Inc. (broiler)	North America	United States	1348	Poultry Feed		-	2024
+Agropecuaria de Guissona	Europe	Spain	1330	Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Cooperl Arc Atlantique	Europe	France	1327	Compound, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Astral Foods	Africa	South Africa	1322	Additive, Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Al-Fakieh Poultry Farms	Middle East	Saudi Arabia	1300	Compound, Poultry Feed		-	2024
+C Vale - Cooperativa Agroindustrial	South America	Brazil	1300	Aqua Feed, Compound, Poultry Feed, Ruminant Feed			2024
+Lantmännen Lantbruk	Europe	Sweden	1300	Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed	-		2024
+Malindo Feedmill	Asia	Indonesia	1300	Aqua Feed, Compound, Pig Feed, Poultry Feed			2024
+Prioskolye	Europe	Russia	1290	Compound, Poultry Feed, Premix		-	2024
+AVSA	South America	Colombia	1275	Compound, Poultry Feed		-	2024
+Granja Mantiqueira	South America	Brazil	1270	Poultry Feed		-	2024
+Granja Yabuta	South America	Brazil	1270	Poultry Feed		-	2024
+Sollio Cooperative Group	North America	Canada	1260	Compound, Pig Feed, Poultry Feed, Premix			2024
+Şenpiliç Gıda Sanayi	Middle East	Türkiye	1254	Compound, Poultry Feed		-	2024
+RCL Foods Ltd.	Africa	South Africa	1250	Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Granja Faria	South America	Brazil	1200	Poultry Feed		-	2024
+Hunan Jiuding Group	Asia	China	1200	Compound, Pig Feed, Poultry Feed, Premix		-	2024
+MEGA Tierernährung	Europe	Germany	1200	Compound, Poultry Feed, Premix			2024
+Lar Cooperativa Agroindustrial	South America	Brazil	1176	Pig Feed, Poultry Feed, Ruminant Feed		-	2024
+Copacol	South America	Brazil	1167	Compound, Poultry Feed, Ruminant Feed		-	2024
+CP Standart Gida Sanayi Ve Ticaret (CP Turkey)	Middle East	Türkiye	1150	Compound, Poultry Feed, Premix, Ruminant Feed			2024
+Bupiliç	Middle East	Türkiye	1122	Compound, Poultry Feed		-	2024
+CMI - Corporación Multi Inversiones	Central America	Guatemala	1100	Pet Feed, Poultry Feed, Ruminant Feed		-	2024
+Guangdong Evergreen Feed Industry Co. Ltd.	Asia	China	1100	Aqua Feed, Compound, Pig Feed, Poultry Feed	-		2024
+Daybreak Foods Inc.	North America	United States	1089	Compound, Poultry Feed		-	2024
+Marfrig Global Foods	South America	Brazil	1087	Aqua Feed, Compound, Pet Feed, Pig Feed, Poultry Feed, Premix, Ruminant Feed		-	2024
+Fieldale Farms	North America	United States	1050	Compound, Poultry Feed		-	2024
+Michael Foods	North America	United States	1035	Poultry Feed		-	2024
+2Agriculture Ltd.	Europe	United Kingdom	1000	Compound, Poultry Feed	-		2024
+Ambar	Middle East	Israel	1000	Aqua Feed, Compound, Poultry Feed, Premix, Ruminant Feed			2024
+Case Foods Inc.	North America	United States	1000	Poultry Feed		-	2024
+Fufeng Group	Asia	China	1000	Pig Feed, Poultry Feed	-	-	2024
+Hebei Jiuxing Food Co. Ltd.	Asia	China	1000	Compound, Poultry Feed		-	2024
+Nichiwa Sangyo	Asia	Japan	1000	Aqua Feed, Compound, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Rothkötter-Mischfutterwerk	Europe	Germany	1000	Pig Feed, Poultry Feed	-	-	2024
+Simmons Foods Inc.	North America	United States	1000	Poultry Feed		-	2024
+Wipasz	Europe	Poland	1000	Compound, Pig Feed, Poultry Feed, Premix, Ruminant Feed			2024
+Woosung Feed Co.	Asia	South Korea	1000	Aqua Feed, Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Zhengbang Science and Technology	Asia	China	1000	Aqua Feed, Compound, Pig Feed, Poultry Feed, Premix			2024
+Rembrandt Enterprises	North America	United States	926	Poultry Feed		-	2024
+Empresas Guadalupe	North America	Mexico	924	Poultry Feed		-	2024
+Banvit	Middle East	Türkiye	920	Compound, Poultry Feed, Ruminant Feed			2024
+Itochu Feed Mills Co.	Asia	Japan	920	Additive, Aqua Feed, Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Showa Sangyo	Asia	Japan	900	Aqua Feed, Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+SKM Animal Feeds & Foods	Asia	India	900	Compound, Poultry Feed, Ruminant Feed			2024
+Cooper Farms	North America	United States	896	Pig Feed, Poultry Feed		-	2024
+Cedrob	Europe	Poland	894	Compound, Pig Feed, Poultry Feed			2024
+Coren	Europe	Spain	894	Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+TS Corp.	Asia	South Korea	885	Compound, Pig Feed, Poultry Feed, Ruminant Feed	-		2024
+Bezrk-Belgrankorm	Europe	Russia	860	Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+MPS Egg Farms	North America	United States	848	Poultry Feed		-	2024
+Center Fresh Group	North America	United States	840	Poultry Feed		-	2024
+Prairie Star Farms	North America	United States	840	Poultry Feed		-	2024
+Le Gouessant	Europe	France	819	Aqua Feed, Compound, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+El Calvario	North America	Mexico	809	Poultry Feed		-	2024
+Erpiliç	Middle East	Türkiye	807	Compound, Poultry Feed		-	2024
+DaChan Food (Asia) Ltd.	Asia	China	800	Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Noble Foods	Europe	United Kingdom	800	Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Guangdong Yuehai Feeds Group	Asia	China	797	Aqua Feed	-	-	2024
+Mar-Jac Poultry	North America	United States	780	Poultry Feed		-	2024
+Nutréa Nutrition Animale (NNA)	Europe	France	775	Compound, Horse Feed, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Redondos SA	South America	Peru	720	Aqua Feed, Compound, Pet Feed, Pig Feed, Poultry Feed			2024
+AFGRI Animal Feeds	Africa	South Africa	700	Compound, Pet Feed, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Gena Agropecuaria	North America	Mexico	700			-	2024
+Sanwang Group	Asia	China	700	Additive, Aqua Feed, Compound, Pig Feed, Poultry Feed	-		2024
+Quantum Foods	Africa	South Africa	671	Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Country Bird Holdings Ltd.	Africa	South Africa	600	Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Olam Agri Nigeria	Africa	Nigeria	600	Aqua Feed, Poultry Feed		-	2024
+Prestage Farms	North America	United States	600	Compound, Pig Feed, Poultry Feed		-	2024
+Keskinoğlu	Middle East	Türkiye	550	Compound, Poultry Feed			2024
+Toyohashi Feed Mills	Asia	Japan	550	Pig Feed, Poultry Feed, Ruminant Feed	-		2022
+Wadi Group	Africa	Egypt	548	Additive, Compound, Poultry Feed, Ruminant Feed			2024
+GFPT	Asia	Thailand	532	Aqua Feed, Compound, Pig Feed, Poultry Feed, Ruminant Feed			2024
+Malayan Flour Mills	Asia	Malaysia	500	Aqua Feed, Compound, Poultry Feed		-	2024
+Shenzhen Alpha Feed Co.	Asia	China	350	Additive, Aqua Feed, Compound, Pig Feed, Poultry Feed	-	-	2024
+Shandong Yisheng Livestock & Poultry Breeding Co.	Asia	China	280	Compound, Poultry Feed		-	2024
+Frigorífico Soychú SA	South America	Argentina	50	Compound, Poultry Feed		-	2023
+Global Eggs	Europe	Luxembourg		Poultry Feed		-	
+Shandong Xinsheng Food Co., Ltd.	Asia	China			-	-	
+Venky's India Ltd.	Asia	India		Compound, Poultry Feed			
