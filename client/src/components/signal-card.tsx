@@ -223,66 +223,20 @@ export function SignalCard({
             </div>
           </div>
 
+          {/* Original Signal Content */}
           {signal.summary && (
             <p className="text-sm text-muted-foreground line-clamp-2">
               {signal.summary}
             </p>
           )}
 
-          {/* AI Insights Section */}
-          {signal.aiAnalysis && typeof signal.aiAnalysis === 'object' && (() => {
-            const analysis = signal.aiAnalysis as any;
-            const takeaways = analysis.keyTakeaways || analysis.keyPoints || [];
-            return (
-              <div className="mt-2 p-2 rounded-md bg-muted/50 space-y-2">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-3 h-3 text-primary" />
-                  <span className="text-xs font-medium">AI Insights</span>
-                  {analysis.relevanceScore && (
-                    <Badge variant="outline" className="text-xs h-5 px-1.5">
-                      Score: {analysis.relevanceScore}
-                    </Badge>
-                  )}
-                </div>
-                {takeaways.length > 0 && (
-                  <ul className="text-xs text-muted-foreground space-y-0.5 pl-4">
-                    {(takeaways as string[]).slice(0, 2).map((takeaway, i) => (
-                      <li key={i} className="list-disc">{takeaway}</li>
-                    ))}
-                  </ul>
-                )}
-                {signal.entities && typeof signal.entities === 'object' && (
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {(signal.entities as any).companies?.map((c: any, i: number) => (
-                      <Badge key={i} variant="secondary" className="text-xs h-5 px-1.5 gap-1">
-                        <Building2 className="w-2.5 h-2.5" />
-                        {c.name}
-                      </Badge>
-                    ))}
-                    {(signal.entities as any).organizations?.map((org: string, i: number) => (
-                      <Badge key={`org-${i}`} variant="secondary" className="text-xs h-5 px-1.5 gap-1">
-                        <Building2 className="w-2.5 h-2.5" />
-                        {org}
-                      </Badge>
-                    ))}
-                    {(signal.entities as any).locations?.slice(0, 2).map((loc: string, i: number) => (
-                      <Badge key={`loc-${i}`} variant="outline" className="text-xs h-5 px-1.5 gap-1">
-                        <MapPin className="w-2.5 h-2.5" />
-                        {loc}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-
+          {/* Signal Metadata Badges */}
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary" className={`text-xs ${typeConfig.color}`}>
               {typeConfig.label}
             </Badge>
 
-            {signal.priority && signal.priority !== "medium" && (
+            {signal.priority && (
               <Badge variant="outline" className={`text-xs ${priorityColor}`}>
                 {signal.priority.charAt(0).toUpperCase() + signal.priority.slice(1)} Priority
               </Badge>
@@ -300,6 +254,14 @@ export function SignalCard({
               </Badge>
             )}
 
+            {/* AI Relevance Score - Prominent */}
+            {signal.aiAnalysis && typeof signal.aiAnalysis === 'object' && (signal.aiAnalysis as any).relevanceScore && (
+              <Badge className="text-xs h-5 px-1.5 gap-1 bg-primary/10 text-primary border-primary/20">
+                <Sparkles className="w-2.5 h-2.5" />
+                Score: {(signal.aiAnalysis as any).relevanceScore}
+              </Badge>
+            )}
+
             {signal.assignedTo && (
               <div className="flex items-center gap-1">
                 <Avatar className="h-5 w-5">
@@ -310,6 +272,85 @@ export function SignalCard({
               </div>
             )}
           </div>
+
+          {/* AI Insights Section */}
+          {signal.aiAnalysis && typeof signal.aiAnalysis === 'object' && (() => {
+            const analysis = signal.aiAnalysis as any;
+            const takeaways = analysis.keyTakeaways || analysis.keyPoints || [];
+            const industryImpact = analysis.industryImpact;
+            const storyAngles = analysis.storyAngles || [];
+            
+            return (
+              <div className="mt-2 p-2.5 rounded-md bg-primary/5 border border-primary/10 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-primary" />
+                  <span className="text-xs font-semibold text-primary">AI Analysis</span>
+                </div>
+                
+                {/* Key Takeaways */}
+                {takeaways.length > 0 && (
+                  <div className="space-y-1">
+                    <span className="text-xs font-medium text-muted-foreground">Key Takeaways:</span>
+                    <ul className="text-xs text-foreground space-y-0.5 pl-4">
+                      {(takeaways as string[]).slice(0, 3).map((takeaway, i) => (
+                        <li key={i} className="list-disc">{takeaway}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Industry Impact */}
+                {industryImpact && (
+                  <div className="space-y-1">
+                    <span className="text-xs font-medium text-muted-foreground">Industry Impact:</span>
+                    <p className="text-xs text-foreground">{industryImpact}</p>
+                  </div>
+                )}
+
+                {/* Story Angles */}
+                {storyAngles.length > 0 && (
+                  <div className="space-y-1">
+                    <span className="text-xs font-medium text-muted-foreground">Story Angles:</span>
+                    <ul className="text-xs text-foreground space-y-0.5 pl-4">
+                      {(storyAngles as string[]).slice(0, 2).map((angle, i) => (
+                        <li key={i} className="list-disc">{angle}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Extracted Entities */}
+                {signal.entities && typeof signal.entities === 'object' && (
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {(signal.entities as any).companies?.map((c: any, i: number) => (
+                      <Badge key={i} variant="secondary" className="text-xs h-5 px-1.5 gap-1">
+                        <Building2 className="w-2.5 h-2.5" />
+                        {c.name}
+                      </Badge>
+                    ))}
+                    {(signal.entities as any).organizations?.map((org: string, i: number) => (
+                      <Badge key={`org-${i}`} variant="secondary" className="text-xs h-5 px-1.5 gap-1">
+                        <Building2 className="w-2.5 h-2.5" />
+                        {org}
+                      </Badge>
+                    ))}
+                    {(signal.entities as any).people?.map((person: any, i: number) => (
+                      <Badge key={`person-${i}`} variant="outline" className="text-xs h-5 px-1.5 gap-1">
+                        <Users className="w-2.5 h-2.5" />
+                        {typeof person === 'string' ? person : person.name}
+                      </Badge>
+                    ))}
+                    {(signal.entities as any).locations?.slice(0, 3).map((loc: string, i: number) => (
+                      <Badge key={`loc-${i}`} variant="outline" className="text-xs h-5 px-1.5 gap-1">
+                        <MapPin className="w-2.5 h-2.5" />
+                        {loc}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </div>
     </Card>
