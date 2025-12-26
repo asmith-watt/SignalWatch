@@ -14,6 +14,7 @@ import { importCompanies, getUSPoultryCompanies } from "./import-companies";
 import { importFeedCompanies } from "./import-feed-companies";
 import { importPetfoodCompanies } from "./import-petfood-companies";
 import { generateRssFeed, generateAllSignalsRssFeed, getAvailableFeeds } from "./rss-feeds";
+import { publishToWordPress, testWordPressConnection } from "./wordpress-publisher";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -545,6 +546,66 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error publishing article:", error);
       res.status(500).json({ error: "Failed to publish article" });
+    }
+  });
+
+  // WordPress direct publishing
+  app.post("/api/wordpress/test", async (req: Request, res: Response) => {
+    try {
+      const { siteUrl, username, applicationPassword } = req.body;
+      
+      if (!siteUrl || !username || !applicationPassword) {
+        return res.status(400).json({ 
+          error: "siteUrl, username, and applicationPassword are required" 
+        });
+      }
+
+      const result = await testWordPressConnection({ siteUrl, username, applicationPassword });
+      res.json(result);
+    } catch (error) {
+      console.error("Error testing WordPress connection:", error);
+      res.status(500).json({ error: "Failed to test connection" });
+    }
+  });
+
+  app.post("/api/signals/:id/publish-wordpress", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { siteUrl, username, applicationPassword, status = "draft", style = "news" } = req.body;
+      
+      if (!siteUrl || !username || !applicationPassword) {
+        return res.status(400).json({ 
+          error: "WordPress credentials (siteUrl, username, applicationPassword) are required" 
+        });
+      }
+
+      const signal = await storage.getSignal(id);
+      if (!signal) {
+        return res.status(404).json({ error: "Signal not found" });
+      }
+
+      const company = await storage.getCompany(signal.companyId);
+      const article = await generateArticleFromSignal(signal, company, style);
+      
+      const result = await publishToWordPress(
+        article,
+        signal,
+        company,
+        { siteUrl, username, applicationPassword },
+        status
+      );
+
+      if (result.success) {
+        await storage.updateSignal(id, { contentStatus: "published" });
+      }
+
+      res.json({
+        ...result,
+        article: result.success ? article : undefined,
+      });
+    } catch (error) {
+      console.error("Error publishing to WordPress:", error);
+      res.status(500).json({ error: "Failed to publish to WordPress" });
     }
   });
 

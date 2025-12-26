@@ -14,6 +14,7 @@ import { AddCompanyDialog } from "@/components/add-company-dialog";
 import { Dashboard } from "@/pages/dashboard";
 import { AllSignalsPage } from "@/pages/all-signals";
 import { AlertsPage } from "@/pages/alerts";
+import WordPressSettings from "@/pages/wordpress-settings";
 import NotFound from "@/pages/not-found";
 import { useToast } from "@/hooks/use-toast";
 import type { Company, Signal, InsertCompany } from "@shared/schema";
@@ -125,6 +126,9 @@ function MainLayout() {
                     Application settings coming soon.
                   </p>
                 </div>
+              </Route>
+              <Route path="/wordpress">
+                <WordPressSettings />
               </Route>
               <Route component={NotFound} />
             </Switch>

@@ -49,6 +49,7 @@ interface SignalCardProps {
   onMarkRead?: (id: number, read: boolean) => void;
   onAssign?: (id: number) => void;
   onCreateContent?: (id: number) => void;
+  onPublishWordPress?: (id: number) => void;
   onClick?: () => void;
 }
 
@@ -98,6 +99,7 @@ export function SignalCard({
   onMarkRead,
   onAssign,
   onCreateContent,
+  onPublishWordPress,
   onClick,
 }: SignalCardProps) {
   const typeConfig = signalTypeConfig[signal.type] || signalTypeConfig.other;
@@ -205,6 +207,10 @@ export function SignalCard({
                   <DropdownMenuItem onClick={() => onCreateContent?.(signal.id)}>
                     <FileEdit className="w-4 h-4 mr-2" />
                     Create content
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onPublishWordPress?.(signal.id)}>
+                    <Globe className="w-4 h-4 mr-2" />
+                    Publish to WordPress
                   </DropdownMenuItem>
                   {signal.sourceUrl && (
                     <DropdownMenuItem asChild>

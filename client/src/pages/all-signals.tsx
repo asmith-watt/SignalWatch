@@ -7,6 +7,7 @@ import { SignalFiltersBar, type SignalFilters } from "@/components/signal-filter
 import { SignalDetailPanel } from "@/components/signal-detail-panel";
 import { SignalFeedSkeleton } from "@/components/loading-skeleton";
 import { EmptySignals, EmptyFilteredSignals } from "@/components/empty-states";
+import { WordPressPublishDialog } from "@/components/wordpress-publish-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { Company, Signal } from "@shared/schema";
@@ -25,6 +26,7 @@ export function AllSignalsPage() {
   const [filters, setFilters] = useState<SignalFilters>(defaultFilters);
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "timeline">("list");
+  const [wpPublishSignalId, setWpPublishSignalId] = useState<number | null>(null);
 
   const { data: signals = [], isLoading: signalsLoading } = useQuery<Signal[]>({
     queryKey: ["/api/signals"],
@@ -205,6 +207,7 @@ export function AllSignalsPage() {
                         showCompany
                         onBookmark={handleBookmark}
                         onMarkRead={handleMarkRead}
+                        onPublishWordPress={(id) => setWpPublishSignalId(id)}
                         onClick={() => handleSignalClick(signal)}
                       />
                     );
@@ -248,6 +251,13 @@ export function AllSignalsPage() {
           />
         </div>
       )}
+
+      <WordPressPublishDialog
+        signalId={wpPublishSignalId}
+        signalTitle={signals.find((s) => s.id === wpPublishSignalId)?.title}
+        open={wpPublishSignalId !== null}
+        onOpenChange={(open) => !open && setWpPublishSignalId(null)}
+      />
     </div>
   );
 }

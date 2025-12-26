@@ -50,6 +50,7 @@ const navigationItems = [
   { title: "All Signals", url: "/signals", icon: Radio },
   { title: "Alerts", url: "/alerts", icon: Bell },
   { title: "Team", url: "/team", icon: Users },
+  { title: "WordPress", url: "/wordpress", icon: Globe },
 ];
 
 const industryGroups: Record<string, string[]> = {
