@@ -1,0 +1,27 @@
+SignalWatch Platform Summary
+What It Is
+SignalWatch is a B2B business intelligence platform designed for editorial teams monitoring the poultry, feed, and pet food industries. It tracks 900+ global companies, collecting and analyzing business signals (news, funding, executive changes, product launches, partnerships) using AI-powered analysis.
+
+Data Storage
+PostgreSQL Database - All company profiles, signals, alerts, and team activity stored persistently
+Company Records: ~900 companies across 3 industry verticals (Poultry, Feed, Pet Food)
+Signals: Business events with AI-generated analysis, sentiment scores, priority ratings, and source attribution
+Core Capabilities
+Feature	Description
+Company Monitoring	Track companies individually, by industry group, or all at once with real-time progress indicators
+AI Signal Analysis	Perplexity AI extracts entities, sentiment, priority, and actionable insights from news
+Three-Level Triggers	Dashboard-wide, industry group, or individual company monitoring
+Article Generation	Create news articles, briefs, or analysis pieces from signals using AI
+CMS Export	Export to WordPress, Contentful, Markdown, or JSON with clickable source links
+RSS Feeds	/api/rss/poultry, /api/rss/feed, /api/rss/pet-food, /api/rss/all
+Collaborative Workflow	Team features for 3-person editorial team with activity tracking
+Alert System	Configure notifications for specific signal types
+Expansion Recommendations
+Scheduled Monitoring - Add automated daily/weekly monitoring via cron jobs
+Email Digests - Send daily signal summaries to team members
+Custom RSS Filters - Allow filtering by signal type, priority, or sentiment
+Competitive Analysis - Compare signals across competing companies
+Dashboard Analytics - Charts showing signal trends, industry activity over time
+Saved Searches - Let users save and rerun specific monitoring queries
+Webhook Integrations - Push signals to Slack, Teams, or custom endpoints
+Multi-language Support - Monitor international sources in multiple languages
