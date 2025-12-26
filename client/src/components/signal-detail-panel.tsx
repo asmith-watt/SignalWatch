@@ -111,7 +111,7 @@ export function SignalDetailPanel({
     <div className="h-full flex flex-col border-l bg-background">
       <div className="flex items-center justify-between p-4 border-b">
         <h2 className="text-lg font-semibold">Signal Details</h2>
-        <Button variant="ghost" size="icon" onClick={onClose} data-testid="button-close-detail">
+        <Button variant="ghost" size="icon" onClick={onClose} data-testid="button-close-detail" aria-label="Close signal details">
           <X className="w-4 h-4" />
         </Button>
       </div>

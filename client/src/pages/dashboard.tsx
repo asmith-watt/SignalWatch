@@ -55,11 +55,11 @@ export function Dashboard({
   const selectedCompany = companies.find((c) => c.id === selectedCompanyId);
 
   const { data: allSignals = [], isLoading: signalsLoading } = useQuery<Signal[]>({
-    queryKey: ["/api/signals", selectedCompanyId],
+    queryKey: ["/api/signals"],
   });
 
   const { data: alerts = [] } = useQuery<Alert[]>({
-    queryKey: ["/api/alerts", selectedCompanyId],
+    queryKey: ["/api/alerts"],
   });
 
   const updateSignalMutation = useMutation({
@@ -102,7 +102,7 @@ export function Dashboard({
   });
 
   const filteredSignals = useMemo(() => {
-    let result = allSignals;
+    let result = Array.isArray(allSignals) ? allSignals : [];
 
     if (selectedCompanyId) {
       result = result.filter((s) => s.companyId === selectedCompanyId);
