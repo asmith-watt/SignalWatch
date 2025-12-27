@@ -149,9 +149,9 @@ export function SignalDetailPanel({
     : new Date(signal.createdAt);
 
   const entities = signal.entities as {
-    people?: string[];
-    organizations?: string[];
-    locations?: string[];
+    people?: (string | { name: string; role?: string; company?: string })[];
+    organizations?: (string | { name: string })[];
+    locations?: (string | { name: string })[];
   } | null;
 
   const aiAnalysis = signal.aiAnalysis as {
@@ -342,31 +342,40 @@ export function SignalDetailPanel({
                   {entities.people && entities.people.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       <span className="text-xs text-muted-foreground w-20">People:</span>
-                      {entities.people.map((person) => (
-                        <Badge key={person} variant="secondary" className="text-xs">
-                          {person}
-                        </Badge>
-                      ))}
+                      {entities.people.map((person, i) => {
+                        const personName = typeof person === 'string' ? person : person.name;
+                        return (
+                          <Badge key={`person-${i}`} variant="secondary" className="text-xs">
+                            {personName}
+                          </Badge>
+                        );
+                      })}
                     </div>
                   )}
                   {entities.organizations && entities.organizations.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       <span className="text-xs text-muted-foreground w-20">Orgs:</span>
-                      {entities.organizations.map((org) => (
-                        <Badge key={org} variant="secondary" className="text-xs">
-                          {org}
-                        </Badge>
-                      ))}
+                      {entities.organizations.map((org, i) => {
+                        const orgName = typeof org === 'string' ? org : org.name;
+                        return (
+                          <Badge key={`org-${i}`} variant="secondary" className="text-xs">
+                            {orgName}
+                          </Badge>
+                        );
+                      })}
                     </div>
                   )}
                   {entities.locations && entities.locations.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       <span className="text-xs text-muted-foreground w-20">Locations:</span>
-                      {entities.locations.map((loc) => (
-                        <Badge key={loc} variant="secondary" className="text-xs">
-                          {loc}
-                        </Badge>
-                      ))}
+                      {entities.locations.map((loc, i) => {
+                        const locName = typeof loc === 'string' ? loc : loc.name;
+                        return (
+                          <Badge key={`loc-${i}`} variant="secondary" className="text-xs">
+                            {locName}
+                          </Badge>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
