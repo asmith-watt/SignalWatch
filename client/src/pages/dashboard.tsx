@@ -39,6 +39,7 @@ const defaultFilters: SignalFilters = {
   status: "all",
   bookmarked: false,
   unread: false,
+  entityQuery: "",
 };
 
 export function Dashboard({
@@ -207,6 +208,10 @@ export function Dashboard({
     updateSignalMutation.mutate({ id, updates: { isRead: read } });
   };
 
+  const handleEntitySelect = (entityName: string) => {
+    setFilters({ ...filters, entityQuery: entityName });
+  };
+
   const handleUpdateStatus = (id: number, status: string) => {
     updateSignalMutation.mutate({ id, updates: { contentStatus: status } });
     if (selectedSignal?.id === id) {
@@ -274,6 +279,7 @@ export function Dashboard({
                     onBookmark={handleBookmark}
                     onMarkRead={handleMarkRead}
                     onSignalClick={handleSignalClick}
+                    onEntitySelect={handleEntitySelect}
                   />
                 )}
               </div>
@@ -335,6 +341,7 @@ export function Dashboard({
                           signal={signal}
                           onBookmark={handleBookmark}
                           onMarkRead={handleMarkRead}
+                          onEntitySelect={handleEntitySelect}
                           onClick={() => handleSignalClick(signal)}
                         />
                       ))}
@@ -352,6 +359,7 @@ export function Dashboard({
                       onBookmark={handleBookmark}
                       onMarkRead={handleMarkRead}
                       onSignalClick={handleSignalClick}
+                      onEntitySelect={handleEntitySelect}
                     />
                   )}
                 </TabsContent>
@@ -382,6 +390,7 @@ export function Dashboard({
             onBookmark={handleBookmark}
             onUpdateStatus={handleUpdateStatus}
             onUpdateNotes={handleUpdateNotes}
+            onEntitySelect={handleEntitySelect}
           />
         </div>
       )}

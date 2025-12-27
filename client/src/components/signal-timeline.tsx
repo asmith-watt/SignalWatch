@@ -13,6 +13,7 @@ interface SignalTimelineProps {
   onAssign?: (id: number) => void;
   onCreateContent?: (id: number) => void;
   onSignalClick?: (signal: Signal) => void;
+  onEntitySelect?: (entityName: string) => void;
 }
 
 interface TimelineGroup {
@@ -70,6 +71,7 @@ export function SignalTimeline({
   onAssign,
   onCreateContent,
   onSignalClick,
+  onEntitySelect,
 }: SignalTimelineProps) {
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
@@ -147,6 +149,7 @@ export function SignalTimeline({
                           onMarkRead={onMarkRead}
                           onAssign={onAssign}
                           onCreateContent={onCreateContent}
+                          onEntitySelect={onEntitySelect}
                           onClick={() => onSignalClick?.(signal)}
                         />
                       </div>

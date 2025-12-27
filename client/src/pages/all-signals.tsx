@@ -276,6 +276,7 @@ export function AllSignalsPage() {
                   onBookmark={handleBookmark}
                   onMarkRead={handleMarkRead}
                   onSignalClick={handleSignalClick}
+                  onEntitySelect={handleEntitySelect}
                 />
               )}
             </TabsContent>
