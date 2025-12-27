@@ -8,9 +8,11 @@ import {
   User,
   ChevronDown,
   Save,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
@@ -35,6 +37,7 @@ export interface SignalFilters {
   status: string;
   bookmarked: boolean;
   unread: boolean;
+  entityQuery: string;
 }
 
 interface SignalFiltersBarProps {
@@ -98,7 +101,8 @@ export function SignalFiltersBar({
     (filters.assignee !== "all" ? 1 : 0) +
     (filters.status !== "all" ? 1 : 0) +
     (filters.bookmarked ? 1 : 0) +
-    (filters.unread ? 1 : 0);
+    (filters.unread ? 1 : 0) +
+    (filters.entityQuery ? 1 : 0);
 
   const handleTypeToggle = (type: string) => {
     const newTypes = filters.types.includes(type)
@@ -123,6 +127,7 @@ export function SignalFiltersBar({
       status: "all",
       bookmarked: false,
       unread: false,
+      entityQuery: "",
     });
   };
 
@@ -155,12 +160,26 @@ export function SignalFiltersBar({
       case "unread":
         onFiltersChange({ ...filters, unread: false });
         break;
+      case "entityQuery":
+        onFiltersChange({ ...filters, entityQuery: "" });
+        break;
     }
   };
 
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search entities..."
+            value={filters.entityQuery}
+            onChange={(e) => onFiltersChange({ ...filters, entityQuery: e.target.value })}
+            className="w-48 pl-8 h-8"
+            data-testid="input-entity-search"
+          />
+        </div>
+
         <Popover open={typePopoverOpen} onOpenChange={setTypePopoverOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" data-testid="button-filter-type">
@@ -394,6 +413,21 @@ export function SignalFiltersBar({
                 size="icon"
                 className="h-4 w-4 p-0 hover:bg-transparent"
                 onClick={() => removeFilter("unread")}
+              >
+                <X className="w-3 h-3" />
+              </Button>
+            </Badge>
+          )}
+
+          {filters.entityQuery && (
+            <Badge variant="default" className="gap-1 pr-1">
+              <Search className="w-3 h-3" />
+              {filters.entityQuery}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-4 w-4 p-0 hover:bg-transparent"
+                onClick={() => removeFilter("entityQuery")}
               >
                 <X className="w-3 h-3" />
               </Button>
