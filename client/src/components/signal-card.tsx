@@ -334,13 +334,13 @@ export function SignalCard({
                     {(signal.entities as any).companies?.map((c: any, i: number) => (
                       <Badge key={i} variant="secondary" className="text-xs h-5 px-1.5 gap-1">
                         <Building2 className="w-2.5 h-2.5" />
-                        {c.name}
+                        {typeof c === 'string' ? c : c.name}
                       </Badge>
                     ))}
-                    {(signal.entities as any).organizations?.map((org: string, i: number) => (
+                    {(signal.entities as any).organizations?.map((org: any, i: number) => (
                       <Badge key={`org-${i}`} variant="secondary" className="text-xs h-5 px-1.5 gap-1">
                         <Building2 className="w-2.5 h-2.5" />
-                        {org}
+                        {typeof org === 'string' ? org : org.name}
                       </Badge>
                     ))}
                     {(signal.entities as any).people?.map((person: any, i: number) => (
@@ -349,10 +349,10 @@ export function SignalCard({
                         {typeof person === 'string' ? person : person.name}
                       </Badge>
                     ))}
-                    {(signal.entities as any).locations?.slice(0, 3).map((loc: string, i: number) => (
+                    {(signal.entities as any).locations?.slice(0, 3).map((loc: any, i: number) => (
                       <Badge key={`loc-${i}`} variant="outline" className="text-xs h-5 px-1.5 gap-1">
                         <MapPin className="w-2.5 h-2.5" />
-                        {loc}
+                        {typeof loc === 'string' ? loc : loc.name}
                       </Badge>
                     ))}
                   </div>
