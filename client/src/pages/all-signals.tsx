@@ -182,6 +182,10 @@ export function AllSignalsPage() {
     }
   };
 
+  const handleEntitySelect = (entityName: string) => {
+    setFilters({ ...filters, entityQuery: entityName });
+  };
+
   const clearFilters = () => {
     setFilters(defaultFilters);
   };
@@ -192,7 +196,8 @@ export function AllSignalsPage() {
     filters.dateRange !== "all" ||
     filters.status !== "all" ||
     filters.bookmarked ||
-    filters.unread;
+    filters.unread ||
+    filters.entityQuery !== "";
 
   return (
     <div className="flex h-full">
@@ -246,6 +251,7 @@ export function AllSignalsPage() {
                         onBookmark={handleBookmark}
                         onMarkRead={handleMarkRead}
                         onPublishWordPress={(id) => setWpPublishSignalId(id)}
+                        onEntitySelect={handleEntitySelect}
                         onClick={() => handleSignalClick(signal)}
                       />
                     );

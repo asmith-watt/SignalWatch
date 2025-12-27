@@ -50,6 +50,7 @@ interface SignalCardProps {
   onAssign?: (id: number) => void;
   onCreateContent?: (id: number) => void;
   onPublishWordPress?: (id: number) => void;
+  onEntitySelect?: (entityName: string) => void;
   onClick?: () => void;
 }
 
@@ -100,6 +101,7 @@ export function SignalCard({
   onAssign,
   onCreateContent,
   onPublishWordPress,
+  onEntitySelect,
   onClick,
 }: SignalCardProps) {
   const typeConfig = signalTypeConfig[signal.type] || signalTypeConfig.other;
@@ -331,30 +333,78 @@ export function SignalCard({
                 {/* Extracted Entities */}
                 {signal.entities && typeof signal.entities === 'object' && (
                   <div className="flex flex-wrap gap-1.5 pt-1">
-                    {(signal.entities as any).companies?.map((c: any, i: number) => (
-                      <Badge key={i} variant="secondary" className="text-xs h-5 px-1.5 gap-1">
-                        <Building2 className="w-2.5 h-2.5" />
-                        {typeof c === 'string' ? c : c.name}
-                      </Badge>
-                    ))}
-                    {(signal.entities as any).organizations?.map((org: any, i: number) => (
-                      <Badge key={`org-${i}`} variant="secondary" className="text-xs h-5 px-1.5 gap-1">
-                        <Building2 className="w-2.5 h-2.5" />
-                        {typeof org === 'string' ? org : org.name}
-                      </Badge>
-                    ))}
-                    {(signal.entities as any).people?.map((person: any, i: number) => (
-                      <Badge key={`person-${i}`} variant="outline" className="text-xs h-5 px-1.5 gap-1">
-                        <Users className="w-2.5 h-2.5" />
-                        {typeof person === 'string' ? person : person.name}
-                      </Badge>
-                    ))}
-                    {(signal.entities as any).locations?.slice(0, 3).map((loc: any, i: number) => (
-                      <Badge key={`loc-${i}`} variant="outline" className="text-xs h-5 px-1.5 gap-1">
-                        <MapPin className="w-2.5 h-2.5" />
-                        {typeof loc === 'string' ? loc : loc.name}
-                      </Badge>
-                    ))}
+                    {(signal.entities as any).companies?.map((c: any, i: number) => {
+                      const name = typeof c === 'string' ? c : c.name;
+                      return (
+                        <Badge
+                          key={i}
+                          variant="secondary"
+                          className="text-xs h-5 px-1.5 gap-1 cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEntitySelect?.(name);
+                          }}
+                          data-testid={`entity-company-${i}`}
+                        >
+                          <Building2 className="w-2.5 h-2.5" />
+                          {name}
+                        </Badge>
+                      );
+                    })}
+                    {(signal.entities as any).organizations?.map((org: any, i: number) => {
+                      const name = typeof org === 'string' ? org : org.name;
+                      return (
+                        <Badge
+                          key={`org-${i}`}
+                          variant="secondary"
+                          className="text-xs h-5 px-1.5 gap-1 cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEntitySelect?.(name);
+                          }}
+                          data-testid={`entity-org-${i}`}
+                        >
+                          <Building2 className="w-2.5 h-2.5" />
+                          {name}
+                        </Badge>
+                      );
+                    })}
+                    {(signal.entities as any).people?.map((person: any, i: number) => {
+                      const name = typeof person === 'string' ? person : person.name;
+                      return (
+                        <Badge
+                          key={`person-${i}`}
+                          variant="outline"
+                          className="text-xs h-5 px-1.5 gap-1 cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEntitySelect?.(name);
+                          }}
+                          data-testid={`entity-person-${i}`}
+                        >
+                          <Users className="w-2.5 h-2.5" />
+                          {name}
+                        </Badge>
+                      );
+                    })}
+                    {(signal.entities as any).locations?.slice(0, 3).map((loc: any, i: number) => {
+                      const name = typeof loc === 'string' ? loc : loc.name;
+                      return (
+                        <Badge
+                          key={`loc-${i}`}
+                          variant="outline"
+                          className="text-xs h-5 px-1.5 gap-1 cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEntitySelect?.(name);
+                          }}
+                          data-testid={`entity-loc-${i}`}
+                        >
+                          <MapPin className="w-2.5 h-2.5" />
+                          {name}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 )}
               </div>
