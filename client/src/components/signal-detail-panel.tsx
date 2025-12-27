@@ -45,6 +45,7 @@ interface SignalDetailPanelProps {
   onBookmark: (id: number, bookmarked: boolean) => void;
   onUpdateStatus: (id: number, status: string) => void;
   onUpdateNotes: (id: number, notes: string) => void;
+  onEntitySelect?: (entityName: string) => void;
   teamMembers?: { id: string; name: string }[];
 }
 
@@ -62,6 +63,7 @@ export function SignalDetailPanel({
   onBookmark,
   onUpdateStatus,
   onUpdateNotes,
+  onEntitySelect,
 }: SignalDetailPanelProps) {
   const { toast } = useToast();
   const [notes, setNotes] = useState(signal.notes || "");
@@ -345,7 +347,13 @@ export function SignalDetailPanel({
                       {entities.people.map((person, i) => {
                         const personName = typeof person === 'string' ? person : person.name;
                         return (
-                          <Badge key={`person-${i}`} variant="secondary" className="text-xs">
+                          <Badge
+                            key={`person-${i}`}
+                            variant="secondary"
+                            className="text-xs cursor-pointer"
+                            onClick={() => onEntitySelect?.(personName)}
+                            data-testid={`detail-entity-person-${i}`}
+                          >
                             {personName}
                           </Badge>
                         );
@@ -358,7 +366,13 @@ export function SignalDetailPanel({
                       {entities.organizations.map((org, i) => {
                         const orgName = typeof org === 'string' ? org : org.name;
                         return (
-                          <Badge key={`org-${i}`} variant="secondary" className="text-xs">
+                          <Badge
+                            key={`org-${i}`}
+                            variant="secondary"
+                            className="text-xs cursor-pointer"
+                            onClick={() => onEntitySelect?.(orgName)}
+                            data-testid={`detail-entity-org-${i}`}
+                          >
                             {orgName}
                           </Badge>
                         );
@@ -371,7 +385,13 @@ export function SignalDetailPanel({
                       {entities.locations.map((loc, i) => {
                         const locName = typeof loc === 'string' ? loc : loc.name;
                         return (
-                          <Badge key={`loc-${i}`} variant="secondary" className="text-xs">
+                          <Badge
+                            key={`loc-${i}`}
+                            variant="secondary"
+                            className="text-xs cursor-pointer"
+                            onClick={() => onEntitySelect?.(locName)}
+                            data-testid={`detail-entity-loc-${i}`}
+                          >
                             {locName}
                           </Badge>
                         );

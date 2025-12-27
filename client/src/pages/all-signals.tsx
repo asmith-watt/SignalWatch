@@ -292,6 +292,7 @@ export function AllSignalsPage() {
             onBookmark={handleBookmark}
             onUpdateStatus={handleUpdateStatus}
             onUpdateNotes={handleUpdateNotes}
+            onEntitySelect={handleEntitySelect}
           />
         </div>
       )}
