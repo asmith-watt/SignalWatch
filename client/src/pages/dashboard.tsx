@@ -42,6 +42,34 @@ const defaultFilters: SignalFilters = {
   entityQuery: "",
 };
 
+function extractEntityNames(entities: unknown): string[] {
+  if (!entities || typeof entities !== 'object') return [];
+  const result: string[] = [];
+  const e = entities as Record<string, unknown>;
+  
+  const extractNames = (arr: unknown) => {
+    if (!Array.isArray(arr)) return;
+    for (const item of arr) {
+      if (typeof item === 'string') {
+        result.push(item.toLowerCase());
+      } else if (item && typeof item === 'object' && 'name' in item) {
+        const name = (item as { name: string }).name;
+        if (typeof name === 'string') {
+          result.push(name.toLowerCase());
+        }
+      }
+    }
+  };
+  
+  extractNames(e.companies);
+  extractNames(e.organizations);
+  extractNames(e.people);
+  extractNames(e.locations);
+  extractNames(e.products);
+  
+  return result;
+}
+
 export function Dashboard({
   selectedCompanyId,
   companies,
@@ -153,6 +181,18 @@ export function Dashboard({
       result = result.filter((s) => {
         const signalDate = s.publishedAt ? new Date(s.publishedAt) : new Date(s.createdAt);
         return signalDate >= startDate;
+      });
+    }
+
+    if (filters.entityQuery) {
+      const query = filters.entityQuery.toLowerCase();
+      result = result.filter((s) => {
+        const entityNames = extractEntityNames(s.entities);
+        const titleMatch = s.title.toLowerCase().includes(query);
+        const contentMatch = s.content?.toLowerCase().includes(query) || false;
+        const summaryMatch = s.summary?.toLowerCase().includes(query) || false;
+        const entityMatch = entityNames.some(name => name.includes(query));
+        return titleMatch || contentMatch || summaryMatch || entityMatch;
       });
     }
 
