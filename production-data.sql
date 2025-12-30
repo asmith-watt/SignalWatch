@@ -1,9 +1,14 @@
 -- SignalWatch Data Export
--- Generated: 2025-12-30T03:29:22.475Z
+-- Generated: 2025-12-30T03:37:54.284Z
 -- Run this in your PRODUCTION database via the Database pane
 
--- Clear existing data (optional - uncomment if you want to replace all data)
--- TRUNCATE companies, signals, alerts, users, conversations, messages, activity_log CASCADE;
+-- IMPORTANT: Run these commands in ORDER (companies first, then signals)
+-- If you get foreign key errors, first run ONLY the companies section,
+-- then run the signals section in a separate query.
+
+-- Clear existing data first to avoid conflicts
+TRUNCATE signals, alerts, activity_log, messages, conversations CASCADE;
+TRUNCATE companies CASCADE;
 
 -- Companies (888 rows)
 INSERT INTO companies (id, name, website, industry, description, logo_url, location, size, founded, tags, rss_feed_url, linkedin_url, twitter_handle, is_active, created_at, updated_at, region, country, product_types) VALUES (1, 'Stripe', 'https://stripe.com', 'Fintech', 'Financial infrastructure platform for the internet', NULL, 'San Francisco, CA', '5001-10000', '2010', '{"payments","fintech","infrastructure"}', NULL, 'https://linkedin.com/company/stripe', 'stripe', true, '2025-12-26T16:41:01.027Z', '2025-12-26T16:41:01.027Z', NULL, NULL, NULL) ON CONFLICT (id) DO NOTHING;

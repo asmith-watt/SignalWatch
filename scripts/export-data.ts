@@ -27,8 +27,13 @@ async function exportData() {
   output.push("-- Generated: " + new Date().toISOString());
   output.push("-- Run this in your PRODUCTION database via the Database pane");
   output.push("");
-  output.push("-- Clear existing data (optional - uncomment if you want to replace all data)");
-  output.push("-- TRUNCATE companies, signals, alerts, users, conversations, messages, activity_log CASCADE;");
+  output.push("-- IMPORTANT: Run these commands in ORDER (companies first, then signals)");
+  output.push("-- If you get foreign key errors, first run ONLY the companies section,");
+  output.push("-- then run the signals section in a separate query.");
+  output.push("");
+  output.push("-- Clear existing data first to avoid conflicts");
+  output.push("TRUNCATE signals, alerts, activity_log, messages, conversations CASCADE;");
+  output.push("TRUNCATE companies CASCADE;");
   output.push("");
   
   const allCompanies = await db.select().from(companies).orderBy(companies.id);
