@@ -31,6 +31,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -110,11 +111,17 @@ export function SignalCard({
   const sentimentColor = sentimentColors[signal.sentiment || "neutral"];
   const statusConfig = contentStatusConfig[signal.contentStatus || "new"];
 
-  const timeAgo = signal.publishedAt
-    ? formatDistanceToNow(new Date(signal.publishedAt), { addSuffix: true })
+  const gatheredTime = signal.gatheredAt
+    ? formatDistanceToNow(new Date(signal.gatheredAt), { addSuffix: true })
     : signal.createdAt
     ? formatDistanceToNow(new Date(signal.createdAt), { addSuffix: true })
     : "";
+  
+  const publishedDate = signal.publishedAt
+    ? new Date(signal.publishedAt).toLocaleDateString()
+    : null;
+  
+  const citations = Array.isArray(signal.citations) ? signal.citations : [];
 
   return (
     <Card
@@ -149,10 +156,16 @@ export function SignalCard({
                   </>
                 )}
                 {signal.sourceName && <span>{signal.sourceName}</span>}
-                {timeAgo && (
+                {gatheredTime && (
                   <>
                     <span>-</span>
-                    <span>{timeAgo}</span>
+                    <span>Gathered {gatheredTime}</span>
+                  </>
+                )}
+                {publishedDate && (
+                  <>
+                    <span>-</span>
+                    <span>Published {publishedDate}</span>
                   </>
                 )}
               </div>
@@ -225,6 +238,34 @@ export function SignalCard({
                         View source
                       </a>
                     </DropdownMenuItem>
+                  )}
+                  {citations.length > 0 && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuLabel className="text-xs text-muted-foreground">
+                        Citations
+                      </DropdownMenuLabel>
+                      {citations.slice(0, 5).map((url, index) => {
+                        try {
+                          const hostname = new URL(url).hostname.replace("www.", "");
+                          return (
+                            <DropdownMenuItem key={index} asChild>
+                              <a
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs"
+                              >
+                                <ExternalLink className="w-3 h-3 mr-2" />
+                                {hostname}
+                              </a>
+                            </DropdownMenuItem>
+                          );
+                        } catch {
+                          return null;
+                        }
+                      })}
+                    </>
                   )}
                 </DropdownMenuContent>
               </DropdownMenu>

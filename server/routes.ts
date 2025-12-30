@@ -159,7 +159,13 @@ export async function registerRoutes(
         }
       }
 
-      const signal = await storage.createSignal(parsed.data);
+      // Ensure citations has a default value
+      const signalData = {
+        ...parsed.data,
+        citations: parsed.data.citations || [],
+      };
+
+      const signal = await storage.createSignal(signalData);
       res.status(201).json(signal);
     } catch (error) {
       console.error("Error creating signal:", error);
@@ -799,7 +805,7 @@ export async function registerRoutes(
   app.get("/api/export/signals.csv", async (req: Request, res: Response) => {
     try {
       const allSignals = await storage.getAllSignals();
-      const headers = ["id", "company_id", "type", "title", "content", "summary", "source_url", "source_name", "published_at", "sentiment", "entities", "priority", "is_read", "is_bookmarked", "assigned_to", "content_status", "notes", "ai_analysis", "hash", "created_at"];
+      const headers = ["id", "company_id", "type", "title", "content", "summary", "source_url", "source_name", "citations", "published_at", "gathered_at", "sentiment", "entities", "priority", "is_read", "is_bookmarked", "assigned_to", "content_status", "notes", "ai_analysis", "hash", "created_at"];
       
       const escapeCSV = (val: unknown): string => {
         if (val === null || val === undefined) return "";
@@ -812,7 +818,8 @@ export async function registerRoutes(
       
       const rows = allSignals.map(s => [
         s.id, s.companyId, s.type, s.title, s.content, s.summary, s.sourceUrl, s.sourceName,
-        s.publishedAt?.toISOString(), s.sentiment,
+        s.citations ? JSON.stringify(s.citations) : "",
+        s.publishedAt?.toISOString(), s.gatheredAt?.toISOString(), s.sentiment,
         s.entities ? JSON.stringify(s.entities) : "",
         s.priority, s.isRead, s.isBookmarked, s.assignedTo, s.contentStatus, s.notes,
         s.aiAnalysis ? JSON.stringify(s.aiAnalysis) : "",
@@ -935,6 +942,7 @@ export async function registerRoutes(
             summary: row.summary || null,
             sourceUrl: row.source_url || null,
             sourceName: row.source_name || null,
+            citations: row.citations ? JSON.parse(row.citations) : [],
             publishedAt: row.published_at ? new Date(row.published_at) : null,
             sentiment: row.sentiment || null,
             entities: row.entities ? JSON.parse(row.entities) : null,

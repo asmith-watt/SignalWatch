@@ -23,6 +23,7 @@ interface ExtractedSignal {
   type: string;
   sourceUrl: string | null;
   sourceName: string | null;
+  citations: string[] | null;
   sentiment: "positive" | "negative" | "neutral";
   priority: "high" | "medium" | "low";
 }
@@ -115,11 +116,26 @@ If no recent news found, return empty array: []`;
       return [];
     }
 
-    return signals.map((s, index) => ({
-      ...s,
-      sourceUrl: citations[index] || citations[0] || null,
-      sourceName: citations[index] ? new URL(citations[index]).hostname.replace("www.", "") : "Perplexity AI",
-    }));
+    return signals.map((s) => {
+      let sourceUrl: string | null = null;
+      let sourceName = "Perplexity AI";
+      
+      if (citations.length > 0 && citations[0]) {
+        try {
+          sourceUrl = citations[0];
+          sourceName = new URL(citations[0]).hostname.replace("www.", "");
+        } catch {
+          sourceUrl = citations[0];
+        }
+      }
+      
+      return {
+        ...s,
+        sourceUrl,
+        sourceName,
+        citations: citations.length > 0 ? citations : [],
+      };
+    });
   } catch (error) {
     console.error(`Error fetching news for ${company.name}:`, error);
     return [];
@@ -147,7 +163,8 @@ export async function monitorCompany(company: Company): Promise<number> {
       summary: signal.summary,
       sourceUrl: signal.sourceUrl,
       sourceName: signal.sourceName,
-      publishedAt: new Date(),
+      citations: signal.citations || [],
+      publishedAt: null,
       sentiment: signal.sentiment,
       priority: signal.priority,
       isRead: false,

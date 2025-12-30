@@ -90,7 +90,9 @@ export const signals = pgTable("signals", {
   summary: text("summary"),
   sourceUrl: text("source_url"),
   sourceName: text("source_name"),
+  citations: text("citations").array().default([]),
   publishedAt: timestamp("published_at"),
+  gatheredAt: timestamp("gathered_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   sentiment: text("sentiment"),
   entities: jsonb("entities"),
   priority: text("priority").default("medium"),
@@ -118,6 +120,7 @@ export const signalsRelations = relations(signals, ({ one }) => ({
 export const insertSignalSchema = createInsertSchema(signals).omit({
   id: true,
   createdAt: true,
+  gatheredAt: true,
 });
 
 export type InsertSignal = z.infer<typeof insertSignalSchema>;
