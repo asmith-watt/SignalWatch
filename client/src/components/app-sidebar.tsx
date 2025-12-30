@@ -14,6 +14,7 @@ import {
   Briefcase,
   TrendingUp,
   RefreshCw,
+  Database,
 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -51,6 +52,7 @@ const navigationItems = [
   { title: "Alerts", url: "/alerts", icon: Bell },
   { title: "Team", url: "/team", icon: Users },
   { title: "WordPress", url: "/wordpress", icon: Globe },
+  { title: "Data", url: "/data", icon: Database },
 ];
 
 const industryGroups: Record<string, string[]> = {

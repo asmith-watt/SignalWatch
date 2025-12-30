@@ -764,6 +764,202 @@ export async function registerRoutes(
     }
   });
 
+  // CSV Export endpoints
+  app.get("/api/export/companies.csv", async (req: Request, res: Response) => {
+    try {
+      const allCompanies = await storage.getAllCompanies();
+      const headers = ["id", "name", "website", "industry", "description", "logo_url", "location", "region", "country", "size", "founded", "tags", "product_types", "rss_feed_url", "linkedin_url", "twitter_handle", "is_active", "created_at", "updated_at"];
+      
+      const escapeCSV = (val: unknown): string => {
+        if (val === null || val === undefined) return "";
+        const str = typeof val === "object" ? JSON.stringify(val) : String(val);
+        if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      };
+      
+      const rows = allCompanies.map(c => [
+        c.id, c.name, c.website, c.industry, c.description, c.logoUrl, c.location, c.region, c.country, c.size, c.founded,
+        c.tags ? JSON.stringify(c.tags) : "",
+        c.productTypes ? JSON.stringify(c.productTypes) : "",
+        c.rssFeedUrl, c.linkedinUrl, c.twitterHandle, c.isActive, c.createdAt?.toISOString(), c.updatedAt?.toISOString()
+      ].map(escapeCSV).join(","));
+      
+      const csv = [headers.join(","), ...rows].join("\n");
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", "attachment; filename=companies-export.csv");
+      res.send(csv);
+    } catch (error) {
+      console.error("Error exporting companies:", error);
+      res.status(500).json({ error: "Failed to export companies" });
+    }
+  });
+
+  app.get("/api/export/signals.csv", async (req: Request, res: Response) => {
+    try {
+      const allSignals = await storage.getAllSignals();
+      const headers = ["id", "company_id", "type", "title", "content", "summary", "source_url", "source_name", "published_at", "sentiment", "entities", "priority", "is_read", "is_bookmarked", "assigned_to", "content_status", "notes", "ai_analysis", "hash", "created_at"];
+      
+      const escapeCSV = (val: unknown): string => {
+        if (val === null || val === undefined) return "";
+        const str = typeof val === "object" ? JSON.stringify(val) : String(val);
+        if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      };
+      
+      const rows = allSignals.map(s => [
+        s.id, s.companyId, s.type, s.title, s.content, s.summary, s.sourceUrl, s.sourceName,
+        s.publishedAt?.toISOString(), s.sentiment,
+        s.entities ? JSON.stringify(s.entities) : "",
+        s.priority, s.isRead, s.isBookmarked, s.assignedTo, s.contentStatus, s.notes,
+        s.aiAnalysis ? JSON.stringify(s.aiAnalysis) : "",
+        s.hash, s.createdAt?.toISOString()
+      ].map(escapeCSV).join(","));
+      
+      const csv = [headers.join(","), ...rows].join("\n");
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", "attachment; filename=signals-export.csv");
+      res.send(csv);
+    } catch (error) {
+      console.error("Error exporting signals:", error);
+      res.status(500).json({ error: "Failed to export signals" });
+    }
+  });
+
+  // CSV Import endpoints
+  app.post("/api/import/companies", async (req: Request, res: Response) => {
+    try {
+      const { csv } = req.body;
+      if (!csv) return res.status(400).json({ error: "No CSV data provided" });
+      
+      const parseCSVLine = (line: string): string[] => {
+        const result: string[] = [];
+        let current = "";
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+            else { inQuotes = !inQuotes; }
+          } else if (char === "," && !inQuotes) { result.push(current); current = ""; }
+          else { current += char; }
+        }
+        result.push(current);
+        return result;
+      };
+      
+      const lines = csv.split("\n").filter((line: string) => line.trim());
+      if (lines.length < 2) return res.status(400).json({ error: "CSV must have header and at least one row" });
+      
+      const headers = parseCSVLine(lines[0]);
+      let imported = 0;
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        const row: Record<string, string> = {};
+        headers.forEach((h, idx) => { row[h] = values[idx] || ""; });
+        
+        try {
+          await storage.createCompany({
+            name: row.name,
+            website: row.website || null,
+            industry: row.industry || null,
+            description: row.description || null,
+            logoUrl: row.logo_url || null,
+            location: row.location || null,
+            region: row.region || null,
+            country: row.country || null,
+            size: row.size || null,
+            founded: row.founded || null,
+            tags: row.tags ? JSON.parse(row.tags) : null,
+            productTypes: row.product_types ? JSON.parse(row.product_types) : null,
+            rssFeedUrl: row.rss_feed_url || null,
+            linkedinUrl: row.linkedin_url || null,
+            twitterHandle: row.twitter_handle || null,
+            isActive: row.is_active === "true",
+          });
+          imported++;
+        } catch (e) {
+          console.error(`Error importing company row ${i}:`, e);
+        }
+      }
+      
+      res.json({ success: true, imported, total: lines.length - 1 });
+    } catch (error) {
+      console.error("Error importing companies:", error);
+      res.status(500).json({ error: "Failed to import companies" });
+    }
+  });
+
+  app.post("/api/import/signals", async (req: Request, res: Response) => {
+    try {
+      const { csv } = req.body;
+      if (!csv) return res.status(400).json({ error: "No CSV data provided" });
+      
+      const parseCSVLine = (line: string): string[] => {
+        const result: string[] = [];
+        let current = "";
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+            else { inQuotes = !inQuotes; }
+          } else if (char === "," && !inQuotes) { result.push(current); current = ""; }
+          else { current += char; }
+        }
+        result.push(current);
+        return result;
+      };
+      
+      const lines = csv.split("\n").filter((line: string) => line.trim());
+      if (lines.length < 2) return res.status(400).json({ error: "CSV must have header and at least one row" });
+      
+      const headers = parseCSVLine(lines[0]);
+      let imported = 0;
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        const row: Record<string, string> = {};
+        headers.forEach((h, idx) => { row[h] = values[idx] || ""; });
+        
+        try {
+          await storage.createSignal({
+            companyId: parseInt(row.company_id, 10),
+            type: row.type || "news",
+            title: row.title,
+            content: row.content || null,
+            summary: row.summary || null,
+            sourceUrl: row.source_url || null,
+            sourceName: row.source_name || null,
+            publishedAt: row.published_at ? new Date(row.published_at) : null,
+            sentiment: row.sentiment || null,
+            entities: row.entities ? JSON.parse(row.entities) : null,
+            priority: row.priority || "medium",
+            isRead: row.is_read === "true",
+            isBookmarked: row.is_bookmarked === "true",
+            assignedTo: row.assigned_to || null,
+            contentStatus: row.content_status || "new",
+            notes: row.notes || null,
+            aiAnalysis: row.ai_analysis ? JSON.parse(row.ai_analysis) : null,
+            hash: row.hash || null,
+          });
+          imported++;
+        } catch (e) {
+          console.error(`Error importing signal row ${i}:`, e);
+        }
+      }
+      
+      res.json({ success: true, imported, total: lines.length - 1 });
+    } catch (error) {
+      console.error("Error importing signals:", error);
+      res.status(500).json({ error: "Failed to import signals" });
+    }
+  });
+
   app.get("/api/rss", (req: Request, res: Response) => {
     const feeds = getAvailableFeeds();
     const baseUrl = `${req.protocol}://${req.get("host")}`;

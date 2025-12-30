@@ -15,6 +15,7 @@ import { Dashboard } from "@/pages/dashboard";
 import { AllSignalsPage } from "@/pages/all-signals";
 import { AlertsPage } from "@/pages/alerts";
 import WordPressSettings from "@/pages/wordpress-settings";
+import DataManagementPage from "@/pages/data-management";
 import NotFound from "@/pages/not-found";
 import { useToast } from "@/hooks/use-toast";
 import type { Company, Signal, InsertCompany } from "@shared/schema";
@@ -129,6 +130,9 @@ function MainLayout() {
               </Route>
               <Route path="/wordpress">
                 <WordPressSettings />
+              </Route>
+              <Route path="/data">
+                <DataManagementPage />
               </Route>
               <Route component={NotFound} />
             </Switch>
