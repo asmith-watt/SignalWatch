@@ -86,10 +86,10 @@ async function exportData() {
   output.push("");
   
   output.push("-- Reset sequences to continue from max ID");
+  output.push("-- Note: users table uses UUID, not serial, so no sequence reset needed");
   output.push("SELECT setval('companies_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM companies), 1));");
   output.push("SELECT setval('signals_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM signals), 1));");
   output.push("SELECT setval('alerts_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM alerts), 1));");
-  output.push("SELECT setval('users_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM users), 1));");
   output.push("SELECT setval('conversations_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM conversations), 1));");
   output.push("SELECT setval('messages_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM messages), 1));");
   output.push("SELECT setval('activity_log_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM activity_log), 1));");

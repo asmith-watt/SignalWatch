@@ -1,5 +1,5 @@
 -- SignalWatch Data Export
--- Generated: 2025-12-30T04:12:03.726Z
+-- Generated: 2025-12-30T04:18:40.377Z
 -- Run this in your PRODUCTION database via the Database pane
 
 -- IMPORTANT: Run these commands in ORDER (companies first, then signals)
@@ -1466,10 +1466,10 @@ INSERT INTO alerts (id, company_id, name, trigger_type, keywords, is_active, not
 INSERT INTO activity_log (id, user_id, action, entity_type, entity_id, details, created_at) VALUES (1, NULL, 'scheduled_monitoring', 'system', NULL, '{"signalsFound":233,"durationSeconds":3554,"companiesProcessed":688}', '2025-12-28T06:59:14.441Z') ON CONFLICT (id) DO NOTHING;
 
 -- Reset sequences to continue from max ID
+-- Note: users table uses UUID, not serial, so no sequence reset needed
 SELECT setval('companies_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM companies), 1));
 SELECT setval('signals_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM signals), 1));
 SELECT setval('alerts_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM alerts), 1));
-SELECT setval('users_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM users), 1));
 SELECT setval('conversations_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM conversations), 1));
 SELECT setval('messages_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM messages), 1));
 SELECT setval('activity_log_id_seq', GREATEST((SELECT COALESCE(MAX(id), 0) FROM activity_log), 1));
