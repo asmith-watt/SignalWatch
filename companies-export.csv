@@ -1,0 +1,889 @@
+id,name,website,industry,description,logo_url,location,region,country,size,founded,tags,product_types,rss_feed_url,linkedin_url,twitter_handle,is_active,created_at,updated_at
+1,Stripe,https://stripe.com,Fintech,Financial infrastructure platform for the internet,,"San Francisco, CA",,,5001-10000,2010,"[""payments"",""fintech"",""infrastructure""]",,,https://linkedin.com/company/stripe,stripe,true,2025-12-26T16:41:01.027Z,2025-12-26T16:41:01.027Z
+2,OpenAI,https://openai.com,AI/ML,AI research and deployment company,,"San Francisco, CA",,,1001-5000,2015,"[""artificial-intelligence"",""research"",""llm""]",,,https://linkedin.com/company/openai,OpenAI,true,2025-12-26T16:41:01.038Z,2025-12-26T16:41:01.038Z
+3,Databricks,https://databricks.com,Cloud,Unified analytics platform for data engineering and data science,,"San Francisco, CA",,,5001-10000,2013,"[""data"",""analytics"",""cloud""]",,,https://linkedin.com/company/databricks,datababorricks,true,2025-12-26T16:41:01.042Z,2025-12-26T16:41:01.042Z
+4,Figma,https://figma.com,SaaS,Collaborative interface design tool,,"San Francisco, CA",,,1001-5000,2012,"[""design"",""collaboration"",""saas""]",,,https://linkedin.com/company/figma,figma,true,2025-12-26T16:41:01.046Z,2025-12-26T16:41:01.046Z
+5,Anthropic,https://anthropic.com,AI/ML,AI safety research company,,"San Francisco, CA",,,201-500,2021,"[""artificial-intelligence"",""safety"",""research""]",,,https://linkedin.com/company/anthropic,AnthropicAI,true,2025-12-26T16:41:01.049Z,2025-12-26T16:41:01.049Z
+6,Notion,https://notion.so,SaaS,"All-in-one workspace for notes, docs, and collaboration",,"San Francisco, CA",,,501-1000,2016,"[""productivity"",""collaboration"",""notes""]",,,https://linkedin.com/company/notionhq,NotionHQ,true,2025-12-26T16:41:01.052Z,2025-12-26T16:41:01.052Z
+7,Snowflake,https://snowflake.com,Cloud,Cloud-based data warehousing company,,"Bozeman, MT",,,5001-10000,2012,"[""data"",""cloud"",""warehouse""]",,,https://linkedin.com/company/snowflake-computing,SnowflakeDB,true,2025-12-26T16:41:01.056Z,2025-12-26T16:41:01.056Z
+8,Plaid,https://plaid.com,Fintech,Financial data network powering digital finance,,"San Francisco, CA",,,1001-5000,2013,"[""fintech"",""api"",""banking""]",,,https://linkedin.com/company/plaid,Plaid,true,2025-12-26T16:41:01.060Z,2025-12-26T16:41:01.060Z
+9,Tyson Foods,https://www.tysonfoods.com,Poultry,Major U.S. poultry producer specializing in broilers and turkeys,,"Springdale, AR",,,10000+,1935,"[""poultry"",""broilers"",""turkeys"",""food-processing""]",,https://www.tysonfoods.com/news/news-releases,,,true,2025-12-26T16:56:33.527Z,2025-12-26T16:56:33.527Z
+10,Pilgrim's Pride,https://www.pilgrims.com,Poultry,Leading chicken producer in the United States,,"Greeley, CO",,,5001-10000,1946,"[""poultry"",""broilers"",""chicken""]",,https://ir.pilgrims.com/news-events/presentations,,,true,2025-12-26T16:56:37.150Z,2025-12-26T16:56:37.150Z
+11,Cal-Maine Foods,https://www.calmainefoods.com,Poultry,Largest producer and marketer of shell eggs in the United States,,"Ridgeland, MS",North America,United States,1001-5000,1957,"[""poultry"",""eggs"",""shell-eggs""]","[""Egg Products"",""Table Eggs""]",https://www.calmainefoods.com/investor-overview,,,true,2025-12-26T16:56:40.577Z,2025-12-26T16:56:40.577Z
+12,Vital Farms,https://vitalfarms.com,Poultry,Pasture-raised egg and butter producer focused on ethical farming,,"Austin, TX",North America,United States,201-500,2007,"[""poultry"",""eggs"",""pasture-raised"",""ethical""]","[""Egg Products"",""Table Eggs""]",https://investors.vitalfarms.com/overview/default.aspx,,,true,2025-12-26T16:56:44.008Z,2025-12-26T16:56:44.008Z
+13,Hormel Foods,https://www.hormelfoods.com,Poultry,Multinational food processing company with significant turkey operations,,"Austin, MN",,,10000+,1891,"[""poultry"",""turkey"",""food-processing""]",,https://investor.hormelfoods.com/ir-home/default.aspx,,,true,2025-12-26T16:56:47.261Z,2025-12-26T16:56:47.261Z
+14,Seaboard Corporation,https://www.seaboardcorp.com,Poultry,Diversified agribusiness and transportation company with turkey operations,,"Merriam, KS",,,10000+,1918,"[""poultry"",""turkey"",""agribusiness""]",,https://www.seaboardcorp.com/investors/,,,true,2025-12-26T16:56:50.638Z,2025-12-26T16:56:50.638Z
+15,Industrias Bachoco,https://en.grupobachoco.com,Poultry,Leading poultry producer in Mexico with U.S. operations,,"Celaya, Mexico",North America,Mexico,10000+,1952,"[""poultry"",""chicken"",""mexico""]","[""Chicken"",""Egg Products"",""Table Eggs"",""Turkey""]",https://en.grupobachoco.com/bachoco-company/annual-report-2024/,,,true,2025-12-26T16:56:54.623Z,2025-12-26T16:56:54.623Z
+16,USDA GATS,https://apps.fas.usda.gov/gats/default.aspx,Data Source,USDA Foreign Agricultural Service Global Agricultural Trade System - database for trade statistics,,"Washington, DC",,,,,"[""usda"",""data-source"",""trade-statistics"",""government""]",,,,,true,2025-12-26T16:57:03.804Z,2025-12-26T16:57:03.804Z
+17,USDA WASDE,https://www.usda.gov/about-usda/general-information/staff-offices/office-chief-economist/commodity-markets/wasde-report,Data Source,World Agricultural Supply and Demand Estimates - monthly USDA commodity report,,"Washington, DC",,,,,"[""usda"",""data-source"",""commodity-markets"",""monthly-report""]",,,,,true,2025-12-26T16:57:07.934Z,2025-12-26T16:57:07.934Z
+18,Egg Industry Center,https://www.eggindustrycenter.org,Data Source,EIC US egg production analysis - monthly industry analysis reports,,"Ames, IA",,,,,"[""eggs"",""data-source"",""industry-analysis"",""monthly-report""]",,https://www.eggindustrycenter.org/industry-analysis,,,true,2025-12-26T16:57:12.789Z,2025-12-26T16:57:12.789Z
+19,2 Sisters Food Group,,Poultry,,,,Europe,United Kingdom,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:14.013Z,2025-12-26T18:43:14.013Z
+20,3 Puglisi Brothers,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.028Z,2025-12-26T18:43:14.028Z
+21,A'Saffa Foods S.A.O.G.,,Poultry,,,,Middle East,Oman,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.032Z,2025-12-26T18:43:14.032Z
+22,Abalıoğlu Group,,Poultry,,,,Middle East,Türkiye,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.037Z,2025-12-26T18:43:14.037Z
+23,Acondesa,,Poultry,,,,South America,Colombia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.041Z,2025-12-26T18:43:14.041Z
+24,Addoha Poultry Co.,,Poultry,,,,Middle East,Saudi Arabia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.045Z,2025-12-26T18:43:14.045Z
+25,Agri Star Meat & Poultry,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.049Z,2025-12-26T18:43:14.049Z
+26,Agrícol,,Poultry,,,,South America,Colombia,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.052Z,2025-12-26T18:43:14.052Z
+27,Agrícola Ariztía,,Poultry,,,,South America,Chile,,,"[""poultry"",""chicken"",""table-eggs"",""turkey""]","[""Chicken"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:14.055Z,2025-12-26T18:43:14.055Z
+28,Agrícola Santa Marta de Liray,,Poultry,,,,South America,Chile,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.059Z,2025-12-26T18:43:14.059Z
+29,Agrícola Santiago Yerkovic,,Poultry,,,,South America,Chile,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.063Z,2025-12-26T18:43:14.063Z
+30,Agricovial SA,,Poultry,,,,South America,Chile,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.066Z,2025-12-26T18:43:14.066Z
+31,Agro Holding Sibirskiy Premier,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.070Z,2025-12-26T18:43:14.070Z
+32,Agrofert Holding,,Poultry,,,,Europe,Czech Republic,,,"[""poultry"",""chicken"",""ducks"",""table-eggs""]","[""Chicken"",""Ducks"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.074Z,2025-12-26T18:43:14.074Z
+33,Agrofirma Oktyabrskaya,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.077Z,2025-12-26T18:43:14.077Z
+34,Agroindustrial AAA,,Poultry,,,,Central America,Dominican Republic,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.081Z,2025-12-26T18:43:14.081Z
+35,Agroindustrias Quesada,,Poultry,,,,North America,Mexico,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.085Z,2025-12-26T18:43:14.085Z
+36,Agroinlaca,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.088Z,2025-12-26T18:43:14.088Z
+37,AgroKomplex,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""ducks"",""table-eggs""]","[""Chicken"",""Ducks"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.092Z,2025-12-26T18:43:14.092Z
+38,Agrolucha,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.102Z,2025-12-26T18:43:14.102Z
+39,AgroNivar,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.105Z,2025-12-26T18:43:14.105Z
+40,Agropecuaria de Guissona,,Poultry,,,,Europe,Spain,,,"[""poultry"",""chicken"",""table-eggs"",""turkey""]","[""Chicken"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:14.109Z,2025-12-26T18:43:14.109Z
+41,Agropecuaria El Huizache,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.113Z,2025-12-26T18:43:14.113Z
+42,Agropecuaria Jochy Polanco,,Poultry,,,,Caribbean,Dominican Republic,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.116Z,2025-12-26T18:43:14.116Z
+43,Agropecuaria Río Bravo,,Poultry,,,,South America,Peru,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.120Z,2025-12-26T18:43:14.120Z
+44,Agropecuaria Sanfandila,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.124Z,2025-12-26T18:43:14.124Z
+45,Agropecuruaria Wilse,,Poultry,,,,Caribbean,Dominican Republic,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.127Z,2025-12-26T18:43:14.127Z
+46,Agropollito C.A.,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.130Z,2025-12-26T18:43:14.130Z
+47,Agrosul Foods,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.134Z,2025-12-26T18:43:14.134Z
+48,Agrosuper Group,,Poultry,,,,South America,Chile,,,"[""poultry"",""chicken"",""table-eggs"",""turkey""]","[""Chicken"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:14.139Z,2025-12-26T18:43:14.139Z
+49,Aitas Kz,,Poultry,,,,Europe,Kazakhstan,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.142Z,2025-12-26T18:43:14.142Z
+50,Ak Bars Holding Co. OJSC,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.145Z,2025-12-26T18:43:14.145Z
+51,Akashevskaya,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.148Z,2025-12-26T18:43:14.148Z
+52,Al Ain Poultry Farm,,Poultry,,,,Middle East,United Arab Emirates,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.151Z,2025-12-26T18:43:14.151Z
+53,Al Akhawain,,Poultry,,,,Middle East,Saudi Arabia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.155Z,2025-12-26T18:43:14.155Z
+54,Al Rawdah (Emirates Modern Poultry Co.),,Poultry,,,,Middle East,United Arab Emirates,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.158Z,2025-12-26T18:43:14.158Z
+55,Al Zain Farms LLC,,Poultry,,,,Middle East,Oman,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.161Z,2025-12-26T18:43:14.161Z
+56,Al-Fakieh Poultry Farms,,Poultry,,,,Middle East,Saudi Arabia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.164Z,2025-12-26T18:43:14.164Z
+57,Al-Watania,,Poultry,,,,Middle East,Saudi Arabia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.167Z,2025-12-26T18:43:14.167Z
+58,Alema Farms,,Poultry,,,,Africa,Ethiopia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.172Z,2025-12-26T18:43:14.172Z
+59,Alf Sahel s.a.r.l.,,Poultry,,,,Africa,Morocco,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:14.176Z,2025-12-26T18:43:14.176Z
+60,Alibue,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.179Z,2025-12-26T18:43:14.179Z
+61,Allen Harim Foods,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.182Z,2025-12-26T18:43:14.182Z
+62,Almarai Co.,,Poultry,,,,Middle East,Saudi Arabia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.186Z,2025-12-26T18:43:14.186Z
+63,Amadori,,Poultry,,,,Europe,Italy,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs"",""turkey""]","[""Chicken"",""Egg Products"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:14.190Z,2025-12-26T18:43:14.190Z
+64,Ambar,,Poultry,,,,Middle East,Israel,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:14.194Z,2025-12-26T18:43:14.194Z
+65,Amick Farms LLC,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.197Z,2025-12-26T18:43:14.197Z
+66,Amigear Ventures (Pty) Ltd.,,Poultry,,,,Africa,Botswana,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.200Z,2025-12-26T18:43:14.200Z
+67,"AN Avícola Mélida, S.L.",,Poultry,,,,Europe,Spain,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.203Z,2025-12-26T18:43:14.203Z
+68,"Anhui Shun'an Agricultural Development Co., Ltd.",,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.207Z,2025-12-26T18:43:14.207Z
+69,Animex,,Poultry,,,,Europe,Poland,,,"[""poultry"",""chicken"",""geese"",""turkey""]","[""Chicken"",""Geese"",""Turkey""]",,,,false,2025-12-26T18:43:14.210Z,2025-12-26T18:43:14.210Z
+70,Aoxiang Poultry,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.214Z,2025-12-26T18:43:14.214Z
+71,Arab Company for Livestock Development (ACOLID),,Poultry,,,,Middle East,Saudi Arabia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.217Z,2025-12-26T18:43:14.217Z
+72,Arasco Foods,,Poultry,,,,Middle East,Saudi Arabia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.222Z,2025-12-26T18:43:14.222Z
+73,Arawak,,Poultry,,,,Caribbean,Trinidad and Tobago,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.230Z,2025-12-26T18:43:14.230Z
+74,Arce Avícola,,Poultry,,,,Central America,Panama,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.235Z,2025-12-26T18:43:14.235Z
+75,AS Ķekava Foods (JSC Putnu fabrika Ķekava),,Poultry,,,,Europe,Latvia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.240Z,2025-12-26T18:43:14.240Z
+76,Astillas de Plata SA/Huevos K s.r.l.,,Poultry,,,,South America,Argentina,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.244Z,2025-12-26T18:43:14.244Z
+77,Astral Foods,,Poultry,,,,Africa,South Africa,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.249Z,2025-12-26T18:43:14.249Z
+78,Atria,,Poultry,,,,Europe,Finland,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.252Z,2025-12-26T18:43:14.252Z
+79,Atyab Investments,,Poultry,,,,Middle East,Oman,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.255Z,2025-12-26T18:43:14.255Z
+80,Aurora Alimentos,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken"",""ducks"",""egg-products"",""turkey""]","[""Chicken"",""Ducks"",""Egg Products"",""Turkey""]",,,,false,2025-12-26T18:43:14.258Z,2025-12-26T18:43:14.258Z
+81,Avangardco,,Poultry,,,,Europe,Ukraine,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.261Z,2025-12-26T18:43:14.261Z
+82,Avara,,Poultry,,,,Europe,United Kingdom,,,"[""poultry"",""chicken"",""ducks"",""turkey""]","[""Chicken"",""Ducks"",""Turkey""]",,,,false,2025-12-26T18:43:14.265Z,2025-12-26T18:43:14.265Z
+83,Avex S.A.,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.268Z,2025-12-26T18:43:14.268Z
+84,AVICA,,Poultry,,,,Central America,Honduras,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.272Z,2025-12-26T18:43:14.272Z
+85,Avícola AAA,,Poultry,,,,South America,Colombia,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.275Z,2025-12-26T18:43:14.275Z
+86,Avícola Agua Blanca,,Poultry,,,,Central America,Guatemala,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.279Z,2025-12-26T18:43:14.279Z
+87,Avícola Campestre,,Poultry,,,,Central America,El Salvador,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.282Z,2025-12-26T18:43:14.282Z
+88,Avícola El Chaparral,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.285Z,2025-12-26T18:43:14.285Z
+89,Avícola El Ciprés,,Poultry,,,,Central America,Guatemala,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.288Z,2025-12-26T18:43:14.288Z
+90,Avícola El Guamito,,Poultry,,,,South America,Colombia,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.292Z,2025-12-26T18:43:14.292Z
+91,Avicola Frontini (Avícola del Oeste),,Poultry,,,,South America,Uruguay,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.295Z,2025-12-26T18:43:14.295Z
+92,Avícola González y González,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.298Z,2025-12-26T18:43:14.298Z
+93,Avícola Kakaraka,,Poultry,,,,South America,Colombia,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.301Z,2025-12-26T18:43:14.301Z
+94,Avícola Kikiriki,,Poultry,,,,Central America,Guatemala,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.305Z,2025-12-26T18:43:14.305Z
+95,Avícola Kikiriki de El Salvador,,Poultry,,,,Central America,El Salvador,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.308Z,2025-12-26T18:43:14.308Z
+96,Avícola Kikiriki de Nicaragua,,Poultry,,,,Central America,Nicaragua,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.312Z,2025-12-26T18:43:14.312Z
+97,Avícola La Barranca,,Poultry,,,,Central America,Nicaragua,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.314Z,2025-12-26T18:43:14.314Z
+98,Avícola La Blanca,,Poultry,,,,South America,Paraguay,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.318Z,2025-12-26T18:43:14.318Z
+99,Avícola La Calera,,Poultry,,,,South America,Peru,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.321Z,2025-12-26T18:43:14.321Z
+100,Avícola La Esperanza,,Poultry,,,,South America,Bolivia,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.323Z,2025-12-26T18:43:14.323Z
+101,Avícola La Guásima,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.326Z,2025-12-26T18:43:14.326Z
+102,Avícola Llombay S.A.,,Poultry,,,,Europe,Spain,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.329Z,2025-12-26T18:43:14.329Z
+103,Avícola Los Cambulos,,Poultry,,,,South America,Colombia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.333Z,2025-12-26T18:43:14.333Z
+104,Avícola Modelo,,Poultry,,,,South America,Bolivia,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.336Z,2025-12-26T18:43:14.336Z
+105,Avícola Ricura,,Poultry,,,,Central America,Costa Rica,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.339Z,2025-12-26T18:43:14.339Z
+106,Avícola Rolón,,Poultry,,,,South America,Bolivia,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.342Z,2025-12-26T18:43:14.342Z
+107,Avícola Rosanda,,Poultry,,,,Central America,Guatemala,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.345Z,2025-12-26T18:43:14.345Z
+108,Avícola San Isidro,,Poultry,,,,South America,Ecuador,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.348Z,2025-12-26T18:43:14.348Z
+109,Avícola San Juan,,Poultry,,,,Central America,Honduras,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.351Z,2025-12-26T18:43:14.351Z
+110,Avícola Santeel,,Poultry,,,,South America,Ecuador,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.355Z,2025-12-26T18:43:14.355Z
+111,Avícola Sofía,,Poultry,,,,South America,Bolivia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.361Z,2025-12-26T18:43:14.361Z
+112,Avícola y Comercial El Toco Ltda.,,Poultry,,,,South America,Chile,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.364Z,2025-12-26T18:43:14.364Z
+113,Avícola y Porcícola de los Altos,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.369Z,2025-12-26T18:43:14.369Z
+114,Avicultores Unidos Avuga SA,,Poultry,,,,Central America,Costa Rica,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.372Z,2025-12-26T18:43:14.372Z
+115,Avicultura Josidith,,Poultry,,,,South America,Brazil,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.375Z,2025-12-26T18:43:14.375Z
+116,Avigrupo,,Poultry,,,,North America,Mexico,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.379Z,2025-12-26T18:43:14.379Z
+117,Avigua SRL,,Poultry,,,,South America,Bolivia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.382Z,2025-12-26T18:43:14.382Z
+118,Avimosa,,Poultry,,,,Europe,Spain,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.385Z,2025-12-26T18:43:14.385Z
+119,Avinal,,Poultry,,,,South America,Colombia,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.388Z,2025-12-26T18:43:14.388Z
+120,"Avinatur Producciones Avícolas, S.L.",,Poultry,,,,Europe,Spain,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.391Z,2025-12-26T18:43:14.391Z
+121,Avine Alimentos,,Poultry,,,,South America,Brazil,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.394Z,2025-12-26T18:43:14.394Z
+122,Avinka SA,,Poultry,,,,South America,Peru,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.398Z,2025-12-26T18:43:14.398Z
+123,Avipechichal SA,,Poultry,,,,South America,Ecuador,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.401Z,2025-12-26T18:43:14.401Z
+124,Avitalsa (Avícola Vitaloa),,Poultry,,,,South America,Ecuador,,,"[""poultry"",""chicken"",""table-eggs"",""turkey""]","[""Chicken"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:14.407Z,2025-12-26T18:43:14.407Z
+125,Avril Group,,Poultry,,,,Europe,France,,,"[""poultry""]",,,,,false,2025-12-26T18:43:14.411Z,2025-12-26T18:43:14.411Z
+126,AVSA,,Poultry,,,,South America,Colombia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.415Z,2025-12-26T18:43:14.415Z
+127,Baiada Poultry,,Poultry,,,,Oceania,Australia,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:14.418Z,2025-12-26T18:43:14.418Z
+128,Balady Poultry Trading Co.,,Poultry,,,,Middle East,Saudi Arabia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.423Z,2025-12-26T18:43:14.423Z
+129,Balticovo,,Poultry,,,,Europe,Latvia,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.427Z,2025-12-26T18:43:14.427Z
+130,Banvit,,Poultry,,,,Middle East,Türkiye,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.431Z,2025-12-26T18:43:14.431Z
+131,Beijing Deqingyuan Agricultural Technology Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.435Z,2025-12-26T18:43:14.435Z
+132,Bell Food Group,,Poultry,,,,Europe,Switzerland,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:14.438Z,2025-12-26T18:43:14.438Z
+133,Berne Hi-Way Hatchery Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.442Z,2025-12-26T18:43:14.442Z
+134,Betagro Group,,Poultry,,,,Asia,Thailand,,,"[""poultry"",""chicken"",""ducks"",""table-eggs""]","[""Chicken"",""Ducks"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.446Z,2025-12-26T18:43:14.446Z
+135,Beypiliç,,Poultry,,,,Middle East,Türkiye,,,"[""poultry"",""chicken"",""ducks"",""table-eggs""]","[""Chicken"",""Ducks"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.450Z,2025-12-26T18:43:14.450Z
+136,Bezrk-Belgrankorm,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""ducks""]","[""Chicken"",""Ducks""]",,,,false,2025-12-26T18:43:14.454Z,2025-12-26T18:43:14.454Z
+137,Boda Food,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.457Z,2025-12-26T18:43:14.457Z
+138,Bohr Poultry,,Poultry,,,,Europe,Russia,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.461Z,2025-12-26T18:43:14.461Z
+139,Bonnín Hnos.,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.464Z,2025-12-26T18:43:14.464Z
+140,Bounty Fresh Group,,Poultry,,,,Asia,Philippines,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.466Z,2025-12-26T18:43:14.466Z
+141,Braswell Egg,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:14.469Z,2025-12-26T18:43:14.469Z
+142,BRF,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:14.472Z,2025-12-26T18:43:14.472Z
+143,Bupiliç,,Poultry,,,,Middle East,Türkiye,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.475Z,2025-12-26T18:43:14.475Z
+144,Butterball,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:14.479Z,2025-12-26T18:43:14.479Z
+145,C Vale - Cooperativa Agroindustrial,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.482Z,2025-12-26T18:43:14.482Z
+146,Cairo Poultry Co. (CPC),,Poultry,,,,Africa,Egypt,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.485Z,2025-12-26T18:43:14.485Z
+147,Caisy Ltda.,,Poultry,,,,South America,Bolivia,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.488Z,2025-12-26T18:43:14.488Z
+148,Camar Agroalimentaria,,Poultry,,,,Europe,Spain,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.497Z,2025-12-26T18:43:14.497Z
+149,Cargill,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.499Z,2025-12-26T18:43:14.499Z
+150,Cargill China,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.503Z,2025-12-26T18:43:14.503Z
+151,Cargill Honduras,,Poultry,,,,Central America,Honduras,,,"[""poultry""]",,,,,false,2025-12-26T18:43:14.506Z,2025-12-26T18:43:14.506Z
+152,Cargill Meats Asia,,Poultry,,,,Asia,Thailand,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.509Z,2025-12-26T18:43:14.509Z
+153,Cargill Meats Europe,,Poultry,,,,Europe,United Kingdom,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.512Z,2025-12-26T18:43:14.512Z
+154,Cargill Protein,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:14.517Z,2025-12-26T18:43:14.517Z
+155,Cargill Proteína Latinoamérica,,Poultry,,,,Central America,Honduras,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:14.520Z,2025-12-26T18:43:14.520Z
+156,Cargill Proteína Latinoamérica -- Colombia,,Poultry,,,,South America,Colombia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.523Z,2025-12-26T18:43:14.523Z
+157,Cargill Proteína Latinoamérica -- Honduras,,Poultry,,,,Central America,Honduras,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:14.526Z,2025-12-26T18:43:14.526Z
+158,Case Foods Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.530Z,2025-12-26T18:43:14.530Z
+159,CDPO,,Poultry,,,,Europe,France,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.533Z,2025-12-26T18:43:14.533Z
+160,Cedrob,,Poultry,,,,Europe,Poland,,,"[""poultry"",""chicken"",""ducks"",""geese""]","[""Chicken"",""Ducks"",""Geese""]",,,,false,2025-12-26T18:43:14.536Z,2025-12-26T18:43:14.536Z
+161,Center Fresh Group,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:14.540Z,2025-12-26T18:43:14.540Z
+162,Central Valley Eggs,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.543Z,2025-12-26T18:43:14.543Z
+163,Centrum Valley Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:14.546Z,2025-12-26T18:43:14.546Z
+164,Chelny Broiler,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.550Z,2025-12-26T18:43:14.550Z
+165,Cherkizovo Group,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:14.553Z,2025-12-26T18:43:14.553Z
+166,Chesterfield Poultry,,Poultry,,,,Europe,United Kingdom,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.557Z,2025-12-26T18:43:14.557Z
+167,Chi Farms Ltd.,,Poultry,,,,Africa,Nigeria,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.560Z,2025-12-26T18:43:14.560Z
+168,Chino Valley Ranchers/MCM Poultry,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.564Z,2025-12-26T18:43:14.564Z
+169,Chubu Shiryo,,Poultry,,,,Asia,Japan,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.567Z,2025-12-26T18:43:14.567Z
+170,CJ Cheil Jedang,,Poultry,,,,Asia,South Korea,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.570Z,2025-12-26T18:43:14.570Z
+171,Claxton Poultry Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.573Z,2025-12-26T18:43:14.573Z
+172,CMI - Corporación Multi Inversiones,,Poultry,,,,Central America,Guatemala,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.576Z,2025-12-26T18:43:14.576Z
+173,CMI - Corporación Multi Inversiones (Costa Rica),,Poultry,,,,Central America,Costa Rica,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.580Z,2025-12-26T18:43:14.580Z
+174,CMI - Corporación Multi Inversiones (El Salvador),,Poultry,,,,Central America,El Salvador,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.583Z,2025-12-26T18:43:14.583Z
+175,CMI - Corporación Multi Inversiones (Guatemala),,Poultry,,,,Central America,Guatemala,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.587Z,2025-12-26T18:43:14.587Z
+176,CMI - Corporación Multi Inversiones (Honduras),,Poultry,,,,Central America,Honduras,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.589Z,2025-12-26T18:43:14.589Z
+177,CMI - Corporación Multi Inversiones (Toledano),,Poultry,,,,Central America,Panama,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.592Z,2025-12-26T18:43:14.592Z
+178,Coave,,Poultry,,,,Caribbean,Dominican Republic,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.595Z,2025-12-26T18:43:14.595Z
+179,Codigoro,,Poultry,,,,Europe,Italy,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.599Z,2025-12-26T18:43:14.599Z
+180,Colorado Eggs,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.602Z,2025-12-26T18:43:14.602Z
+181,Coopavel,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken"",""ducks""]","[""Chicken"",""Ducks""]",,,,false,2025-12-26T18:43:14.606Z,2025-12-26T18:43:14.606Z
+182,Cooper Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs"",""turkey""]","[""Egg Products"",""Table Eggs"",""Turkey""]",,,,true,2025-12-26T18:43:14.609Z,2025-12-26T18:43:14.609Z
+183,Copacol,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.615Z,2025-12-26T18:43:14.615Z
+184,Coren,,Poultry,,,,Europe,Spain,,,"[""poultry"",""chicken"",""ducks"",""egg-products"",""table-eggs"",""turkey""]","[""Chicken"",""Ducks"",""Egg Products"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:14.623Z,2025-12-26T18:43:14.623Z
+185,Corporación Avícola Dominicana,,Poultry,,,,Caribbean,Dominican Republic,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.626Z,2025-12-26T18:43:14.626Z
+186,Corporación Pipasa (Cargill),,Poultry,,,,Central America,Costa Rica,,,"[""poultry"",""chicken"",""table-eggs"",""turkey""]","[""Chicken"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:14.631Z,2025-12-26T18:43:14.631Z
+187,Country Bird Holdings Ltd.,,Poultry,,,,Africa,South Africa,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.634Z,2025-12-26T18:43:14.634Z
+188,Country Charm Eggs,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.638Z,2025-12-26T18:43:14.638Z
+189,CP China,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.642Z,2025-12-26T18:43:14.642Z
+190,CP Group,,Poultry,,,,Asia,Thailand,,,"[""poultry"",""chicken"",""ducks"",""egg-products"",""table-eggs""]","[""Chicken"",""Ducks"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.645Z,2025-12-26T18:43:14.645Z
+191,CP Standart Gida Sanayi Ve Ticaret (CP Turkey),,Poultry,,,,Middle East,Türkiye,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.648Z,2025-12-26T18:43:14.648Z
+192,Cranswick,,Poultry,,,,Europe,United Kingdom,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.652Z,2025-12-26T18:43:14.652Z
+193,Creighton Brothers LLC,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.655Z,2025-12-26T18:43:14.655Z
+194,DaChan Food (Asia) Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.658Z,2025-12-26T18:43:14.658Z
+195,DACSA,,Poultry,,,,Central America,Honduras,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.662Z,2025-12-26T18:43:14.662Z
+196,Dafa Animal Husbandry,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.665Z,2025-12-26T18:43:14.665Z
+197,Dakahlia Poultry Co.,,Poultry,,,,Africa,Egypt,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.669Z,2025-12-26T18:43:14.669Z
+198,Dakota Layers LLP,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.673Z,2025-12-26T18:43:14.673Z
+199,Dakota Provisions,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:14.677Z,2025-12-26T18:43:14.677Z
+200,DANÆG A/S,,Poultry,,,,Europe,Denmark,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.680Z,2025-12-26T18:43:14.680Z
+201,Darko Farms,,Poultry,,,,Africa,Ghana,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.683Z,2025-12-26T18:43:14.683Z
+202,DAVA Foods Holding A/S,,Poultry,,,,Europe,Denmark,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.686Z,2025-12-26T18:43:14.686Z
+203,Daybreak Farms,,Poultry,,,,Africa,South Africa,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.690Z,2025-12-26T18:43:14.690Z
+204,Daybreak Foods Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:14.694Z,2025-12-26T18:43:14.694Z
+205,Dekang Animal Husbandry Group Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.698Z,2025-12-26T18:43:14.698Z
+206,Delmon Poultry Co.,,Poultry,,,,Middle East,Bahrain,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.701Z,2025-12-26T18:43:14.701Z
+207,Demler Brothers LLC,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.705Z,2025-12-26T18:43:14.705Z
+208,Demler Enterprises,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.709Z,2025-12-26T18:43:14.709Z
+209,Demler Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.713Z,2025-12-26T18:43:14.713Z
+210,Deveci Broyler,,Poultry,,,,Middle East,Azerbaijan,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.716Z,2025-12-26T18:43:14.716Z
+211,Dexin Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.720Z,2025-12-26T18:43:14.720Z
+212,Diplomata,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.723Z,2025-12-26T18:43:14.723Z
+213,Distraves S.A.,,Poultry,,,,South America,Colombia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.726Z,2025-12-26T18:43:14.726Z
+214,"Domvil, SA",,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.729Z,2025-12-26T18:43:14.729Z
+215,Don Pollo (Chile),,Poultry,,,,South America,Chile,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.733Z,2025-12-26T18:43:14.733Z
+216,Don Pollo (Colombia),,Poultry,,,,South America,Colombia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.736Z,2025-12-26T18:43:14.736Z
+217,Dongwoo Co. Ltd.,,Poultry,,,,Asia,South Korea,,,"[""poultry"",""chicken"",""ducks""]","[""Chicken"",""Ducks""]",,,,false,2025-12-26T18:43:14.741Z,2025-12-26T18:43:14.741Z
+218,Drobex,,Poultry,,,,Europe,Poland,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.745Z,2025-12-26T18:43:14.745Z
+219,Druzhba Narodov,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.754Z,2025-12-26T18:43:14.754Z
+220,Dutchland Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.758Z,2025-12-26T18:43:14.758Z
+221,Dutt & Wagner,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.763Z,2025-12-26T18:43:14.763Z
+222,Easy Holdings Co. Ltd.,,Poultry,,,,Asia,South Korea,,,"[""poultry"",""chicken"",""ducks""]","[""Chicken"",""Ducks""]",,,,false,2025-12-26T18:43:14.767Z,2025-12-26T18:43:14.767Z
+223,Ecoptitsa,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.772Z,2025-12-26T18:43:14.772Z
+224,El Calvario,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.775Z,2025-12-26T18:43:14.775Z
+225,El Cortijo,,Poultry,,,,Central America,Honduras,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.779Z,2025-12-26T18:43:14.779Z
+226,El Granjero,,Poultry,,,,Central America,El Salvador,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.782Z,2025-12-26T18:43:14.782Z
+227,El Rocio,,Poultry,,,,South America,Peru,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.786Z,2025-12-26T18:43:14.786Z
+228,El Vasquito Ltd,,Poultry,,,,South America,Uruguay,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.790Z,2025-12-26T18:43:14.790Z
+229,Elinar,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.794Z,2025-12-26T18:43:14.794Z
+230,Emilio Silva e Hijos (Avícola Santa Elvira),,Poultry,,,,South America,Chile,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.800Z,2025-12-26T18:43:14.800Z
+231,Empire Kosher Poultry Inc. (broiler),,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.805Z,2025-12-26T18:43:14.805Z
+232,Empire Kosher Poultry Inc. (turkey),,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:14.809Z,2025-12-26T18:43:14.809Z
+233,Empresas Guadalupe,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.813Z,2025-12-26T18:43:14.813Z
+234,Endy Agroindustrial,,Poultry,,,,Caribbean,Dominican Republic,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.817Z,2025-12-26T18:43:14.817Z
+235,Erpiliç,,Poultry,,,,Middle East,Türkiye,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:14.822Z,2025-12-26T18:43:14.822Z
+236,Esbenshade Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.825Z,2025-12-26T18:43:14.825Z
+237,Eureden,,Poultry,,,,Europe,France,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.829Z,2025-12-26T18:43:14.829Z
+238,Eurovo,,Poultry,,,,Europe,Italy,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.832Z,2025-12-26T18:43:14.832Z
+239,Exceldor Cooperative Avicole,,Poultry,,,,North America,Canada,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:14.836Z,2025-12-26T18:43:14.836Z
+240,Fadel SA,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.842Z,2025-12-26T18:43:14.842Z
+241,Farbest Foods,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:14.846Z,2025-12-26T18:43:14.846Z
+242,Farmers Hen House,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.850Z,2025-12-26T18:43:14.850Z
+243,Farmers Pride Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.853Z,2025-12-26T18:43:14.853Z
+244,Fassio Egg Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.856Z,2025-12-26T18:43:14.856Z
+245,Fengji Food Group Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.860Z,2025-12-26T18:43:14.860Z
+246,FEPASA (Frigorífico Entrerriano de Productores Avícolas SA),,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.864Z,2025-12-26T18:43:14.864Z
+247,FFM Berhad,,Poultry,,,,Asia,Malaysia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.867Z,2025-12-26T18:43:14.867Z
+248,Fieldale Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.871Z,2025-12-26T18:43:14.871Z
+249,Flamboia,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.875Z,2025-12-26T18:43:14.875Z
+250,Forsman Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.879Z,2025-12-26T18:43:14.879Z
+251,Foster Farms (broiler),,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.883Z,2025-12-26T18:43:14.883Z
+252,Foster Farms (turkey),,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:14.885Z,2025-12-26T18:43:14.885Z
+253,FreeBird Chicken,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.889Z,2025-12-26T18:43:14.889Z
+254,Fremont Farms of Iowa,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products""]","[""Egg Products""]",,,,true,2025-12-26T18:43:14.893Z,2025-12-26T18:43:14.893Z
+255,Frigorífico Soychú SA,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.897Z,2025-12-26T18:43:14.897Z
+256,Frinavur S.A.,,Poultry,,,,South America,Uruguay,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.901Z,2025-12-26T18:43:14.901Z
+257,FRISA (Areca),,Poultry,,,,Central America,Guatemala,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.904Z,2025-12-26T18:43:14.904Z
+258,Fufeng Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.908Z,2025-12-26T18:43:14.908Z
+259,Fujian Sunner Development Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.911Z,2025-12-26T18:43:14.911Z
+260,G.M. Farms,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.914Z,2025-12-26T18:43:14.914Z
+261,GAAS,,Poultry,,,,South America,Brazil,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.918Z,2025-12-26T18:43:14.918Z
+262,Galliance,,Poultry,,,,Europe,France,,,"[""poultry"",""chicken"",""ducks"",""turkey""]","[""Chicken"",""Ducks"",""Turkey""]",,,,false,2025-12-26T18:43:14.922Z,2025-12-26T18:43:14.922Z
+263,Galline Frais,,Poultry,,,,Europe,France,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.926Z,2025-12-26T18:43:14.926Z
+264,Gemperle Family Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:14.930Z,2025-12-26T18:43:14.930Z
+265,Gena Agropecuaria,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.935Z,2025-12-26T18:43:14.935Z
+266,George's Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.939Z,2025-12-26T18:43:14.939Z
+267,Gerber's Poultry,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.943Z,2025-12-26T18:43:14.943Z
+268,GFPT,,Poultry,,,,Asia,Thailand,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.947Z,2025-12-26T18:43:14.947Z
+269,Giroux's Poultry Farm,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:14.951Z,2025-12-26T18:43:14.951Z
+270,Global Eggs,,Poultry,,,,Europe,Luxembourg,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.954Z,2025-12-26T18:43:14.954Z
+271,Global Eggs (U.S. Division),,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:14.957Z,2025-12-26T18:43:14.957Z
+272,GNP Company,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.961Z,2025-12-26T18:43:14.961Z
+273,Godrej Agrovet,,Poultry,,,,Asia,India,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.971Z,2025-12-26T18:43:14.971Z
+274,Golden Chicken,,Poultry,,,,Middle East,Saudi Arabia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.974Z,2025-12-26T18:43:14.974Z
+275,Golden-Rod Broilers Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:14.977Z,2025-12-26T18:43:14.977Z
+276,Gornet SA,,Poultry,,,,South America,Uruguay,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.981Z,2025-12-26T18:43:14.981Z
+277,Gran Tijuca,,Poultry,,,,South America,Brazil,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.984Z,2025-12-26T18:43:14.984Z
+278,Granja Almeida,,Poultry,,,,South America,Brazil,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:14.988Z,2025-12-26T18:43:14.988Z
+279,Granja Avícola Arizona,,Poultry,,,,South America,Chile,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:14.991Z,2025-12-26T18:43:14.991Z
+280,Granja Avícola del Campo S.R.L,,Poultry,,,,South America,Uruguay,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:14.994Z,2025-12-26T18:43:14.994Z
+281,Granja Bailon,,Poultry,,,,Europe,Spain,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.002Z,2025-12-26T18:43:15.002Z
+282,Granja Catalana,,Poultry,,,,Central America,El Salvador,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.006Z,2025-12-26T18:43:15.006Z
+283,Granja Faria,,Poultry,,,,South America,Brazil,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.009Z,2025-12-26T18:43:15.009Z
+284,Granja Joselyn,,Poultry,,,,Caribbean,Dominican Republic,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.013Z,2025-12-26T18:43:15.013Z
+285,Granja Kunitomo,,Poultry,,,,South America,Brazil,,,"[""poultry""]",,,,,false,2025-12-26T18:43:15.021Z,2025-12-26T18:43:15.021Z
+286,Granja Mantiqueira,,Poultry,,,,South America,Brazil,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.026Z,2025-12-26T18:43:15.026Z
+287,Granja Maxi Pollo,,Poultry,,,,South America,Venezuela,,,"[""poultry""]",,,,,false,2025-12-26T18:43:15.029Z,2025-12-26T18:43:15.029Z
+288,Granja Pinilla,,Poultry,,,,Europe,Spain,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.032Z,2025-12-26T18:43:15.032Z
+289,Granja San Miguel,,Poultry,,,,Europe,Spain,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.036Z,2025-12-26T18:43:15.036Z
+290,Granja Sumaré,,Poultry,,,,South America,Brazil,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.039Z,2025-12-26T18:43:15.039Z
+291,Granja Tres Arroyos,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.053Z,2025-12-26T18:43:15.053Z
+292,Granja Tres Arroyos Uruguay,,Poultry,,,,South America,Uruguay,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.056Z,2025-12-26T18:43:15.056Z
+293,Granja Virgen Del Rosario,,Poultry,,,,Europe,Spain,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.059Z,2025-12-26T18:43:15.059Z
+294,Granja Yabuta,,Poultry,,,,South America,Brazil,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.062Z,2025-12-26T18:43:15.062Z
+295,Granjas Avícolas Rancho Grande,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.065Z,2025-12-26T18:43:15.065Z
+296,Granjas Carnave,,Poultry,,,,South America,Argentina,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.069Z,2025-12-26T18:43:15.069Z
+297,Granjas Kaki,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.072Z,2025-12-26T18:43:15.072Z
+298,Granjazul (Proavisa),,Poultry,,,,Central America,Guatemala,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.169Z,2025-12-26T18:43:15.169Z
+299,Granjita El Progreso,,Poultry,,,,Central America,El Salvador,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.172Z,2025-12-26T18:43:15.172Z
+300,Grenja Vciola del Camp S.R.L.,,Poultry,,,,South America,Uruguay,,,"[""poultry""]",,,,,false,2025-12-26T18:43:15.175Z,2025-12-26T18:43:15.175Z
+301,Groupe Cocorette,,Poultry,,,,Europe,France,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.178Z,2025-12-26T18:43:15.178Z
+302,Grupo Agropecuario Don Julio,,Poultry,,,,Caribbean,Dominican Republic,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.182Z,2025-12-26T18:43:15.182Z
+303,Grupo Avícola Rujamar,,Poultry,,,,Europe,Spain,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.185Z,2025-12-26T18:43:15.185Z
+304,Grupo Avimarca,,Poultry,,,,North America,Mexico,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.188Z,2025-12-26T18:43:15.188Z
+305,Grupo Buenaventura,,Poultry,,,,North America,Mexico,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.191Z,2025-12-26T18:43:15.191Z
+306,Grupo CAC,,Poultry,,,,Europe,Portugal,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.194Z,2025-12-26T18:43:15.194Z
+307,Grupo Crío,,Poultry,,,,North America,Mexico,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.197Z,2025-12-26T18:43:15.197Z
+308,Grupo Don Pollo,,Poultry,,,,South America,Peru,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.200Z,2025-12-26T18:43:15.200Z
+309,Grupo Ebenezer,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.203Z,2025-12-26T18:43:15.203Z
+310,Grupo El Tunal,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.206Z,2025-12-26T18:43:15.206Z
+311,Grupo Huevos Guillén,,Poultry,,,,Europe,Spain,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.209Z,2025-12-26T18:43:15.209Z
+312,Grupo Industrial El Granjero,,Poultry,,,,Central America,Nicaragua,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.214Z,2025-12-26T18:43:15.214Z
+313,Grupo Katayama,,Poultry,,,,South America,Brazil,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.217Z,2025-12-26T18:43:15.217Z
+314,Grupo La Caridad,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.220Z,2025-12-26T18:43:15.220Z
+315,Grupo Melo,,Poultry,,,,Central America,Panama,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.223Z,2025-12-26T18:43:15.223Z
+316,Grupo Motta (CALISA),,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.226Z,2025-12-26T18:43:15.226Z
+317,Grupo MRB (Sr. Huevo),,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.229Z,2025-12-26T18:43:15.229Z
+318,Grupo Oro,,Poultry,,,,South America,Ecuador,,,"[""poultry"",""table-eggs"",""turkey""]","[""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:15.233Z,2025-12-26T18:43:15.233Z
+319,Grupo Pecuario San Antonio,,Poultry,,,,North America,Mexico,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.236Z,2025-12-26T18:43:15.236Z
+320,Grupo Proa (Avicola Andina),,Poultry,,,,South America,Chile,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.239Z,2025-12-26T18:43:15.239Z
+321,Grupo Sada,,Poultry,,,,Europe,Spain,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.243Z,2025-12-26T18:43:15.243Z
+322,Grupo San Benito,,Poultry,,,,Central America,El Salvador,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.247Z,2025-12-26T18:43:15.247Z
+323,Grupo Santa Elena,,Poultry,,,,South America,Peru,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.250Z,2025-12-26T18:43:15.250Z
+324,Grupo Sierra Fértil (Velastegui),,Poultry,,,,South America,Ecuador,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.252Z,2025-12-26T18:43:15.252Z
+325,Grupo Superalba,,Poultry,,,,Caribbean,Dominican Republic,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.255Z,2025-12-26T18:43:15.255Z
+326,Grupo Vall Companys,,Poultry,,,,Europe,Spain,,,"[""poultry"",""chicken"",""ducks"",""turkey""]","[""Chicken"",""Ducks"",""Turkey""]",,,,false,2025-12-26T18:43:15.258Z,2025-12-26T18:43:15.258Z
+327,Grupo VMR,,Poultry,,,,Europe,Spain,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.262Z,2025-12-26T18:43:15.262Z
+328,Gruppo Veronesi,,Poultry,,,,Europe,Italy,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs"",""turkey""]","[""Chicken"",""Egg Products"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:15.265Z,2025-12-26T18:43:15.265Z
+329,GTFoods Group,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.269Z,2025-12-26T18:43:15.269Z
+330,Guadalupe,,Poultry,,,,South America,Ecuador,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.272Z,2025-12-26T18:43:15.272Z
+331,Guangdong Evergreen Feed Industry Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry""]",,,,,false,2025-12-26T18:43:15.274Z,2025-12-26T18:43:15.274Z
+332,Guangdong Tiannong Food Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.278Z,2025-12-26T18:43:15.278Z
+333,Guangdong Yihao Foodstuff Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.282Z,2025-12-26T18:43:15.282Z
+334,Guangxi Jinling Farming And Animal Husbandry Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.285Z,2025-12-26T18:43:15.285Z
+335,Guilin Liyuan,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken"",""ducks"",""table-eggs""]","[""Chicken"",""Ducks"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.288Z,2025-12-26T18:43:15.288Z
+336,Guldfågeln AB,,Poultry,,,,Europe,Sweden,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.292Z,2025-12-26T18:43:15.292Z
+337,Hamilton Eggs Holdings LLC,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.294Z,2025-12-26T18:43:15.294Z
+338,Hammoudeh Group,,Poultry,,,,Middle East,Jordan,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.296Z,2025-12-26T18:43:15.296Z
+339,Handsome Brook Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.299Z,2025-12-26T18:43:15.299Z
+340,Hanwei Group,,Poultry,,,,Asia,China,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.302Z,2025-12-26T18:43:15.302Z
+341,Harim Group,,Poultry,,,,Asia,South Korea,,,"[""poultry"",""chicken"",""ducks""]","[""Chicken"",""Ducks""]",,,,false,2025-12-26T18:43:15.305Z,2025-12-26T18:43:15.305Z
+342,Harrison Poultry Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.309Z,2025-12-26T18:43:15.309Z
+343,Hazeldene's,,Poultry,,,,Oceania,Australia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.312Z,2025-12-26T18:43:15.312Z
+344,Hebei Jiuxing Food Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.316Z,2025-12-26T18:43:15.316Z
+345,Hebei Luanping Huadu Foodstuff Co Ltd,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.319Z,2025-12-26T18:43:15.319Z
+346,Heilongjiang Beisanxia Foods Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.322Z,2025-12-26T18:43:15.322Z
+347,Henan Liujiang Ecological Animal Husbandry Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.326Z,2025-12-26T18:43:15.326Z
+348,"Henan Shuanghui Investment & Development Co., Ltd.",,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.329Z,2025-12-26T18:43:15.329Z
+349,"Henan Tianzhonghe Agriculture and Animal Husbandry Co., Ltd.",,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.332Z,2025-12-26T18:43:15.332Z
+350,Herbruck's Poultry Ranch,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.335Z,2025-12-26T18:43:15.335Z
+351,Heritage PMS/LaValle Egg Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.341Z,2025-12-26T18:43:15.341Z
+352,Hertzfeld Poultry Farms Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.344Z,2025-12-26T18:43:15.344Z
+353,"Hesheng Food Group Co., Ltd.",,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.347Z,2025-12-26T18:43:15.347Z
+354,Hevo Group,,Poultry,,,,Europe,Spain,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.350Z,2025-12-26T18:43:15.350Z
+355,Hidden Villa Ranch,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:15.353Z,2025-12-26T18:43:15.353Z
+356,Hillside Poultry Farms Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.356Z,2025-12-26T18:43:15.356Z
+357,HKFoods,,Poultry,,,,Europe,Finland,,,"[""poultry"",""chicken"",""ducks"",""turkey""]","[""Chicken"",""Ducks"",""Turkey""]",,,,false,2025-12-26T18:43:15.359Z,2025-12-26T18:43:15.359Z
+358,Holmes Foods,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.363Z,2025-12-26T18:43:15.363Z
+359,Houde Foods Co. Ltd,,Poultry,,,,Asia,China,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.367Z,2025-12-26T18:43:15.367Z
+360,House of Raeford Farms Inc. (broiler),,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.370Z,2025-12-26T18:43:15.370Z
+361,Huadu Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.375Z,2025-12-26T18:43:15.375Z
+362,Huadu Yukou Poultry Industry,,Poultry,,,,Asia,China,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.378Z,2025-12-26T18:43:15.378Z
+363,Huat Lai Resources Berhad,,Poultry,,,,Asia,Malaysia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.381Z,2025-12-26T18:43:15.381Z
+364,Huawei Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.384Z,2025-12-26T18:43:15.384Z
+365,Huaying Agricultural Development Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""ducks""]","[""Ducks""]",,,,false,2025-12-26T18:43:15.387Z,2025-12-26T18:43:15.387Z
+366,Hubei Yuxiang Poultry Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.390Z,2025-12-26T18:43:15.390Z
+367,Huevo Avícola Tehuacán,,Poultry,,,,North America,Mexico,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.393Z,2025-12-26T18:43:15.393Z
+368,Huevos de Talca (Avícola Las Rastras),,Poultry,,,,South America,Chile,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.396Z,2025-12-26T18:43:15.396Z
+369,Huevos Kikes,,Poultry,,,,South America,Colombia,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.399Z,2025-12-26T18:43:15.399Z
+370,Huevos Santa Reyes,,Poultry,,,,South America,Colombia,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.403Z,2025-12-26T18:43:15.403Z
+371,Hunan Xiangjia Animal Husbandry Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.406Z,2025-12-26T18:43:15.406Z
+372,HyFresh,,Poultry,,,,Asia,Malaysia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.410Z,2025-12-26T18:43:15.410Z
+373,Ianovo Granjas Avícolas,,Poultry,,,,South America,Uruguay,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.413Z,2025-12-26T18:43:15.413Z
+374,IKO,,Poultry,,,,Europe,Poland,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.416Z,2025-12-26T18:43:15.416Z
+375,Impulsora Agropecuaria Santa Rosa,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.420Z,2025-12-26T18:43:15.420Z
+376,Inacruz,,Poultry,,,,South America,Bolivia,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.423Z,2025-12-26T18:43:15.423Z
+377,Inavih,,Poultry,,,,Central America,Honduras,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.427Z,2025-12-26T18:43:15.427Z
+378,Indavisa,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.430Z,2025-12-26T18:43:15.430Z
+379,Indian Broiler Group,,Poultry,,,,Asia,India,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.434Z,2025-12-26T18:43:15.434Z
+380,Industria Avikiri,,Poultry,,,,Central America,Costa Rica,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.438Z,2025-12-26T18:43:15.438Z
+381,Industrias Pollos Premium 5.8,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.446Z,2025-12-26T18:43:15.446Z
+382,Inghams Enterprises Pty. Ltd.,,Poultry,,,,Oceania,Australia,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:15.450Z,2025-12-26T18:43:15.450Z
+383,"Inner Mongolia Runhaiyuan Industrial Co.,",,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.453Z,2025-12-26T18:43:15.453Z
+384,Interovo Ibérica SL,,Poultry,,,,Europe,Spain,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.456Z,2025-12-26T18:43:15.456Z
+385,Interpec San Marcos,,Poultry,,,,North America,Mexico,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.459Z,2025-12-26T18:43:15.459Z
+386,Inveravica,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.463Z,2025-12-26T18:43:15.463Z
+387,Iowa Cage Free,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:15.468Z,2025-12-26T18:43:15.468Z
+388,Irvine's Zimbabwe,,Poultry,,,,Africa,Zimbabwe,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.471Z,2025-12-26T18:43:15.471Z
+389,ISE America,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:15.475Z,2025-12-26T18:43:15.475Z
+390,Ismailia-Misr Poultry Co.,,Poultry,,,,Africa,Egypt,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.481Z,2025-12-26T18:43:15.481Z
+391,Italcol,,Poultry,,,,South America,Colombia,,,"[""poultry"",""table-eggs"",""turkey""]","[""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:15.486Z,2025-12-26T18:43:15.486Z
+392,J.S. West Milling,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.490Z,2025-12-26T18:43:15.490Z
+393,JA Zen-Noh,,Poultry,,,,Asia,Japan,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.493Z,2025-12-26T18:43:15.493Z
+394,Jaguafrangos,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.497Z,2025-12-26T18:43:15.497Z
+395,Jaindl Turkey Sales Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:15.501Z,2025-12-26T18:43:15.501Z
+396,Jamaica Broilers Group Ltd.,,Poultry,,,,Caribbean,Jamaica,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.505Z,2025-12-26T18:43:15.505Z
+397,Japfa Ltd.,,Poultry,,,,Asia,Singapore,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.508Z,2025-12-26T18:43:15.508Z
+398,JBS S.A.,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:15.512Z,2025-12-26T18:43:15.512Z
+399,JBS S.A. (Latin America),,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:15.516Z,2025-12-26T18:43:15.516Z
+400,Jennie-O Turkey Store,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:15.519Z,2025-12-26T18:43:15.519Z
+401,Jiangsu Ecolovo Food Co. Ltd. (Yike Group),,Poultry,,,,Asia,China,,,"[""poultry"",""chicken"",""ducks""]","[""Chicken"",""Ducks""]",,,,false,2025-12-26T18:43:15.522Z,2025-12-26T18:43:15.522Z
+402,Jiangsu Lihua Animal Husbandry,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken"",""ducks"",""geese"",""table-eggs""]","[""Chicken"",""Ducks"",""Geese"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.525Z,2025-12-26T18:43:15.525Z
+403,Jiangsu Tiancheng Egg Industry Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.529Z,2025-12-26T18:43:15.529Z
+404,"Jining Hongrun Food Co,",,Poultry,,,,Asia,China,,,"[""poultry"",""chicken"",""ducks""]","[""Chicken"",""Ducks""]",,,,false,2025-12-26T18:43:15.532Z,2025-12-26T18:43:15.532Z
+405,Jordan Poultry Processing and Marketing Co.,,Poultry,,,,Middle East,Jordan,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.535Z,2025-12-26T18:43:15.535Z
+406,Kasemchai Farm Group,,Poultry,,,,Asia,Thailand,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.537Z,2025-12-26T18:43:15.537Z
+407,Kaxim,,Poultry,,,,Central America,Guatemala,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.540Z,2025-12-26T18:43:15.540Z
+408,Kazi Farms Group,,Poultry,,,,Asia,Bangladesh,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.543Z,2025-12-26T18:43:15.543Z
+409,Kenchic Limited,,Poultry,,,,Africa,Kenya,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.546Z,2025-12-26T18:43:15.546Z
+410,KerOvos Alimentos,,Poultry,,,,South America,Brazil,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.549Z,2025-12-26T18:43:15.549Z
+411,Keskinoğlu,,Poultry,,,,Middle East,Türkiye,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.552Z,2025-12-26T18:43:15.552Z
+412,KG Group,,Poultry,,,,Europe,Lithuania,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.555Z,2025-12-26T18:43:15.555Z
+413,Koch Foods Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.558Z,2025-12-26T18:43:15.558Z
+414,Koch’s Turkey Farm,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:15.561Z,2025-12-26T18:43:15.561Z
+415,Koka,,Poultry,,,,Europe,Croatia,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:15.564Z,2025-12-26T18:43:15.564Z
+416,Kraft Heinz Company,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:15.567Z,2025-12-26T18:43:15.567Z
+417,Krasnodonskoe,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.570Z,2025-12-26T18:43:15.570Z
+418,Kreher's Farm Fresh Eggs LLC,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.573Z,2025-12-26T18:43:15.573Z
+419,Kreider Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.576Z,2025-12-26T18:43:15.576Z
+420,Kruczyn Mariusz Pachura,,Poultry,,,,Europe,Poland,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.578Z,2025-12-26T18:43:15.578Z
+421,Kula Yağ ve Emek Yem Sanayi Tic.,,Poultry,,,,Middle East,Türkiye,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.581Z,2025-12-26T18:43:15.581Z
+422,L'Œuf de Nos Villages,,Poultry,,,,Europe,France,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.585Z,2025-12-26T18:43:15.585Z
+423,La Naturaleza,,Poultry,,,,South America,Uruguay,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.589Z,2025-12-26T18:43:15.589Z
+424,La Ponderosa,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.592Z,2025-12-26T18:43:15.592Z
+425,La Unión Tepatitlán (Huevo Alteño),,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.595Z,2025-12-26T18:43:15.595Z
+426,La Virtud,,Poultry,,,,Central America,Honduras,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.598Z,2025-12-26T18:43:15.598Z
+427,La Yema Dorada (Monserrat),,Poultry,,,,Central America,Costa Rica,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.601Z,2025-12-26T18:43:15.601Z
+428,Laemthong Corp. Group,,Poultry,,,,Asia,Thailand,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.604Z,2025-12-26T18:43:15.604Z
+429,Lar Cooperativa Agroindustrial,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.607Z,2025-12-26T18:43:15.607Z
+430,Las Camelias,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.610Z,2025-12-26T18:43:15.610Z
+431,Las Delicias,,Poultry,,,,Central America,Honduras,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.613Z,2025-12-26T18:43:15.613Z
+432,Las Tacuaras (Nutrihuevos),,Poultry,,,,South America,Paraguay,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.616Z,2025-12-26T18:43:15.616Z
+433,Lathem Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.619Z,2025-12-26T18:43:15.619Z
+434,Lauro Morishita,,Poultry,,,,South America,Brazil,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.622Z,2025-12-26T18:43:15.622Z
+435,Lay Hong Bhd,,Poultry,,,,Asia,Malaysia,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.625Z,2025-12-26T18:43:15.625Z
+436,LDC,,Poultry,,,,Europe,France,,,"[""poultry"",""chicken"",""ducks"",""geese"",""table-eggs"",""turkey""]","[""Chicken"",""Ducks"",""Geese"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:15.628Z,2025-12-26T18:43:15.628Z
+437,Le Gouessant,,Poultry,,,,Europe,France,,,"[""poultry"",""chicken"",""table-eggs"",""turkey""]","[""Chicken"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:15.630Z,2025-12-26T18:43:15.630Z
+438,Leong Hup International Bhd,,Poultry,,,,Asia,Malaysia,,,"[""poultry"",""chicken"",""ducks"",""egg-products"",""table-eggs"",""turkey""]","[""Chicken"",""Ducks"",""Egg Products"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:15.634Z,2025-12-26T18:43:15.634Z
+439,Liaoning Haoming Food Group Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.636Z,2025-12-26T18:43:15.636Z
+440,Liaoning Yingde Food Group Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.639Z,2025-12-26T18:43:15.639Z
+441,Lincoln Premium Poultry,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.642Z,2025-12-26T18:43:15.642Z
+442,Longhai Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.645Z,2025-12-26T18:43:15.645Z
+443,LTKM Bhd.,,Poultry,,,,Asia,Malaysia,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.648Z,2025-12-26T18:43:15.648Z
+444,Lusiaves Grupo,,Poultry,,,,Europe,Portugal,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:15.651Z,2025-12-26T18:43:15.651Z
+445,Malayan Flour Mills,,Poultry,,,,Asia,Malaysia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.654Z,2025-12-26T18:43:15.654Z
+446,Malindo Feedmill,,Poultry,,,,Asia,Indonesia,,,"[""poultry"",""chicken"",""ducks"",""table-eggs""]","[""Chicken"",""Ducks"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.657Z,2025-12-26T18:43:15.657Z
+447,Mansoura Poultry,,Poultry,,,,Africa,Egypt,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.661Z,2025-12-26T18:43:15.661Z
+448,Mantiqueira Brasil,,Poultry,,,,South America,Brazil,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.665Z,2025-12-26T18:43:15.665Z
+449,Mantiqueira USA,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:15.668Z,2025-12-26T18:43:15.668Z
+450,Maple Lodge Farms Ltd.,,Poultry,,,,North America,Canada,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:15.670Z,2025-12-26T18:43:15.670Z
+451,Mar-Jac Poultry,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.673Z,2025-12-26T18:43:15.673Z
+452,Mar-Jac Poultry Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.676Z,2025-12-26T18:43:15.676Z
+453,Mar-Jac Poultry LLC,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.679Z,2025-12-26T18:43:15.679Z
+454,Marcopolo Comercio SL,,Poultry,,,,Europe,Spain,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.682Z,2025-12-26T18:43:15.682Z
+455,Marubeni Nisshin Feed Co.,,Poultry,,,,Asia,Japan,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.685Z,2025-12-26T18:43:15.685Z
+456,Matli,,Poultry,,,,Middle East,Türkiye,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.687Z,2025-12-26T18:43:15.687Z
+457,Mauricea Alimentos,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.691Z,2025-12-26T18:43:15.691Z
+458,Mercer Landmark,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.693Z,2025-12-26T18:43:15.693Z
+459,MHP,,Poultry,,,,Europe,Ukraine,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.696Z,2025-12-26T18:43:15.696Z
+460,Michael Foods,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:15.699Z,2025-12-26T18:43:15.699Z
+461,Michigan Turkey Producers,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:15.702Z,2025-12-26T18:43:15.702Z
+462,Mid-States Specialty Eggs,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.705Z,2025-12-26T18:43:15.705Z
+463,Miller Poultry,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.708Z,2025-12-26T18:43:15.708Z
+464,"Milouof Agricultural Cooperative, Ltd.",,Poultry,,,,Middle East,Israel,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:15.711Z,2025-12-26T18:43:15.711Z
+465,Minnich Eggs,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.715Z,2025-12-26T18:43:15.715Z
+466,Miralejos,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken"",""ducks"",""turkey""]","[""Chicken"",""Ducks"",""Turkey""]",,,,false,2025-12-26T18:43:15.717Z,2025-12-26T18:43:15.717Z
+467,Miratorg,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.721Z,2025-12-26T18:43:15.721Z
+468,Mizgier Poultry Farms,,Poultry,,,,Europe,Poland,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.724Z,2025-12-26T18:43:15.724Z
+469,Modern Poultry Farms,,Poultry,,,,Middle East,Oman,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.727Z,2025-12-26T18:43:15.727Z
+470,Molino La Perla,,Poultry,,,,South America,Peru,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.730Z,2025-12-26T18:43:15.730Z
+471,Molino San Juan SRL (Pollo Don Juan),,Poultry,,,,South America,Paraguay,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.733Z,2025-12-26T18:43:15.733Z
+472,Molinos de Nicaragua (Monisa),,Poultry,,,,Central America,Nicaragua,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.736Z,2025-12-26T18:43:15.736Z
+473,Morning Fresh Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.739Z,2025-12-26T18:43:15.739Z
+474,Mountaire Farms Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.742Z,2025-12-26T18:43:15.742Z
+475,Moy Park Ltd.,,Poultry,,,,Europe,United Kingdom,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.745Z,2025-12-26T18:43:15.745Z
+476,MPS Egg Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.747Z,2025-12-26T18:43:15.747Z
+477,Murray's Chicken,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.750Z,2025-12-26T18:43:15.750Z
+478,N & N Agriculture Ltd.,,Poultry,,,,Asia,Singapore,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.753Z,2025-12-26T18:43:15.753Z
+479,Namib Poultry Industries,,Poultry,,,,Africa,Namibia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.757Z,2025-12-26T18:43:15.757Z
+480,Nanda Group,,Poultry,,,,Asia,India,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.760Z,2025-12-26T18:43:15.760Z
+481,Nanyang Food Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.763Z,2025-12-26T18:43:15.763Z
+482,Naturovos,,Poultry,,,,South America,Brazil,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.766Z,2025-12-26T18:43:15.766Z
+483,Nesma Ommat,,Poultry,,,,Africa,Egypt,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.769Z,2025-12-26T18:43:15.769Z
+484,New Hope Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken"",""ducks""]","[""Chicken"",""Ducks""]",,,,false,2025-12-26T18:43:15.772Z,2025-12-26T18:43:15.772Z
+485,New Hope Liuhe,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken"",""ducks"",""table-eggs""]","[""Chicken"",""Ducks"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.775Z,2025-12-26T18:43:15.775Z
+486,Noble Foods,,Poultry,,,,Europe,United Kingdom,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.779Z,2025-12-26T18:43:15.779Z
+487,Noelma,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.782Z,2025-12-26T18:43:15.782Z
+488,Norbest LLC,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:15.784Z,2025-12-26T18:43:15.784Z
+489,Northern Pride Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:15.787Z,2025-12-26T18:43:15.787Z
+490,Nuestra Huella SA,,Poultry,,,,South America,Argentina,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.790Z,2025-12-26T18:43:15.790Z
+491,Nutréa Nutrition Animale (NNA),,Poultry,,,,Europe,France,,,"[""poultry"",""chicken"",""ducks"",""table-eggs"",""turkey""]","[""Chicken"",""Ducks"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:15.793Z,2025-12-26T18:43:15.793Z
+492,Nutriavícola SA,,Poultry,,,,South America,Colombia,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.795Z,2025-12-26T18:43:15.795Z
+493,Nutriproductos Santa Ana,,Poultry,,,,South America,Peru,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.799Z,2025-12-26T18:43:15.799Z
+494,Oakdell Egg Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.802Z,2025-12-26T18:43:15.802Z
+495,Obasanjo Farms Nigeria Ltd.,,Poultry,,,,Africa,Nigeria,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.806Z,2025-12-26T18:43:15.806Z
+496,Of Tov Group,,Poultry,,,,Middle East,Israel,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:15.808Z,2025-12-26T18:43:15.808Z
+497,Ojai Alimentos,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.811Z,2025-12-26T18:43:15.811Z
+498,OK Foods Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.814Z,2025-12-26T18:43:15.814Z
+499,Olam Agri Nigeria,,Poultry,,,,Africa,Nigeria,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.817Z,2025-12-26T18:43:15.817Z
+500,Opal Foods,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:15.819Z,2025-12-26T18:43:15.819Z
+501,Operadora Avicola Opav (Grupo Bios),,Poultry,,,,South America,Colombia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.823Z,2025-12-26T18:43:15.823Z
+502,OSI Group,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.826Z,2025-12-26T18:43:15.826Z
+503,Otto & Sons Weihai,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.830Z,2025-12-26T18:43:15.830Z
+504,Ovobrand SA,,Poultry,,,,South America,Argentina,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.833Z,2025-12-26T18:43:15.833Z
+505,Ovostar Union,,Poultry,,,,Europe,Ukraine,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.837Z,2025-12-26T18:43:15.837Z
+506,P H Van Den Brink,,Poultry,,,,Oceania,New Zealand,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.840Z,2025-12-26T18:43:15.840Z
+507,Pace Farm,,Poultry,,,,Oceania,Australia,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.843Z,2025-12-26T18:43:15.843Z
+508,Padesa,,Poultry,,,,Europe,Spain,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:15.848Z,2025-12-26T18:43:15.848Z
+509,Pampr’œuf,,Poultry,,,,Europe,France,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.852Z,2025-12-26T18:43:15.852Z
+510,Paragon Group,,Poultry,,,,Asia,Bangladesh,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.856Z,2025-12-26T18:43:15.856Z
+511,PATSA,,Poultry,,,,North America,Mexico,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.862Z,2025-12-26T18:43:15.862Z
+512,Pearl Valley Eggs,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:15.872Z,2025-12-26T18:43:15.872Z
+513,Peco Foods,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.875Z,2025-12-26T18:43:15.875Z
+514,PEP,,Poultry,,,,Europe,France,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.878Z,2025-12-26T18:43:15.878Z
+515,Perdue Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken"",""table-eggs"",""turkey""]","[""Chicken"",""Table Eggs"",""Turkey""]",,,,true,2025-12-26T18:43:15.883Z,2025-12-26T18:43:15.883Z
+516,Perdue Foods (broiler),,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.887Z,2025-12-26T18:43:15.887Z
+517,Perdue Foods (turkey),,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:15.890Z,2025-12-26T18:43:15.890Z
+518,PHW Group,,Poultry,,,,Europe,Germany,,,"[""poultry"",""chicken"",""ducks"",""turkey""]","[""Chicken"",""Ducks"",""Turkey""]",,,,false,2025-12-26T18:43:15.894Z,2025-12-26T18:43:15.894Z
+519,Pif Paf Alimentos,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.898Z,2025-12-26T18:43:15.898Z
+520,Pilgrim's de México,,Poultry,,,,North America,Mexico,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.901Z,2025-12-26T18:43:15.901Z
+521,Pilgrim's Pride Corp.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:15.905Z,2025-12-26T18:43:15.905Z
+522,PIPASA (Nicaragua),,Poultry,,,,Central America,Nicaragua,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:15.910Z,2025-12-26T18:43:15.910Z
+523,Pitman Family Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""ducks"",""turkey""]","[""Ducks"",""Turkey""]",,,,true,2025-12-26T18:43:15.916Z,2025-12-26T18:43:15.916Z
+524,Pixal S.A.,,Poultry,,,,South America,Uruguay,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.920Z,2025-12-26T18:43:15.920Z
+525,Plainville Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:15.923Z,2025-12-26T18:43:15.923Z
+526,Plukon Food Group,,Poultry,,,,Europe,Netherlands,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:15.927Z,2025-12-26T18:43:15.927Z
+527,Pollo Andino SA,,Poultry,,,,South America,Colombia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.929Z,2025-12-26T18:43:15.929Z
+528,Pollo Cibao,,Poultry,,,,Caribbean,Dominican Republic,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.933Z,2025-12-26T18:43:15.933Z
+529,Pollo Favorito SA (Pofasa),,Poultry,,,,South America,Ecuador,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:15.937Z,2025-12-26T18:43:15.937Z
+530,Pollo Industrializado de México,,Poultry,,,,North America,Mexico,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.942Z,2025-12-26T18:43:15.942Z
+531,Pollolín,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.946Z,2025-12-26T18:43:15.946Z
+532,Pollos Eccus,,Poultry,,,,Caribbean,Dominican Republic,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.950Z,2025-12-26T18:43:15.950Z
+533,Pollos El Bucanero,,Poultry,,,,South America,Colombia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.953Z,2025-12-26T18:43:15.953Z
+534,Pollos Savicol,,Poultry,,,,South America,Colombia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.956Z,2025-12-26T18:43:15.956Z
+535,Pollpar,,Poultry,,,,South America,Paraguay,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.959Z,2025-12-26T18:43:15.959Z
+536,Prairie Star Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:15.962Z,2025-12-26T18:43:15.962Z
+537,Prestage Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs"",""turkey""]","[""Table Eggs"",""Turkey""]",,,,true,2025-12-26T18:43:15.965Z,2025-12-26T18:43:15.965Z
+538,Prioskolie,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs"",""turkey""]","[""Chicken"",""Egg Products"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:15.968Z,2025-12-26T18:43:15.968Z
+539,Prodhin,,Poultry,,,,South America,Uruguay,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.971Z,2025-12-26T18:43:15.971Z
+540,Prodo Group,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.974Z,2025-12-26T18:43:15.974Z
+541,Producciones Avícolas El Granjero S.L.,,Poultry,,,,Europe,Spain,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.978Z,2025-12-26T18:43:15.978Z
+542,Productora de Huevo Gigantes,,Poultry,,,,North America,Mexico,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:15.982Z,2025-12-26T18:43:15.982Z
+543,Pronaca,,Poultry,,,,South America,Ecuador,,,"[""poultry"",""chicken"",""table-eggs"",""turkey""]","[""Chicken"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:15.985Z,2025-12-26T18:43:15.985Z
+544,Proteína Animal (PROAN),,Poultry,,,,North America,Mexico,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:15.989Z,2025-12-26T18:43:15.989Z
+545,Proteinsa,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.992Z,2025-12-26T18:43:15.992Z
+546,Protinal-Proagro CA,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.995Z,2025-12-26T18:43:15.995Z
+547,Puro Pollo,,Poultry,,,,South America,Colombia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:15.998Z,2025-12-26T18:43:15.998Z
+548,Purolomo - Alibal,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.001Z,2025-12-26T18:43:16.001Z
+549,Pyramid Poultry Co.,,Poultry,,,,Africa,Egypt,,,"[""poultry"",""chicken"",""ducks"",""turkey""]","[""Chicken"",""Ducks"",""Turkey""]",,,,false,2025-12-26T18:43:16.004Z,2025-12-26T18:43:16.004Z
+550,Qingdao Nine-Alliance Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.007Z,2025-12-26T18:43:16.007Z
+551,QL Resources Berhad,,Poultry,,,,Asia,Malaysia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.010Z,2025-12-26T18:43:16.010Z
+552,QSR Brands (M) Holdings Sdn Bhd,,Poultry,,,,Asia,Malaysia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.013Z,2025-12-26T18:43:16.013Z
+553,Quantum Foods,,Poultry,,,,Africa,South Africa,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.016Z,2025-12-26T18:43:16.016Z
+554,Qué Rico,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.020Z,2025-12-26T18:43:16.020Z
+555,Radwah Chicken Poultry & Fine Food,,Poultry,,,,Middle East,Saudi Arabia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.024Z,2025-12-26T18:43:16.024Z
+556,Ravis,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.028Z,2025-12-26T18:43:16.028Z
+557,RCL Foods Ltd.,,Poultry,,,,Africa,South Africa,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.031Z,2025-12-26T18:43:16.031Z
+558,Redondos SA,,Poultry,,,,South America,Peru,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:16.034Z,2025-12-26T18:43:16.034Z
+559,Reftinskaya Poultry Farm,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.037Z,2025-12-26T18:43:16.037Z
+560,Rembrandt Enterprises,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:16.040Z,2025-12-26T18:43:16.040Z
+561,Resource Agribusiness Group,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.043Z,2025-12-26T18:43:16.043Z
+562,Rico Pollo,,Poultry,,,,South America,Peru,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.045Z,2025-12-26T18:43:16.045Z
+563,Rongrat,,Poultry,,,,South America,Venezuela,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:16.048Z,2025-12-26T18:43:16.048Z
+564,Rose Acre Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:16.051Z,2025-12-26T18:43:16.051Z
+565,Roskar,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.054Z,2025-12-26T18:43:16.054Z
+566,Roth SRL,,Poultry,,,,South America,Argentina,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:16.058Z,2025-12-26T18:43:16.058Z
+567,Rothex SA,,Poultry,,,,South America,Argentina,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:16.061Z,2025-12-26T18:43:16.061Z
+568,Rothkötter-Unternehmensgruppe,,Poultry,,,,Europe,Germany,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.064Z,2025-12-26T18:43:16.064Z
+569,Rusgrain Holding,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.068Z,2025-12-26T18:43:16.068Z
+570,S&R Egg Farm,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:16.073Z,2025-12-26T18:43:16.073Z
+571,Sadiq Brothers,,Poultry,,,,Asia,Pakistan,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.077Z,2025-12-26T18:43:16.077Z
+572,Saha Farms,,Poultry,,,,Asia,Thailand,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.081Z,2025-12-26T18:43:16.081Z
+573,Sakku Group,,Poultry,,,,Asia,India,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.084Z,2025-12-26T18:43:16.084Z
+574,San Fernando,,Poultry,,,,South America,Peru,,,"[""poultry"",""chicken"",""ducks"",""table-eggs"",""turkey""]","[""Chicken"",""Ducks"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:16.087Z,2025-12-26T18:43:16.087Z
+575,San Miguel Foods,,Poultry,,,,Asia,Philippines,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.090Z,2025-12-26T18:43:16.090Z
+576,Sanderson Farms Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:16.093Z,2025-12-26T18:43:16.093Z
+577,Santa Anita Nápoles,,Poultry,,,,South America,Colombia,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:16.097Z,2025-12-26T18:43:16.097Z
+578,"Santa Maria, C.A.",,Poultry,,,,South America,Venezuela,,,"[""poultry""]",,,,,false,2025-12-26T18:43:16.100Z,2025-12-26T18:43:16.100Z
+579,Santiago Eichhorn e Hijos SRL,,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.103Z,2025-12-26T18:43:16.103Z
+580,São Salvador Alimentos,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.106Z,2025-12-26T18:43:16.106Z
+581,Sasti Kumar Poultry Farm,,Poultry,,,,Asia,India,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:16.109Z,2025-12-26T18:43:16.109Z
+582,Sauder’s Eggs,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:16.111Z,2025-12-26T18:43:16.111Z
+583,Savel,,Poultry,,,,Europe,France,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.114Z,2025-12-26T18:43:16.114Z
+584,Scandi Standard,,Poultry,,,,Europe,Sweden,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.117Z,2025-12-26T18:43:16.117Z
+585,Schipper Eggs LLC,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:16.120Z,2025-12-26T18:43:16.120Z
+586,Seara,,Poultry,,,,South America,Brazil,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:16.124Z,2025-12-26T18:43:16.124Z
+587,Sede América (FABA),,Poultry,,,,South America,Argentina,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.127Z,2025-12-26T18:43:16.127Z
+588,Sedima,,Poultry,,,,Africa,Senegal,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.130Z,2025-12-26T18:43:16.130Z
+589,Segrasa,,Poultry,,,,Central America,Guatemala,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:16.134Z,2025-12-26T18:43:16.134Z
+590,Sello de Oro,,Poultry,,,,Central America,El Salvador,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.136Z,2025-12-26T18:43:16.136Z
+591,Seng Choon Farm,,Poultry,,,,Asia,Singapore,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.139Z,2025-12-26T18:43:16.139Z
+592,Şenpiliç Gıda Sanayi,,Poultry,,,,Middle East,Türkiye,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.142Z,2025-12-26T18:43:16.142Z
+593,Sensheng Food Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.145Z,2025-12-26T18:43:16.145Z
+594,Sepidmakian,,Poultry,,,,Middle East,Iran,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.148Z,2025-12-26T18:43:16.148Z
+595,Servolux,,Poultry,,,,Europe,Belarus,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.151Z,2025-12-26T18:43:16.151Z
+596,Severnaya,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.155Z,2025-12-26T18:43:16.155Z
+597,Shalimar Group,,Poultry,,,,Asia,India,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.158Z,2025-12-26T18:43:16.158Z
+598,Shandong Asia Pacific Zhonghui Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.161Z,2025-12-26T18:43:16.161Z
+599,Shandong Backbone Group,,Poultry,,,,Asia,China,,,"[""poultry""]",,,,,false,2025-12-26T18:43:16.164Z,2025-12-26T18:43:16.164Z
+600,Shandong Chohe Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.167Z,2025-12-26T18:43:16.167Z
+601,Shandong Fengxiang Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.170Z,2025-12-26T18:43:16.170Z
+602,Shandong Hemei Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.174Z,2025-12-26T18:43:16.174Z
+603,Shandong Minhe Animal Husbandry Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.177Z,2025-12-26T18:43:16.177Z
+604,Shandong Qianhu Tianyikong Food Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.180Z,2025-12-26T18:43:16.180Z
+605,Shandong Ronghua Food Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.183Z,2025-12-26T18:43:16.183Z
+606,Shandong Springsnow Food Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.186Z,2025-12-26T18:43:16.186Z
+607,Shandong Taihe Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken"",""ducks""]","[""Chicken"",""Ducks""]",,,,false,2025-12-26T18:43:16.189Z,2025-12-26T18:43:16.189Z
+608,Shandong Xiantan Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.192Z,2025-12-26T18:43:16.192Z
+609,Shandong Xinhe Shengxiang Food Group Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.195Z,2025-12-26T18:43:16.195Z
+610,"Shandong Xinsheng Food Co., Ltd.",,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.197Z,2025-12-26T18:43:16.197Z
+611,Shandong Zhongxin Food Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken"",""ducks""]","[""Chicken"",""Ducks""]",,,,false,2025-12-26T18:43:16.200Z,2025-12-26T18:43:16.200Z
+612,Shanthi Feeds Pvt Ltd,,Poultry,,,,Asia,India,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.203Z,2025-12-26T18:43:16.203Z
+613,Shanxi Daxiang Group Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.206Z,2025-12-26T18:43:16.206Z
+614,Shanxi Jinlong Breeding Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:16.209Z,2025-12-26T18:43:16.209Z
+615,Shenandoah Valley Organic LLC,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:16.212Z,2025-12-26T18:43:16.212Z
+616,Shendan Healthy Food,,Poultry,,,,Asia,China,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.215Z,2025-12-26T18:43:16.215Z
+617,Shendi Agricultural Branch Trade Co,,Poultry,,,,Asia,China,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.218Z,2025-12-26T18:43:16.218Z
+618,ShenHuang Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.222Z,2025-12-26T18:43:16.222Z
+619,Shigueno,,Poultry,,,,South America,Brazil,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:16.225Z,2025-12-26T18:43:16.225Z
+620,Sichuan Houquan Ecological Food Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.227Z,2025-12-26T18:43:16.227Z
+621,Sichuan Sundaily Farm Ecological Food Co.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.230Z,2025-12-26T18:43:16.230Z
+622,Sigma Supplies (Isinya Feeds Limited),,Poultry,,,,Africa,Kenya,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.234Z,2025-12-26T18:43:16.234Z
+623,Simmons Foods Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:16.237Z,2025-12-26T18:43:16.237Z
+624,Simpson's Eggs,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:16.240Z,2025-12-26T18:43:16.240Z
+625,Sinyavskaya Poultry Farm,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.245Z,2025-12-26T18:43:16.245Z
+626,Sitno,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.249Z,2025-12-26T18:43:16.249Z
+627,SKM Egg Products,,Poultry,,,,Asia,India,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.252Z,2025-12-26T18:43:16.252Z
+628,Skylark Group,,Poultry,,,,Asia,India,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.255Z,2025-12-26T18:43:16.255Z
+629,Sollio Cooperative Group,,Poultry,,,,North America,Canada,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:16.258Z,2025-12-26T18:43:16.258Z
+630,Somai Nordeste,,Poultry,,,,South America,Brazil,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.260Z,2025-12-26T18:43:16.260Z
+631,Sopraval,,Poultry,,,,South America,Chile,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,false,2025-12-26T18:43:16.263Z,2025-12-26T18:43:16.263Z
+632,Sovereign Food Investments,,Poultry,,,,Africa,South Africa,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.265Z,2025-12-26T18:43:16.265Z
+633,Sparboe Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:16.269Z,2025-12-26T18:43:16.269Z
+634,Sprehe Gruppe,,Poultry,,,,Europe,Germany,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:16.272Z,2025-12-26T18:43:16.272Z
+635,Suguna Foods,,Poultry,,,,Asia,India,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.275Z,2025-12-26T18:43:16.275Z
+636,Sunrise Acres Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:16.279Z,2025-12-26T18:43:16.279Z
+637,Sunrise Farms Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:16.281Z,2025-12-26T18:43:16.281Z
+638,Sunrise Farms LLC,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:16.284Z,2025-12-26T18:43:16.284Z
+639,Supreme Poultry (South Africa),,Poultry,,,,Africa,South Africa,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.287Z,2025-12-26T18:43:16.287Z
+640,Sverdlovsk,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.291Z,2025-12-26T18:43:16.291Z
+641,Talentis Agro Zrt,,Poultry,,,,Europe,Hungary,,,"[""poultry"",""table-eggs"",""turkey""]","[""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:16.293Z,2025-12-26T18:43:16.293Z
+642,Tamago & Co. Inc. (Ise Inc.),,Poultry,,,,Asia,Japan,,,"[""poultry"",""chicken"",""egg-products"",""table-eggs""]","[""Chicken"",""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.297Z,2025-12-26T18:43:16.297Z
+643,Tanmiah Food Group,,Poultry,,,,Middle East,Saudi Arabia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.300Z,2025-12-26T18:43:16.300Z
+644,Técnica Avícola,,Poultry,,,,South America,Peru,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.303Z,2025-12-26T18:43:16.303Z
+645,Tegel Foods,,Poultry,,,,Oceania,New Zealand,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,false,2025-12-26T18:43:16.307Z,2025-12-26T18:43:16.307Z
+646,Telos SA,,Poultry,,,,South America,Argentina,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:16.310Z,2025-12-26T18:43:16.310Z
+647,Teo Seng Capital Bhd.,,Poultry,,,,Asia,Malaysia,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:16.313Z,2025-12-26T18:43:16.313Z
+648,Terrena,,Poultry,,,,Europe,France,,,"[""poultry"",""chicken"",""ducks"",""table-eggs"",""turkey""]","[""Chicken"",""Ducks"",""Table Eggs"",""Turkey""]",,,,false,2025-12-26T18:43:16.316Z,2025-12-26T18:43:16.316Z
+649,Thai Foods Group,,Poultry,,,,Asia,Thailand,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.320Z,2025-12-26T18:43:16.320Z
+650,The Arab Qatari Co. for Poultry Production,,Poultry,,,,Middle East,Qatar,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.323Z,2025-12-26T18:43:16.323Z
+651,The Best Dressed Chicken,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:16.325Z,2025-12-26T18:43:16.325Z
+652,The Golden Cockerel Group,,Poultry,,,,Oceania,Australia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.328Z,2025-12-26T18:43:16.328Z
+653,The Happy Egg Co.,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:16.331Z,2025-12-26T18:43:16.331Z
+654,The Union for Agricultural Development and Slaughtering,,Poultry,,,,Middle East,Jordan,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.335Z,2025-12-26T18:43:16.335Z
+655,Tileo S.A. (Avícola El Poyote),,Poultry,,,,South America,Uruguay,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.338Z,2025-12-26T18:43:16.338Z
+656,Tip-Top Industrial,,Poultry,,,,Central America,Nicaragua,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.341Z,2025-12-26T18:43:16.341Z
+657,Trillium Farm Holdings,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:16.345Z,2025-12-26T18:43:16.345Z
+658,TRUST Ptitsevodcheskiy Aktivi,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.348Z,2025-12-26T18:43:16.348Z
+659,Turkey Valley Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:16.351Z,2025-12-26T18:43:16.351Z
+660,Turosi,,Poultry,,,,Oceania,Australia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.354Z,2025-12-26T18:43:16.354Z
+661,Tyson China,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.357Z,2025-12-26T18:43:16.357Z
+662,Tyson Foods (broiler),,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:16.360Z,2025-12-26T18:43:16.360Z
+663,Tyson Foods (turkey),,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:16.362Z,2025-12-26T18:43:16.362Z
+664,Tyson Foods Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken"",""turkey""]","[""Chicken"",""Turkey""]",,,,true,2025-12-26T18:43:16.366Z,2025-12-26T18:43:16.366Z
+665,Udmurt Poultry Factory,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.369Z,2025-12-26T18:43:16.369Z
+666,UK Russian Field,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken"",""ducks"",""table-eggs""]","[""Chicken"",""Ducks"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.372Z,2025-12-26T18:43:16.372Z
+667,Uvesa,,Poultry,,,,Europe,Spain,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.376Z,2025-12-26T18:43:16.376Z
+668,Venky's India Ltd.,,Poultry,,,,Asia,India,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.379Z,2025-12-26T18:43:16.379Z
+669,Versova Holdings LLP,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:16.382Z,2025-12-26T18:43:16.382Z
+670,Villa Rose Egg Farm,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:16.385Z,2025-12-26T18:43:16.385Z
+671,Virginia Poultry Growers Cooperative Inc.,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:16.388Z,2025-12-26T18:43:16.388Z
+672,Vodňanská Drůbež,,Poultry,,,,Europe,Czech Republic,,,"[""poultry"",""chicken"",""ducks""]","[""Chicken"",""Ducks""]",,,,false,2025-12-26T18:43:16.396Z,2025-12-26T18:43:16.396Z
+673,Volovsky Broiler,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.399Z,2025-12-26T18:43:16.399Z
+674,Wabash Valley Produce,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:16.402Z,2025-12-26T18:43:16.402Z
+675,Wadi Group,,Poultry,,,,Africa,Egypt,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.405Z,2025-12-26T18:43:16.405Z
+676,Wagner Shinoda,,Poultry,,,,South America,Brazil,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.409Z,2025-12-26T18:43:16.409Z
+677,Waldemiro Berger,,Poultry,,,,South America,Brazil,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:16.412Z,2025-12-26T18:43:16.412Z
+678,Wayne-Sanderson Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,true,2025-12-26T18:43:16.416Z,2025-12-26T18:43:16.416Z
+679,Weaver Brothers,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:16.419Z,2025-12-26T18:43:16.419Z
+680,Weber Family Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:16.422Z,2025-12-26T18:43:16.422Z
+681,Wellhope Agri-Tech,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.425Z,2025-12-26T18:43:16.425Z
+682,Wens Food Group,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken"",""ducks"",""geese"",""table-eggs""]","[""Chicken"",""Ducks"",""Geese"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.427Z,2025-12-26T18:43:16.427Z
+683,West Liberty Foods LLC,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:16.431Z,2025-12-26T18:43:16.431Z
+684,White Water Processing Co.,,Poultry,,,,North America,United States,,,"[""poultry"",""turkey""]","[""Turkey""]",,,,true,2025-12-26T18:43:16.435Z,2025-12-26T18:43:16.435Z
+685,Wilco,,Poultry,,,,Middle East,Lebanon,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.438Z,2025-12-26T18:43:16.438Z
+686,Wilcox Farms,,Poultry,,,,North America,United States,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,true,2025-12-26T18:43:16.441Z,2025-12-26T18:43:16.441Z
+687,Willamette Egg Farm,,Poultry,,,,North America,United States,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,true,2025-12-26T18:43:16.445Z,2025-12-26T18:43:16.445Z
+688,Wipasz,,Poultry,,,,Europe,Poland,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.448Z,2025-12-26T18:43:16.448Z
+689,Wozniak Poultry Farms,,Poultry,,,,Europe,Poland,,,"[""poultry"",""table-eggs""]","[""Table Eggs""]",,,,false,2025-12-26T18:43:16.451Z,2025-12-26T18:43:16.451Z
+690,Yaroslavl Broiler,,Poultry,,,,Europe,Russia,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.454Z,2025-12-26T18:43:16.454Z
+691,Yo Kuku,,Poultry,,,,Africa,Uganda,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.457Z,2025-12-26T18:43:16.457Z
+692,Yonekyu Corp. Inc.,,Poultry,,,,Asia,Japan,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.460Z,2025-12-26T18:43:16.460Z
+693,Yongda Food Industry,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.463Z,2025-12-26T18:43:16.463Z
+694,Yu Jiang Nan Agriculture Group Co.,,Poultry,,,,Asia,China,,,"[""poultry""]",,,,,false,2025-12-26T18:43:16.466Z,2025-12-26T18:43:16.466Z
+695,Yunken Group Co. Ltd.,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.469Z,2025-12-26T18:43:16.469Z
+696,Zambeef Products PLC,,Poultry,,,,Africa,Zambia,,,"[""poultry"",""chicken"",""table-eggs""]","[""Chicken"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.472Z,2025-12-26T18:43:16.472Z
+697,Zêzerovo,,Poultry,,,,Europe,Portugal,,,"[""poultry"",""egg-products"",""table-eggs""]","[""Egg Products"",""Table Eggs""]",,,,false,2025-12-26T18:43:16.475Z,2025-12-26T18:43:16.475Z
+698,"Zhonghong Sanrong Group Co., Ltd.",,Poultry,,,,Asia,China,,,"[""poultry"",""chicken""]","[""Chicken""]",,,,false,2025-12-26T18:43:16.478Z,2025-12-26T18:43:16.478Z
+699,Zhucheng Waimao Co. Ltd,,Poultry,,,,Asia,China,,,"[""poultry"",""chicken"",""ducks""]","[""Chicken"",""Ducks""]",,,,false,2025-12-26T18:43:16.481Z,2025-12-26T18:43:16.481Z
+700,Haid Group,,Feed,,,,Asia,China,,,"[""feed"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.258Z,2025-12-26T20:01:00.258Z
+701,Muyuan Foodstuff,,Feed,,,,Asia,China,,,"[""feed"",""compound"",""pig-feed""]",,,,,false,2025-12-26T20:01:00.276Z,2025-12-26T20:01:00.276Z
+702,Shuangbaotai Group (Twins Group),,Feed,,,,Asia,China,,,"[""feed"",""compound"",""pig-feed""]",,,,,false,2025-12-26T20:01:00.284Z,2025-12-26T20:01:00.284Z
+703,Land O'Lakes,,Feed,,,,North America,United States,,,"[""feed"",""aqua-feed"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,true,2025-12-26T20:01:00.294Z,2025-12-26T20:01:00.294Z
+704,Chia Tai Investment,,Feed,,,,Asia,China,,,"[""feed"",""pig-feed"",""poultry-feed""]",,,,,false,2025-12-26T20:01:00.298Z,2025-12-26T20:01:00.298Z
+705,De Heus,,Feed,,,,Europe,Netherlands,,,"[""feed"",""aqua-feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.304Z,2025-12-26T20:01:00.304Z
+706,ForFarmers N.V.,,Feed,,,,Europe,Netherlands,,,"[""feed"",""additive"",""aqua-feed"",""compound"",""horse-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.314Z,2025-12-26T20:01:00.314Z
+707,Nutreco,,Feed,,,,Europe,Netherlands,,,"[""feed"",""additive"",""aqua-feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.318Z,2025-12-26T20:01:00.318Z
+708,Tongwei Group,,Feed,,,,Asia,China,,,"[""feed"",""aqua-feed"",""compound"",""pet-feed"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.323Z,2025-12-26T20:01:00.323Z
+709,Alltech,,Feed,,,,North America,United States,,,"[""feed"",""aqua-feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,true,2025-12-26T20:01:00.327Z,2025-12-26T20:01:00.327Z
+710,Tangrenshen Group (TRS),,Feed,,,,Asia,China,,,"[""feed"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed"",""premix""]",,,,,false,2025-12-26T20:01:00.331Z,2025-12-26T20:01:00.331Z
+711,WH Group,,Feed,,,,Asia,China,,,"[""feed"",""compound"",""pig-feed"",""premix""]",,,,,false,2025-12-26T20:01:00.336Z,2025-12-26T20:01:00.336Z
+712,Smithfield Foods,,Feed,,,,North America,United States,,,"[""feed"",""compound"",""pig-feed""]",,,,,true,2025-12-26T20:01:00.340Z,2025-12-26T20:01:00.340Z
+713,Dabeinong Group,,Feed,,,,Asia,China,,,"[""feed"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.344Z,2025-12-26T20:01:00.344Z
+714,East Hope Group,,Feed,,,,Asia,China,,,"[""feed"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.348Z,2025-12-26T20:01:00.348Z
+715,Gold Coin,,Feed,,,,Asia,Singapore,,,"[""feed"",""additive"",""aqua-feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.351Z,2025-12-26T20:01:00.351Z
+716,Feed One,,Feed,,,,Asia,Japan,,,"[""feed"",""aqua-feed"",""compound"",""pet-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.357Z,2025-12-26T20:01:00.357Z
+717,ADM Animal Nutrition,,Feed,,,,North America,United States,,,"[""feed"",""additive"",""aqua-feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,true,2025-12-26T20:01:00.359Z,2025-12-26T20:01:00.359Z
+718,Anyou Biotechnology Group Co.,,Feed,,,,Asia,China,,,"[""feed"",""additive"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.363Z,2025-12-26T20:01:00.363Z
+719,Huaxi Hope Group,,Feed,,,,Asia,China,,,"[""feed"",""aqua-feed"",""pig-feed"",""poultry-feed""]",,,,,false,2025-12-26T20:01:00.365Z,2025-12-26T20:01:00.365Z
+720,Veronesi,,Feed,,,,Europe,Italy,,,"[""feed"",""aqua-feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.368Z,2025-12-26T20:01:00.368Z
+721,Amul,,Feed,,,,Asia,India,,,"[""feed"",""compound"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.371Z,2025-12-26T20:01:00.371Z
+722,AGRAVIS Raiffeisen,,Feed,,,,Europe,Germany,,,"[""feed"",""aqua-feed"",""compound"",""horse-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.374Z,2025-12-26T20:01:00.374Z
+723,Royal Agrifirm Group,,Feed,,,,Europe,Netherlands,,,"[""feed"",""additive"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.377Z,2025-12-26T20:01:00.377Z
+724,Xinjiang Tiankang,,Feed,,,,Asia,China,,,"[""feed"",""additive"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.381Z,2025-12-26T20:01:00.381Z
+725,DLG Group,,Feed,,,,Europe,Denmark,,,"[""feed"",""compound"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.384Z,2025-12-26T20:01:00.384Z
+726,Guangxi Yangxiang Co.,,Feed,,,,Asia,China,,,"[""feed"",""pig-feed"",""poultry-feed""]",,,,,false,2025-12-26T20:01:00.387Z,2025-12-26T20:01:00.387Z
+727,NongHyup Feed Inc.,,Feed,,,,Asia,South Korea,,,"[""feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.391Z,2025-12-26T20:01:00.391Z
+728,Sichuan Tequ Group,,Feed,,,,Asia,China,,,"[""feed"",""aqua-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.397Z,2025-12-26T20:01:00.397Z
+729,Danish Agro Group,,Feed,,,,Europe,Denmark,,,"[""feed"",""additive"",""compound"",""horse-feed"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.400Z,2025-12-26T20:01:00.400Z
+730,AB Agri,,Feed,,,,Europe,United Kingdom,,,"[""feed"",""additive"",""aqua-feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.403Z,2025-12-26T20:01:00.403Z
+731,DTC Deutsche Tiernahrung Cremer,,Feed,,,,Europe,Germany,,,"[""feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.406Z,2025-12-26T20:01:00.406Z
+732,Nosan Corp.,,Feed,,,,Asia,Japan,,,"[""feed"",""aqua-feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.412Z,2025-12-26T20:01:00.412Z
+733,Arvesta,,Feed,,,,Europe,Belgium,,,"[""feed"",""additive"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.415Z,2025-12-26T20:01:00.415Z
+734,Guangdong Nanbao Group,,Feed,,,,Asia,China,,,"[""feed"",""pig-feed"",""poultry-feed""]",,,,,false,2025-12-26T20:01:00.418Z,2025-12-26T20:01:00.418Z
+735,JDH,,Feed,,,,North America,United States,,,"[""feed"",""compound"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,true,2025-12-26T20:01:00.420Z,2025-12-26T20:01:00.420Z
+736,Ridley AgriProducts,,Feed,,,,Oceania,Australia,,,"[""feed"",""additive"",""aqua-feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.423Z,2025-12-26T20:01:00.423Z
+737,Arasco Feed,,Feed,,,,Middle East,Saudi Arabia,,,"[""feed"",""additive"",""aqua-feed"",""compound"",""horse-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.426Z,2025-12-26T20:01:00.426Z
+738,Bröring Unternehmensgruppe,,Feed,,,,Europe,Germany,,,"[""feed"",""compound"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.429Z,2025-12-26T20:01:00.429Z
+739,GreenFeed,,Feed,,,,Asia,Vietnam,,,"[""feed"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.432Z,2025-12-26T20:01:00.432Z
+740,Kent Nutrition Group,,Feed,,,,North America,United States,,,"[""feed"",""aqua-feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,true,2025-12-26T20:01:00.435Z,2025-12-26T20:01:00.435Z
+741,Seaboard Foods,,Feed,,,,North America,United States,,,"[""feed"",""pig-feed""]",,,,,true,2025-12-26T20:01:00.438Z,2025-12-26T20:01:00.438Z
+742,Fujian Aonong Group,,Feed,,,,Asia,China,,,"[""feed"",""aqua-feed"",""pig-feed"",""poultry-feed""]",,,,,false,2025-12-26T20:01:00.440Z,2025-12-26T20:01:00.440Z
+743,Tieqilisi Group,,Feed,,,,Asia,China,,,"[""feed"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.443Z,2025-12-26T20:01:00.443Z
+744,Jiada Group,,Feed,,,,Asia,China,,,"[""feed"",""pig-feed"",""premix""]",,,,,false,2025-12-26T20:01:00.446Z,2025-12-26T20:01:00.446Z
+745,BioMar Group,,Feed,,,,Europe,Denmark,,,"[""feed"",""aqua-feed"",""compound""]",,,,,false,2025-12-26T20:01:00.450Z,2025-12-26T20:01:00.450Z
+746,Masan MEATLife,,Feed,,,,Asia,Vietnam,,,"[""feed"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.453Z,2025-12-26T20:01:00.453Z
+747,Cooperl Arc Atlantique,,Feed,,,,Europe,France,,,"[""feed"",""compound"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.455Z,2025-12-26T20:01:00.455Z
+748,Lantmännen Lantbruk,,Feed,,,,Europe,Sweden,,,"[""feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.458Z,2025-12-26T20:01:00.458Z
+749,Prioskolye,,Feed,,,,Europe,Russia,,,"[""feed"",""compound"",""poultry-feed"",""premix""]",,,,,false,2025-12-26T20:01:00.461Z,2025-12-26T20:01:00.461Z
+750,Hunan Jiuding Group,,Feed,,,,Asia,China,,,"[""feed"",""compound"",""pig-feed"",""poultry-feed"",""premix""]",,,,,false,2025-12-26T20:01:00.463Z,2025-12-26T20:01:00.463Z
+751,MEGA Tierernährung,,Feed,,,,Europe,Germany,,,"[""feed"",""compound"",""poultry-feed"",""premix""]",,,,,false,2025-12-26T20:01:00.465Z,2025-12-26T20:01:00.465Z
+752,Marfrig Global Foods,,Feed,,,,South America,Brazil,,,"[""feed"",""aqua-feed"",""compound"",""pet-feed"",""pig-feed"",""poultry-feed"",""premix"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.468Z,2025-12-26T20:01:00.468Z
+753,2Agriculture Ltd.,,Feed,,,,Europe,United Kingdom,,,"[""feed"",""compound"",""poultry-feed""]",,,,,false,2025-12-26T20:01:00.472Z,2025-12-26T20:01:00.472Z
+754,Nichiwa Sangyo,,Feed,,,,Asia,Japan,,,"[""feed"",""aqua-feed"",""compound"",""pet-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.475Z,2025-12-26T20:01:00.475Z
+755,Rothkötter-Mischfutterwerk,,Feed,,,,Europe,Germany,,,"[""feed"",""pig-feed"",""poultry-feed""]",,,,,false,2025-12-26T20:01:00.477Z,2025-12-26T20:01:00.477Z
+756,Woosung Feed Co.,,Feed,,,,Asia,South Korea,,,"[""feed"",""aqua-feed"",""compound"",""horse-feed"",""pet-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.480Z,2025-12-26T20:01:00.480Z
+757,Zhengbang Science and Technology,,Feed,,,,Asia,China,,,"[""feed"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed"",""premix""]",,,,,false,2025-12-26T20:01:00.482Z,2025-12-26T20:01:00.482Z
+758,Itochu Feed Mills Co.,,Feed,,,,Asia,Japan,,,"[""feed"",""additive"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.485Z,2025-12-26T20:01:00.485Z
+759,Showa Sangyo,,Feed,,,,Asia,Japan,,,"[""feed"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.488Z,2025-12-26T20:01:00.488Z
+760,SKM Animal Feeds & Foods,,Feed,,,,Asia,India,,,"[""feed"",""compound"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.493Z,2025-12-26T20:01:00.493Z
+761,TS Corp.,,Feed,,,,Asia,South Korea,,,"[""feed"",""compound"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.495Z,2025-12-26T20:01:00.495Z
+762,Guangdong Yuehai Feeds Group,,Feed,,,,Asia,China,,,"[""feed"",""aqua-feed""]",,,,,false,2025-12-26T20:01:00.498Z,2025-12-26T20:01:00.498Z
+763,AFGRI Animal Feeds,,Feed,,,,Africa,South Africa,,,"[""feed"",""compound"",""pet-feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.501Z,2025-12-26T20:01:00.501Z
+764,Sanwang Group,,Feed,,,,Asia,China,,,"[""feed"",""additive"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed""]",,,,,false,2025-12-26T20:01:00.506Z,2025-12-26T20:01:00.506Z
+765,Toyohashi Feed Mills,,Feed,,,,Asia,Japan,,,"[""feed"",""pig-feed"",""poultry-feed"",""ruminant-feed""]",,,,,false,2025-12-26T20:01:00.510Z,2025-12-26T20:01:00.510Z
+766,Shenzhen Alpha Feed Co.,,Feed,,,,Asia,China,,,"[""feed"",""additive"",""aqua-feed"",""compound"",""pig-feed"",""poultry-feed""]",,,,,false,2025-12-26T20:01:00.513Z,2025-12-26T20:01:00.513Z
+767,Shandong Yisheng Livestock & Poultry Breeding Co.,,Feed,,,,Asia,China,,,"[""feed"",""compound"",""poultry-feed""]",,,,,false,2025-12-26T20:01:00.516Z,2025-12-26T20:01:00.516Z
+768,Nestlé Purina PetCare,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:32.957Z,2025-12-26T20:05:32.957Z
+769,Mars Petcare Inc.,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:32.972Z,2025-12-26T20:05:32.972Z
+770,Hill's Pet Nutrition,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:32.977Z,2025-12-26T20:05:32.977Z
+771,General Mills,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:32.982Z,2025-12-26T20:05:32.982Z
+772,J.M. Smucker,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:32.985Z,2025-12-26T20:05:32.985Z
+773,Diamond Pet Foods,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:32.991Z,2025-12-26T20:05:32.991Z
+774,United Petfood,,Pet Food,,,,,Belgium,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:32.998Z,2025-12-26T20:05:32.998Z
+775,Simmons Pet Food,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.005Z,2025-12-26T20:05:33.005Z
+776,Spectrum Brands / United Pet Group,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.009Z,2025-12-26T20:05:33.009Z
+777,Unicharm Corp.,,Pet Food,,,,,Japan,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.012Z,2025-12-26T20:05:33.012Z
+778,Alphia,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.018Z,2025-12-26T20:05:33.018Z
+779,Freshpet,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.022Z,2025-12-26T20:05:33.022Z
+780,Inaba Petfood,,Pet Food,,,,,Japan,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.027Z,2025-12-26T20:05:33.027Z
+781,Partner in Pet Food,,Pet Food,,,,,Hungary,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.032Z,2025-12-26T20:05:33.032Z
+782,Agrolimen SA,,Pet Food,,,,,Spain,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.036Z,2025-12-26T20:05:33.036Z
+783,Premier Pet,,Pet Food,,,,,Brazil,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.040Z,2025-12-26T20:05:33.040Z
+784,Heristo AG,,Pet Food,,,,,Germany,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.043Z,2025-12-26T20:05:33.043Z
+785,Perfect Companion Group Co.,,Pet Food,,,,,Thailand,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.049Z,2025-12-26T20:05:33.049Z
+786,BRF Pet SA,,Pet Food,,,,,Brazil,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.056Z,2025-12-26T20:05:33.056Z
+787,Deuerer,,Pet Food,,,,,Germany,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.059Z,2025-12-26T20:05:33.059Z
+788,Wellness Pet Company,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.063Z,2025-12-26T20:05:33.063Z
+789,Vafo Group,,Pet Food,,,,,Czech Republic,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.066Z,2025-12-26T20:05:33.066Z
+790,Central Garden & Pet,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.069Z,2025-12-26T20:05:33.069Z
+791,i-Tail Corporation,,Pet Food,,,,,Thailand,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.072Z,2025-12-26T20:05:33.072Z
+792,Jeil Feed,,Pet Food,,,,,South Korea,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.075Z,2025-12-26T20:05:33.075Z
+793,Sunshine Mills,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.078Z,2025-12-26T20:05:33.078Z
+794,Affinity Petcare SA,,Pet Food,,,,,Spain,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.081Z,2025-12-26T20:05:33.081Z
+795,Monge & C. S.p.A.,,Pet Food,,,,,Italy,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.086Z,2025-12-26T20:05:33.086Z
+796,C & D Foods,,Pet Food,,,,,Ireland,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.090Z,2025-12-26T20:05:33.090Z
+797,Farmina Pet Foods,,Pet Food,,,,,Italy,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.097Z,2025-12-26T20:05:33.097Z
+798,Tuffy's Pet Foods,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.100Z,2025-12-26T20:05:33.100Z
+799,Real Pet Food Company,,Pet Food,,,,,Australia,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.103Z,2025-12-26T20:05:33.103Z
+800,Special Dog,,Pet Food,,,,,Brazil,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.105Z,2025-12-26T20:05:33.105Z
+801,Adimax Indústria e Comércio de Alimentos Ltda,,Pet Food,,,,,Brazil,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.109Z,2025-12-26T20:05:33.109Z
+802,Whitebridge Pet Brands,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.112Z,2025-12-26T20:05:33.112Z
+803,Versele-Laga NV,,Pet Food,,,,,Belgium,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.115Z,2025-12-26T20:05:33.115Z
+804,Compana Pet Brands,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.117Z,2025-12-26T20:05:33.117Z
+805,Nulo Pet Food,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.120Z,2025-12-26T20:05:33.120Z
+806,Champion Petfoods,,Pet Food,,,,,Canada,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.123Z,2025-12-26T20:05:33.123Z
+807,Group Depre,,Pet Food,,,,,Belgium,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.126Z,2025-12-26T20:05:33.126Z
+808,Morando,,Pet Food,,,,,Italy,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.129Z,2025-12-26T20:05:33.129Z
+809,Inspired Pet Nutrition,,Pet Food,,,,,United Kingdom,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.132Z,2025-12-26T20:05:33.132Z
+810,Petline Ltd.,,Pet Food,,,,,Japan,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.135Z,2025-12-26T20:05:33.135Z
+811,Rondo Food,,Pet Food,,,,,Germany,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.138Z,2025-12-26T20:05:33.138Z
+812,GA Pet Food Partners,,Pet Food,,,,,United Kingdom,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.142Z,2025-12-26T20:05:33.142Z
+813,Instinct,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.146Z,2025-12-26T20:05:33.146Z
+814,Normandise Pet Food,,Pet Food,,,,,France,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.149Z,2025-12-26T20:05:33.149Z
+815,Total Alimentos SA,,Pet Food,,,,,Brazil,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.152Z,2025-12-26T20:05:33.152Z
+816,Bewital Petfood GmbH & Co. KG,,Pet Food,,,,,Germany,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.155Z,2025-12-26T20:05:33.155Z
+817,Butcher's Pet Care,,Pet Food,,,,,United Kingdom,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.158Z,2025-12-26T20:05:33.158Z
+818,Lider Petfood,,Pet Food,,,,,Turkey,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.161Z,2025-12-26T20:05:33.161Z
+819,"DoggyMan H.A. Co., Ltd.",,Pet Food,,,,,Japan,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.164Z,2025-12-26T20:05:33.164Z
+820,Redbarn Pet Products,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.167Z,2025-12-26T20:05:33.167Z
+821,Kormotech LLC,,Pet Food,,,,,Ukraine,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.170Z,2025-12-26T20:05:33.170Z
+822,MG Group,,Pet Food,,,,,Japan,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.172Z,2025-12-26T20:05:33.172Z
+823,Vitakraft Pet Care GmbH & Co.,,Pet Food,,,,,Germany,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.175Z,2025-12-26T20:05:33.175Z
+824,Empresas Carozzi,,Pet Food,,,,,Chile,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.178Z,2025-12-26T20:05:33.178Z
+825,Irish Dog Foods Ltd.,,Pet Food,,,,,Ireland,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.182Z,2025-12-26T20:05:33.182Z
+826,Virbac,,Pet Food,,,,,France,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.185Z,2025-12-26T20:05:33.185Z
+827,Pets Choice,,Pet Food,,,,,United Kingdom,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.188Z,2025-12-26T20:05:33.188Z
+828,Maruha Nichiro Corporation,,Pet Food,,,,,Japan,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.191Z,2025-12-26T20:05:33.191Z
+829,Bynsa Pets,,Pet Food,,,,,Spain,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.197Z,2025-12-26T20:05:33.197Z
+830,Almo Nature,,Pet Food,,,,,Italy,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.200Z,2025-12-26T20:05:33.200Z
+831,MPM Products,,Pet Food,,,,,United Kingdom,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.203Z,2025-12-26T20:05:33.203Z
+832,Mid America Pet Food,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.206Z,2025-12-26T20:05:33.206Z
+833,Nippon Pet Food Co.,,Pet Food,,,,,Japan,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.209Z,2025-12-26T20:05:33.209Z
+834,Solid Gold Pet,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.212Z,2025-12-26T20:05:33.212Z
+835,Kent Corp.,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.215Z,2025-12-26T20:05:33.215Z
+836,Nordic Pet Care Group,,Pet Food,,,,,Denmark,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.218Z,2025-12-26T20:05:33.218Z
+837,Montego Pet Nutrition,,Pet Food,,,,,South Africa,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.221Z,2025-12-26T20:05:33.221Z
+838,Primal Pet Group,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.224Z,2025-12-26T20:05:33.224Z
+839,Ethos Pet Brands,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.227Z,2025-12-26T20:05:33.227Z
+840,Landini Giuntini SPA,,Pet Food,,,,,Italy,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.231Z,2025-12-26T20:05:33.231Z
+841,Champion Pet Care,,Pet Food,,,,,Chile,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.234Z,2025-12-26T20:05:33.234Z
+842,Rush Direct Inc,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.238Z,2025-12-26T20:05:33.238Z
+843,Sopral,,Pet Food,,,,,France,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.241Z,2025-12-26T20:05:33.241Z
+844,Drools Pet Food,,Pet Food,,,,,India,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.244Z,2025-12-26T20:05:33.244Z
+845,Natures Menu,,Pet Food,,,,,United Kingdom,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.249Z,2025-12-26T20:05:33.249Z
+846,Natura Plus Ultra Pet Food,,Pet Food,,,,,France,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.252Z,2025-12-26T20:05:33.252Z
+847,Midwestern Pet Foods,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.255Z,2025-12-26T20:05:33.255Z
+848,Gimborn,,Pet Food,,,,,Germany,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.260Z,2025-12-26T20:05:33.260Z
+849,Natural Balance Pet Foods,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.263Z,2025-12-26T20:05:33.263Z
+850,Dorado S.r.l.,,Pet Food,,,,,Italy,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.267Z,2025-12-26T20:05:33.267Z
+851,Doggy AB,,Pet Food,,,,,Sweden,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.270Z,2025-12-26T20:05:33.270Z
+852,Interquell,,Pet Food,,,,,Germany,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.275Z,2025-12-26T20:05:33.275Z
+853,Laroy Group,,Pet Food,,,,,Belgium,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.278Z,2025-12-26T20:05:33.278Z
+854,TFP Nutrition,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.281Z,2025-12-26T20:05:33.281Z
+855,Vobra Special Petfoods,,Pet Food,,,,,Netherlands,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.284Z,2025-12-26T20:05:33.284Z
+856,National Flour Mills,,Pet Food,,,,,Trinidad and Tobago,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.286Z,2025-12-26T20:05:33.286Z
+857,Betagro,,Pet Food,,,,,Thailand,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.290Z,2025-12-26T20:05:33.290Z
+858,The Crump Group Inc.,,Pet Food,,,,,Canada,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.294Z,2025-12-26T20:05:33.294Z
+859,Austria Pet Food GmbH,,Pet Food,,,,,Austria,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.302Z,2025-12-26T20:05:33.302Z
+860,Grupo Pilar (Gepsa Pet Foods),,Pet Food,,,,,Argentina,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.314Z,2025-12-26T20:05:33.314Z
+861,Aller Petfood Group A/S,,Pet Food,,,,,Denmark,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.320Z,2025-12-26T20:05:33.320Z
+862,Red Collar Pet Foods,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.323Z,2025-12-26T20:05:33.323Z
+863,Canagan Group,,Pet Food,,,,,United Kingdom,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.326Z,2025-12-26T20:05:33.326Z
+864,Stella & Chewy's,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.329Z,2025-12-26T20:05:33.329Z
+865,Campi Alimentos S.A de C.V.,,Pet Food,,,,,Mexico,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.334Z,2025-12-26T20:05:33.334Z
+866,BrightPet Nutrition Group,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.337Z,2025-12-26T20:05:33.337Z
+867,FirstMate Pet Foods,,Pet Food,,,,,Canada,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.340Z,2025-12-26T20:05:33.340Z
+868,PLB International,,Pet Food,,,,,Canada,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.344Z,2025-12-26T20:05:33.344Z
+869,Dibaq Mascotas,,Pet Food,,,,,Spain,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.351Z,2025-12-26T20:05:33.351Z
+870,Forthglade,,Pet Food,,,,,United Kingdom,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.354Z,2025-12-26T20:05:33.354Z
+871,The Honest Kitchen,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.357Z,2025-12-26T20:05:33.357Z
+872,Vital Petfood Group,,Pet Food,,,,,Denmark,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.361Z,2025-12-26T20:05:33.361Z
+873,Better Choice Company Inc.,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.364Z,2025-12-26T20:05:33.364Z
+874,Grove Pet Foods,,Pet Food,,,,,United Kingdom,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.372Z,2025-12-26T20:05:33.372Z
+875,JustFoodForDogs,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.376Z,2025-12-26T20:05:33.376Z
+876,Life's Abundance,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.378Z,2025-12-26T20:05:33.378Z
+877,Burns Pet Nutrition,,Pet Food,,,,,United Kingdom,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.382Z,2025-12-26T20:05:33.382Z
+878,Tropikal Pet,,Pet Food,,,,,Turkey,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.390Z,2025-12-26T20:05:33.390Z
+879,ZIWI Limited,,Pet Food,,,,,New Zealand,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.394Z,2025-12-26T20:05:33.394Z
+880,Elmira Pet Products,,Pet Food,,,,,Canada,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.398Z,2025-12-26T20:05:33.398Z
+881,Weruva Pet Foods,,Pet Food,,,,,United States,,,"[""pet-food""]",,,,,true,2025-12-26T20:05:33.404Z,2025-12-26T20:05:33.404Z
+882,Agroindustrias Baires,,Pet Food,,,,,Argentina,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.408Z,2025-12-26T20:05:33.408Z
+883,Nutec Group,,Pet Food,,,,,Mexico,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.411Z,2025-12-26T20:05:33.411Z
+884,SANYpet SpA,,Pet Food,,,,,Italy,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.415Z,2025-12-26T20:05:33.415Z
+885,Propecsa,,Pet Food,,,,,Mexico,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.420Z,2025-12-26T20:05:33.420Z
+886,Best Friend Group Oy,,Pet Food,,,,,Finland,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.423Z,2025-12-26T20:05:33.423Z
+887,Rinti SA,,Pet Food,,,,,Peru,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.426Z,2025-12-26T20:05:33.426Z
+888,Hagen Pet Foods,,Pet Food,,,,,Canada,,,"[""pet-food""]",,,,,false,2025-12-26T20:05:33.431Z,2025-12-26T20:05:33.431Z
