@@ -304,6 +304,173 @@ function matchesIndustryGroup(companyIndustry: string | null, groupName: string)
   );
 }
 
+interface CompanyEnrichment {
+  description: string | null;
+  website: string | null;
+  location: string | null;
+  region: string | null;
+  country: string | null;
+  size: string | null;
+  founded: string | null;
+  linkedinUrl: string | null;
+  twitterHandle: string | null;
+}
+
+export async function enrichCompanyData(company: Company): Promise<CompanyEnrichment | null> {
+  if (!PERPLEXITY_API_KEY) {
+    console.error("PERPLEXITY_API_KEY not configured");
+    return null;
+  }
+
+  const query = `Find business information about the company "${company.name}" in the ${company.industry || "agriculture/food"} industry.
+
+Provide the following details if available:
+1. A brief description (1-2 sentences about what they do)
+2. Official website URL
+3. Headquarters location (city, state/country)
+4. Geographic region (North America, Europe, Asia, South America, Africa, Oceania, Middle East)
+5. Country
+6. Company size (e.g., "1-50", "51-200", "201-500", "501-1000", "1000+", "10000+")
+7. Year founded
+8. LinkedIn company page URL
+9. Twitter/X handle
+
+Return as JSON object:
+{
+  "description": "Brief company description",
+  "website": "https://...",
+  "location": "City, State/Country",
+  "region": "North America",
+  "country": "United States",
+  "size": "1000+",
+  "founded": "1995",
+  "linkedinUrl": "https://linkedin.com/company/...",
+  "twitterHandle": "@handle"
+}
+
+For any field you cannot find reliable information for, use null.`;
+
+  try {
+    const response = await fetch("https://api.perplexity.ai/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${PERPLEXITY_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "sonar",
+        messages: [
+          {
+            role: "system",
+            content: "You are a business research assistant. Return only valid JSON with company information. Use null for any field you cannot verify.",
+          },
+          {
+            role: "user",
+            content: query,
+          },
+        ],
+        temperature: 0.1,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(`Perplexity API error: ${response.status}`);
+      return null;
+    }
+
+    const data: PerplexityResponse = await response.json();
+    const content = data.choices[0]?.message?.content;
+
+    if (!content) {
+      return null;
+    }
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error("Could not parse company enrichment JSON");
+      return null;
+    }
+
+    const enrichment = JSON.parse(jsonMatch[0]) as CompanyEnrichment;
+    return enrichment;
+  } catch (error) {
+    console.error(`Error enriching company ${company.name}:`, error);
+    return null;
+  }
+}
+
+export async function enrichCompanies(companyIds?: number[]): Promise<{ company: string; updated: boolean; error?: string }[]> {
+  const allCompanies = await storage.getAllCompanies();
+  const companies = companyIds 
+    ? allCompanies.filter(c => companyIds.includes(c.id))
+    : allCompanies.filter(c => !c.description || !c.website);
+
+  console.log(`Enriching ${companies.length} companies...`);
+  
+  const results: { company: string; updated: boolean; error?: string }[] = [];
+  
+  for (const company of companies) {
+    console.log(`[${results.length + 1}/${companies.length}] Enriching ${company.name}...`);
+    
+    try {
+      const enrichment = await enrichCompanyData(company);
+      
+      if (enrichment) {
+        const updates: Partial<Company> = {};
+        
+        if (enrichment.description && !company.description) {
+          updates.description = enrichment.description;
+        }
+        if (enrichment.website && !company.website) {
+          updates.website = enrichment.website;
+        }
+        if (enrichment.location && !company.location) {
+          updates.location = enrichment.location;
+        }
+        if (enrichment.region && !company.region) {
+          updates.region = enrichment.region;
+        }
+        if (enrichment.country && !company.country) {
+          updates.country = enrichment.country;
+        }
+        if (enrichment.size && !company.size) {
+          updates.size = enrichment.size;
+        }
+        if (enrichment.founded && !company.founded) {
+          updates.founded = enrichment.founded;
+        }
+        if (enrichment.linkedinUrl && !company.linkedinUrl) {
+          updates.linkedinUrl = enrichment.linkedinUrl;
+        }
+        if (enrichment.twitterHandle && !company.twitterHandle) {
+          updates.twitterHandle = enrichment.twitterHandle;
+        }
+        
+        if (Object.keys(updates).length > 0) {
+          await storage.updateCompany(company.id, updates);
+          console.log(`  Updated ${Object.keys(updates).length} fields for ${company.name}`);
+          results.push({ company: company.name, updated: true });
+        } else {
+          console.log(`  No new data found for ${company.name}`);
+          results.push({ company: company.name, updated: false });
+        }
+      } else {
+        results.push({ company: company.name, updated: false, error: "No enrichment data returned" });
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : "Unknown error";
+      console.error(`  Error enriching ${company.name}: ${errorMsg}`);
+      results.push({ company: company.name, updated: false, error: errorMsg });
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  const updatedCount = results.filter(r => r.updated).length;
+  console.log(`Enrichment complete! Updated ${updatedCount}/${companies.length} companies.`);
+  return results;
+}
+
 export async function monitorCompaniesByIndustry(industry: string): Promise<{ company: string; signalsCreated: number }[]> {
   const companies = await storage.getAllCompanies();
   const industryCompanies = companies.filter(c => matchesIndustryGroup(c.industry, industry));

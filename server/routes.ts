@@ -9,7 +9,7 @@ import {
 import { z } from "zod";
 import { analyzeSignal, enrichSignal, batchEnrichSignals, extractRelationshipsFromSignal } from "./ai-analysis";
 import { generateArticleFromSignal, exportArticleForCMS } from "./article-generator";
-import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany, monitorUSPoultryCompanies, monitorCompaniesByCountry, monitorCompaniesByIndustry } from "./perplexity-monitor";
+import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany, monitorUSPoultryCompanies, monitorCompaniesByCountry, monitorCompaniesByIndustry, enrichCompanies } from "./perplexity-monitor";
 import { importCompanies, getUSPoultryCompanies } from "./import-companies";
 import { importFeedCompanies } from "./import-feed-companies";
 import { importPetfoodCompanies } from "./import-petfood-companies";
@@ -832,6 +832,64 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error monitoring companies by industry:", error);
       res.status(500).json({ error: "Failed to monitor companies" });
+    }
+  });
+
+  app.post("/api/companies/enrich", async (req: Request, res: Response) => {
+    try {
+      const { companyIds, industry } = req.body as { companyIds?: number[]; industry?: string };
+      
+      let idsToEnrich: number[] | undefined = companyIds;
+      
+      if (industry && !companyIds) {
+        const allCompanies = await storage.getAllCompanies();
+        idsToEnrich = allCompanies
+          .filter(c => c.industry === industry)
+          .map(c => c.id);
+      }
+      
+      console.log(`Starting company enrichment${idsToEnrich ? ` for ${idsToEnrich.length} companies` : " for all companies missing data"}...`);
+      const results = await enrichCompanies(idsToEnrich);
+      const updatedCount = results.filter(r => r.updated).length;
+      
+      res.json({ 
+        success: true, 
+        message: `Enrichment complete. Updated ${updatedCount}/${results.length} companies.`,
+        companiesProcessed: results.length,
+        companiesUpdated: updatedCount,
+        results 
+      });
+    } catch (error) {
+      console.error("Error enriching companies:", error);
+      res.status(500).json({ error: "Failed to enrich companies" });
+    }
+  });
+
+  app.post("/api/companies/:id/enrich", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const company = await storage.getCompany(id);
+      
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      
+      console.log(`Enriching single company: ${company.name}...`);
+      const results = await enrichCompanies([id]);
+      
+      const updatedCompany = await storage.getCompany(id);
+      
+      res.json({ 
+        success: true, 
+        message: results[0]?.updated 
+          ? `Successfully enriched ${company.name}` 
+          : `No new data found for ${company.name}`,
+        updated: results[0]?.updated || false,
+        company: updatedCompany
+      });
+    } catch (error) {
+      console.error("Error enriching company:", error);
+      res.status(500).json({ error: "Failed to enrich company" });
     }
   });
 
