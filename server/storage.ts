@@ -9,11 +9,14 @@ import {
   type InsertAlert,
   type ActivityLog,
   type InsertActivityLog,
+  type CompanyRelationship,
+  type InsertCompanyRelationship,
   users,
   companies,
   signals,
   alerts,
   activityLog,
+  companyRelationships,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike, sql } from "drizzle-orm";
@@ -53,6 +56,12 @@ export interface IStorage {
   // Activity Log
   createActivityLog(log: InsertActivityLog): Promise<ActivityLog>;
   getRecentActivity(limit?: number): Promise<ActivityLog[]>;
+
+  // Company Relationships
+  getAllRelationships(): Promise<CompanyRelationship[]>;
+  getRelationshipsByCompany(companyId: number): Promise<CompanyRelationship[]>;
+  createRelationship(relationship: InsertCompanyRelationship): Promise<CompanyRelationship>;
+  deleteRelationship(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -209,6 +218,33 @@ export class DatabaseStorage implements IStorage {
       .from(activityLog)
       .orderBy(desc(activityLog.createdAt))
       .limit(limit);
+  }
+
+  // Company Relationships
+  async getAllRelationships(): Promise<CompanyRelationship[]> {
+    return db.select().from(companyRelationships).orderBy(desc(companyRelationships.createdAt));
+  }
+
+  async getRelationshipsByCompany(companyId: number): Promise<CompanyRelationship[]> {
+    return db
+      .select()
+      .from(companyRelationships)
+      .where(
+        or(
+          eq(companyRelationships.sourceCompanyId, companyId),
+          eq(companyRelationships.targetCompanyId, companyId)
+        )
+      )
+      .orderBy(desc(companyRelationships.createdAt));
+  }
+
+  async createRelationship(relationship: InsertCompanyRelationship): Promise<CompanyRelationship> {
+    const [created] = await db.insert(companyRelationships).values(relationship).returning();
+    return created;
+  }
+
+  async deleteRelationship(id: number): Promise<void> {
+    await db.delete(companyRelationships).where(eq(companyRelationships.id, id));
   }
 }
 

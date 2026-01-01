@@ -300,6 +300,49 @@ export async function registerRoutes(
     }
   });
 
+  // Company Relationships for Industry Map
+  app.get("/api/relationships", async (req: Request, res: Response) => {
+    try {
+      const relationships = await storage.getAllRelationships();
+      res.json(relationships);
+    } catch (error) {
+      console.error("Error fetching relationships:", error);
+      res.status(500).json({ error: "Failed to fetch relationships" });
+    }
+  });
+
+  app.get("/api/relationships/company/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const relationships = await storage.getRelationshipsByCompany(id);
+      res.json(relationships);
+    } catch (error) {
+      console.error("Error fetching company relationships:", error);
+      res.status(500).json({ error: "Failed to fetch relationships" });
+    }
+  });
+
+  app.post("/api/relationships", async (req: Request, res: Response) => {
+    try {
+      const relationship = await storage.createRelationship(req.body);
+      res.status(201).json(relationship);
+    } catch (error) {
+      console.error("Error creating relationship:", error);
+      res.status(500).json({ error: "Failed to create relationship" });
+    }
+  });
+
+  app.delete("/api/relationships/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteRelationship(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting relationship:", error);
+      res.status(500).json({ error: "Failed to delete relationship" });
+    }
+  });
+
   // AI Signal Analysis
   app.post("/api/signals/:id/analyze", async (req: Request, res: Response) => {
     try {
