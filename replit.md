@@ -2,7 +2,17 @@
 
 ## Overview
 
-SignalWatch is a B2B business intelligence platform designed for editorial teams to monitor companies and track business signals. The application allows users to track 300+ companies, collecting and analyzing signals from news, funding announcements, executive changes, job postings, and other business events. It features AI-powered analysis to help teams prioritize and act on relevant business intelligence.
+SignalWatch is a B2B business intelligence platform designed for editorial teams to monitor companies and track business signals. The application allows users to track 900+ companies, collecting and analyzing signals from news, funding announcements, executive changes, job postings, and other business events. It features AI-powered analysis to help teams prioritize and act on relevant business intelligence.
+
+## Recent Changes
+
+### Industry Map Feature (January 2026)
+- Added interactive network visualization showing company relationships
+- Relationships extracted by AI from signal text (partner, competitor, supplier, customer, etc.)
+- Pagination with 150 companies per page for full dataset access
+- Focus mode: double-click any company to see its complete relationship network
+- Industry and relationship type filters
+- Deterministic sorting by relationship degree then signal count
 
 ## User Preferences
 

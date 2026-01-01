@@ -21,7 +21,11 @@ import {
   ArrowRightLeft,
   Sparkles,
   Link2,
-  Loader2
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  Focus,
+  X
 } from "lucide-react";
 import type { Company, CompanyRelationship, Signal } from "@shared/schema";
 
@@ -82,6 +86,9 @@ export function IndustryMapPage() {
   const [filterIndustry, setFilterIndustry] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
   const [isExtracting, setIsExtracting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [focusCompanyId, setFocusCompanyId] = useState<number | null>(null);
+  const PAGE_SIZE = 150;
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
@@ -141,29 +148,50 @@ export function IndustryMapPage() {
     return ids;
   }, [filteredRelationships]);
 
-  const { filteredCompanies, totalMatchingCount, isTruncated } = useMemo(() => {
-    const NODE_LIMIT = 200;
-    
+  const relationshipDegree = useMemo(() => {
+    const degree: Record<number, number> = {};
+    filteredRelationships.forEach(r => {
+      degree[r.sourceCompanyId] = (degree[r.sourceCompanyId] || 0) + 1;
+      degree[r.targetCompanyId] = (degree[r.targetCompanyId] || 0) + 1;
+    });
+    return degree;
+  }, [filteredRelationships]);
+
+  const { filteredCompanies, totalMatchingCount, totalPages, isFocusMode } = useMemo(() => {
+    if (focusCompanyId !== null) {
+      const focusCompany = companies.find(c => c.id === focusCompanyId);
+      if (!focusCompany) {
+        return { filteredCompanies: [], totalMatchingCount: 0, totalPages: 1, isFocusMode: true };
+      }
+      const connectedIds = new Set<number>([focusCompanyId]);
+      filteredRelationships.forEach(r => {
+        if (r.sourceCompanyId === focusCompanyId) connectedIds.add(r.targetCompanyId);
+        if (r.targetCompanyId === focusCompanyId) connectedIds.add(r.sourceCompanyId);
+      });
+      const connected = companies.filter(c => connectedIds.has(c.id));
+      return { filteredCompanies: connected, totalMatchingCount: connected.length, totalPages: 1, isFocusMode: true };
+    }
+
     let matching = companies.filter(c => {
       if (filterIndustry !== "all" && c.industry !== filterIndustry) return false;
       if (filteredRelationships.length > 0 && !relevantCompanyIds.has(c.id)) return false;
       return true;
     });
     
+    matching.sort((a, b) => {
+      const aDeg = relationshipDegree[a.id] || 0;
+      const bDeg = relationshipDegree[b.id] || 0;
+      if (aDeg !== bDeg) return bDeg - aDeg;
+      return (signalCountMap[b.id] || 0) - (signalCountMap[a.id] || 0);
+    });
+    
     const total = matching.length;
+    const pages = Math.ceil(total / PAGE_SIZE);
+    const startIdx = (currentPage - 1) * PAGE_SIZE;
+    const paged = matching.slice(startIdx, startIdx + PAGE_SIZE);
     
-    if (matching.length > NODE_LIMIT) {
-      matching.sort((a, b) => {
-        const aHasRel = relevantCompanyIds.has(a.id) ? 1 : 0;
-        const bHasRel = relevantCompanyIds.has(b.id) ? 1 : 0;
-        if (aHasRel !== bHasRel) return bHasRel - aHasRel;
-        return (signalCountMap[b.id] || 0) - (signalCountMap[a.id] || 0);
-      });
-      matching = matching.slice(0, NODE_LIMIT);
-    }
-    
-    return { filteredCompanies: matching, totalMatchingCount: total, isTruncated: total > NODE_LIMIT };
-  }, [companies, filterIndustry, filteredRelationships, relevantCompanyIds, signalCountMap]);
+    return { filteredCompanies: paged, totalMatchingCount: total, totalPages: pages, isFocusMode: false };
+  }, [companies, filterIndustry, filteredRelationships, relevantCompanyIds, signalCountMap, relationshipDegree, currentPage, focusCompanyId, PAGE_SIZE]);
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const nodePositionsRef = useRef<Map<number, { x: number; y: number }>>(new Map());
@@ -181,6 +209,10 @@ export function IndustryMapPage() {
       confidence: r.confidence || 100,
     }));
   }, [filteredRelationships]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterIndustry, filterType]);
 
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
@@ -209,13 +241,11 @@ export function IndustryMapPage() {
       animationIdRef.current = null;
     }
 
-    const MAX_NODES = 200;
     const MAX_ITERATIONS = 200;
-    const limitedCompanies = filteredCompanies.slice(0, MAX_NODES);
     
-    const newNodes = limitedCompanies.map((c, i) => {
+    const newNodes = filteredCompanies.map((c, i) => {
       const existing = nodePositionsRef.current.get(c.id);
-      const angle = (i / Math.max(limitedCompanies.length, 1)) * 2 * Math.PI;
+      const angle = (i / Math.max(filteredCompanies.length, 1)) * 2 * Math.PI;
       const radius = Math.min(dimensions.width, dimensions.height) * 0.35;
       return {
         id: c.id,
@@ -370,14 +400,24 @@ export function IndustryMapPage() {
             <Network className="h-5 w-5 text-muted-foreground" />
             <h1 className="text-xl font-semibold">Industry Map</h1>
             <Badge variant="secondary" className="ml-2">
-              {isTruncated ? `${nodes.length} of ${totalMatchingCount}` : nodes.length} companies
+              {totalPages > 1 ? `${nodes.length} of ${totalMatchingCount}` : nodes.length} companies
             </Badge>
             <Badge variant="outline">
               {visibleEdges.length} relationships
             </Badge>
-            {isTruncated && (
-              <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-600">
-                Use filters to focus view
+            {isFocusMode && (
+              <Badge variant="outline" className="flex items-center gap-1 text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-600">
+                <Focus className="h-3 w-3" />
+                Focus Mode
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-4 w-4 p-0 ml-1"
+                  onClick={() => setFocusCompanyId(null)}
+                  data-testid="button-exit-focus"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
               </Badge>
             )}
           </div>
@@ -532,6 +572,7 @@ export function IndustryMapPage() {
                         strokeWidth={isSelected ? 3 : 2}
                         style={{ cursor: 'pointer' }}
                         onClick={() => handleNodeClick(node)}
+                        onDoubleClick={() => setFocusCompanyId(node.id)}
                         data-testid={`node-${node.id}`}
                       />
                       <text
@@ -566,10 +607,10 @@ export function IndustryMapPage() {
           )}
         </div>
 
-        <div className="p-3 border-t bg-background flex items-center gap-6 text-sm text-muted-foreground">
+        <div className="p-3 border-t bg-background flex items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-4 flex-wrap">
             <span className="font-medium">Legend:</span>
-            {Object.entries(relationshipLabels).slice(0, 5).map(([key, label]) => (
+            {Object.entries(relationshipLabels).slice(0, 4).map(([key, label]) => (
               <div key={key} className="flex items-center gap-1">
                 <div 
                   className="w-4 h-1" 
@@ -580,9 +621,39 @@ export function IndustryMapPage() {
             ))}
             <div className="flex items-center gap-1">
               <div className="w-4 border-t-2 border-dashed border-muted-foreground" />
-              <span>AI Extracted</span>
+              <span>AI</span>
             </div>
           </div>
+          
+          {!isFocusMode && totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                disabled={currentPage <= 1}
+                onClick={() => setCurrentPage(p => p - 1)}
+                data-testid="button-page-prev"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="min-w-[80px] text-center">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage(p => p + 1)}
+                data-testid="button-page-next"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+          
+          {!isFocusMode && (
+            <span className="text-xs text-muted-foreground">Double-click node to focus</span>
+          )}
         </div>
       </div>
 
