@@ -142,17 +142,26 @@ If no recent news found, return empty array: []`;
   }
 }
 
-export async function monitorCompany(company: Company): Promise<number> {
+export interface MonitorResult {
+  signalsCreated: number;
+  signalsFound: number;
+  duplicatesSkipped: number;
+}
+
+export async function monitorCompany(company: Company): Promise<MonitorResult> {
   console.log(`Monitoring ${company.name}...`);
   const signals = await searchCompanyNews(company);
   
   let createdCount = 0;
+  let duplicatesSkipped = 0;
+  
   for (const signal of signals) {
     const hash = generateHash(signal.title + company.name);
     
     const existing = await storage.getSignalByHash(hash);
     if (existing) {
       console.log(`  Skipping duplicate: ${signal.title}`);
+      duplicatesSkipped++;
       continue;
     }
 
@@ -198,7 +207,11 @@ export async function monitorCompany(company: Company): Promise<number> {
     createdCount++;
   }
 
-  return createdCount;
+  return {
+    signalsCreated: createdCount,
+    signalsFound: signals.length,
+    duplicatesSkipped,
+  };
 }
 
 export async function monitorPoultryCompanies(): Promise<{ company: string; signalsCreated: number }[]> {
@@ -213,8 +226,8 @@ export async function monitorPoultryCompanies(): Promise<{ company: string; sign
   const results: { company: string; signalsCreated: number }[] = [];
   
   for (const company of poultryCompanies) {
-    const count = await monitorCompany(company);
-    results.push({ company: company.name, signalsCreated: count });
+    const result = await monitorCompany(company);
+    results.push({ company: company.name, signalsCreated: result.signalsCreated });
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
@@ -233,8 +246,8 @@ export async function monitorUSPoultryCompanies(): Promise<{ company: string; si
   const results: { company: string; signalsCreated: number }[] = [];
   
   for (const company of usPoultryCompanies) {
-    const count = await monitorCompany(company);
-    results.push({ company: company.name, signalsCreated: count });
+    const result = await monitorCompany(company);
+    results.push({ company: company.name, signalsCreated: result.signalsCreated });
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
@@ -250,8 +263,8 @@ export async function monitorCompaniesByCountry(country: string): Promise<{ comp
   const results: { company: string; signalsCreated: number }[] = [];
   
   for (const company of filteredCompanies) {
-    const count = await monitorCompany(company);
-    results.push({ company: company.name, signalsCreated: count });
+    const result = await monitorCompany(company);
+    results.push({ company: company.name, signalsCreated: result.signalsCreated });
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
@@ -268,8 +281,8 @@ export async function monitorAllCompanies(): Promise<{ company: string; signalsC
   
   for (const company of poultryCompanies) {
     console.log(`[${results.length + 1}/${poultryCompanies.length}] Monitoring ${company.name}...`);
-    const count = await monitorCompany(company);
-    results.push({ company: company.name, signalsCreated: count });
+    const result = await monitorCompany(company);
+    results.push({ company: company.name, signalsCreated: result.signalsCreated });
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
@@ -306,8 +319,8 @@ export async function monitorCompaniesByIndustry(industry: string): Promise<{ co
   
   for (const company of industryCompanies) {
     console.log(`[${results.length + 1}/${industryCompanies.length}] Monitoring ${company.name}...`);
-    const count = await monitorCompany(company);
-    results.push({ company: company.name, signalsCreated: count });
+    const result = await monitorCompany(company);
+    results.push({ company: company.name, signalsCreated: result.signalsCreated });
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
 

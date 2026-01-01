@@ -658,11 +658,24 @@ export async function registerRoutes(
       }
       
       console.log(`Starting monitoring for ${company.name}...`);
-      const signalsCreated = await monitorCompany(company);
+      const result = await monitorCompany(company);
+      
+      let message: string;
+      if (result.signalsFound === 0) {
+        message = `No news found for ${company.name}`;
+      } else if (result.signalsCreated === 0) {
+        message = `Checked ${result.signalsFound} articles for ${company.name} - all already collected`;
+      } else {
+        message = `Found ${result.signalsCreated} new signals for ${company.name}`;
+      }
+      
       res.json({ 
         success: true, 
-        message: `Created ${signalsCreated} new signals for ${company.name}`,
-        signalsCreated 
+        message,
+        company: company.name,
+        signalsCreated: result.signalsCreated,
+        signalsFound: result.signalsFound,
+        duplicatesSkipped: result.duplicatesSkipped,
       });
     } catch (error) {
       console.error("Error monitoring company:", error);

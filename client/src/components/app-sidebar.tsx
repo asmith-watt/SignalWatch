@@ -141,7 +141,7 @@ export function AppSidebar({
       queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
       toast({
         title: "Company updated",
-        description: `Found ${data.signalsCreated || 0} new signals for ${data.company}`,
+        description: data.message || `Found ${data.signalsCreated || 0} new signals for ${data.company}`,
       });
       setUpdatingCompany(null);
     },
