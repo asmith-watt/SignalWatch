@@ -130,6 +130,22 @@ export function Dashboard({
     },
   });
 
+  const enrichCompanyMutation = useMutation({
+    mutationFn: async (companyId: number) => {
+      return apiRequest("POST", `/api/companies/${companyId}/enrich`, {});
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
+      toast({ 
+        title: data.updated ? "Company enriched" : "No new data found",
+        description: data.message 
+      });
+    },
+    onError: () => {
+      toast({ title: "Failed to enrich company", variant: "destructive" });
+    },
+  });
+
   const filteredSignals = useMemo(() => {
     let result = Array.isArray(allSignals) ? allSignals : [];
 
@@ -342,6 +358,8 @@ export function Dashboard({
                   onArchive={() => {
                     toast({ title: "Archive feature coming soon" });
                   }}
+                  onEnrich={() => enrichCompanyMutation.mutate(selectedCompany.id)}
+                  isEnriching={enrichCompanyMutation.isPending}
                 />
               )}
 

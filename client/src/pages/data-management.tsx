@@ -8,13 +8,15 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle } from "lucide-react";
+import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle, Sparkles } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Company, Signal } from "@shared/schema";
 
 export function DataManagementPage() {
   const { toast } = useToast();
   const [companiesCSV, setCompaniesCSV] = useState("");
   const [signalsCSV, setSignalsCSV] = useState("");
+  const [enrichIndustry, setEnrichIndustry] = useState<string>("all");
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
@@ -52,6 +54,23 @@ export function DataManagementPage() {
     },
   });
 
+  const enrichCompaniesMutation = useMutation({
+    mutationFn: async (industry?: string) => {
+      const body = industry && industry !== "all" ? { industry } : {};
+      return apiRequest("POST", "/api/companies/enrich", body);
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
+      toast({ 
+        title: "Enrichment Complete", 
+        description: `Updated ${data.companiesUpdated} of ${data.companiesProcessed} companies with AI data` 
+      });
+    },
+    onError: () => {
+      toast({ title: "Failed to enrich companies", variant: "destructive" });
+    },
+  });
+
   const handleFileUpload = (
     e: React.ChangeEvent<HTMLInputElement>,
     setter: (val: string) => void
@@ -74,7 +93,7 @@ export function DataManagementPage() {
           <p className="text-muted-foreground mt-1">Export and import your company and signal data</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
@@ -83,7 +102,7 @@ export function DataManagementPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <Badge variant="secondary">{companies.length} total</Badge>
                 <Button
                   variant="outline"
@@ -108,7 +127,7 @@ export function DataManagementPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <Badge variant="secondary">{signals.length} total</Badge>
                 <Button
                   variant="outline"
@@ -120,6 +139,43 @@ export function DataManagementPage() {
                     <Download className="h-4 w-4 mr-2" />
                     Export CSV
                   </a>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-muted-foreground" />
+                <CardTitle className="text-lg">AI Enrichment</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-3">
+                <Select value={enrichIndustry} onValueChange={setEnrichIndustry}>
+                  <SelectTrigger data-testid="select-enrich-industry">
+                    <SelectValue placeholder="Select industry" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Industries</SelectItem>
+                    <SelectItem value="Poultry">Poultry</SelectItem>
+                    <SelectItem value="Feed">Feed</SelectItem>
+                    <SelectItem value="Pet Food">Pet Food</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  size="sm"
+                  onClick={() => enrichCompaniesMutation.mutate(enrichIndustry)}
+                  disabled={enrichCompaniesMutation.isPending}
+                  data-testid="button-enrich-companies"
+                >
+                  {enrichCompaniesMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-2" />
+                  )}
+                  Enrich Companies
                 </Button>
               </div>
             </CardContent>

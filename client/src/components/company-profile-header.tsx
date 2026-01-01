@@ -13,6 +13,8 @@ import {
   Clock,
   AlertCircle,
   StickyNote,
+  Sparkles,
+  Loader2,
 } from "lucide-react";
 import { SiLinkedin, SiX } from "react-icons/si";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -36,6 +38,8 @@ interface CompanyProfileHeaderProps {
   onConfigureAlerts: () => void;
   onExport: () => void;
   onArchive: () => void;
+  onEnrich?: () => void;
+  isEnriching?: boolean;
 }
 
 function getCompanyInitials(name: string): string {
@@ -56,6 +60,8 @@ export function CompanyProfileHeader({
   onConfigureAlerts,
   onExport,
   onArchive,
+  onEnrich,
+  isEnriching,
 }: CompanyProfileHeaderProps) {
   return (
     <div className="space-y-4">
@@ -145,6 +151,16 @@ export function CompanyProfileHeader({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {onEnrich && (
+                <DropdownMenuItem onClick={onEnrich} disabled={isEnriching}>
+                  {isEnriching ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-4 h-4 mr-2" />
+                  )}
+                  {isEnriching ? "Enriching..." : "AI Enrich Data"}
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={onExport}>
                 <Download className="w-4 h-4 mr-2" />
                 Export data
