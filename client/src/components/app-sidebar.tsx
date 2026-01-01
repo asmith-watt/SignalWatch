@@ -15,6 +15,7 @@ import {
   TrendingUp,
   RefreshCw,
   Database,
+  Network,
 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -49,6 +50,7 @@ interface AppSidebarProps {
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: TrendingUp },
   { title: "All Signals", url: "/signals", icon: Radio },
+  { title: "Industry Map", url: "/industry-map", icon: Network },
   { title: "Alerts", url: "/alerts", icon: Bell },
   { title: "Team", url: "/team", icon: Users },
   { title: "WordPress", url: "/wordpress", icon: Globe },

@@ -14,6 +14,7 @@ import { AddCompanyDialog } from "@/components/add-company-dialog";
 import { Dashboard } from "@/pages/dashboard";
 import { AllSignalsPage } from "@/pages/all-signals";
 import { AlertsPage } from "@/pages/alerts";
+import { IndustryMapPage } from "@/pages/industry-map";
 import WordPressSettings from "@/pages/wordpress-settings";
 import DataManagementPage from "@/pages/data-management";
 import NotFound from "@/pages/not-found";
@@ -111,6 +112,9 @@ function MainLayout() {
               </Route>
               <Route path="/alerts">
                 <AlertsPage />
+              </Route>
+              <Route path="/industry-map">
+                <IndustryMapPage />
               </Route>
               <Route path="/team">
                 <div className="p-6">
