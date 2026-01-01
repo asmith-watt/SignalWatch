@@ -174,6 +174,60 @@ export const insertAlertSchema = createInsertSchema(alerts).omit({
 export type InsertAlert = z.infer<typeof insertAlertSchema>;
 export type Alert = typeof alerts.$inferSelect;
 
+// Company relationship types
+export const relationshipTypes = [
+  "partner",
+  "competitor",
+  "supplier",
+  "customer",
+  "acquired",
+  "investor",
+  "subsidiary",
+  "joint_venture",
+  "distributor",
+] as const;
+
+export type RelationshipType = (typeof relationshipTypes)[number];
+
+// Company relationships table for industry map
+export const companyRelationships = pgTable("company_relationships", {
+  id: serial("id").primaryKey(),
+  sourceCompanyId: integer("source_company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
+  targetCompanyId: integer("target_company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
+  relationshipType: text("relationship_type").notNull(),
+  strength: integer("strength").default(1),
+  description: text("description"),
+  sourceSignalId: integer("source_signal_id").references(() => signals.id),
+  isAiExtracted: boolean("is_ai_extracted").default(false),
+  confidence: integer("confidence").default(100),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const companyRelationshipsRelations = relations(companyRelationships, ({ one }) => ({
+  sourceCompany: one(companies, {
+    fields: [companyRelationships.sourceCompanyId],
+    references: [companies.id],
+  }),
+  targetCompany: one(companies, {
+    fields: [companyRelationships.targetCompanyId],
+    references: [companies.id],
+  }),
+  sourceSignal: one(signals, {
+    fields: [companyRelationships.sourceSignalId],
+    references: [signals.id],
+  }),
+}));
+
+export const insertCompanyRelationshipSchema = createInsertSchema(companyRelationships).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCompanyRelationship = z.infer<typeof insertCompanyRelationshipSchema>;
+export type CompanyRelationship = typeof companyRelationships.$inferSelect;
+
 // Activity log for team collaboration
 export const activityLog = pgTable("activity_log", {
   id: serial("id").primaryKey(),
