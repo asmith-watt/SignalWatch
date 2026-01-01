@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import type { Signal } from "@shared/schema";
+import type { Signal, Company, RelationshipType, relationshipTypes } from "@shared/schema";
 
 const openai = new OpenAI({
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
@@ -257,4 +257,90 @@ export async function batchAnalyzeSignals(
   }
   
   return results;
+}
+
+export interface ExtractedRelationship {
+  sourceCompanyName: string;
+  targetCompanyName: string;
+  relationshipType: string;
+  description: string;
+  confidence: number;
+}
+
+export async function extractRelationshipsFromSignal(
+  signal: Signal,
+  allCompanies: Company[]
+): Promise<ExtractedRelationship[]> {
+  const companyNames = allCompanies.map(c => c.name);
+  const companyNamesStr = companyNames.slice(0, 100).join(", ");
+
+  const prompt = `Analyze this business signal and identify any company relationships mentioned.
+
+Signal Title: ${signal.title}
+Signal Content: ${signal.content || ""}
+Signal Type: ${signal.type}
+
+Known companies in our system (partial list):
+${companyNamesStr}
+
+Look for relationships between companies such as:
+- partner: Business partners, joint projects
+- competitor: Direct competitors in the market
+- supplier: One company supplies products/services to another
+- customer: One company buys from another
+- acquired: One company acquired another
+- investor: One company invested in another
+- subsidiary: One company is a subsidiary of another
+- joint_venture: Companies created a joint venture together
+- distributor: One company distributes products for another
+
+Return a JSON array of relationships found. Each relationship should have:
+{
+  "sourceCompanyName": "Name of first company",
+  "targetCompanyName": "Name of second company",
+  "relationshipType": "partner|competitor|supplier|customer|acquired|investor|subsidiary|joint_venture|distributor",
+  "description": "Brief description of the relationship",
+  "confidence": 70-100 (how confident you are this relationship exists)
+}
+
+Only include relationships where BOTH companies are clearly mentioned or implied.
+Return an empty array [] if no clear relationships are found.
+Return ONLY valid JSON, no markdown or explanation.`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      max_completion_tokens: 1024,
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (!content) {
+      return [];
+    }
+
+    const parsed = JSON.parse(content);
+    const relationships = Array.isArray(parsed) ? parsed : (parsed.relationships || []);
+    
+    const validTypes = new Set([
+      "partner", "competitor", "supplier", "customer", 
+      "acquired", "investor", "subsidiary", "joint_venture", "distributor"
+    ]);
+    
+    return relationships.filter((r: ExtractedRelationship) => 
+      r.sourceCompanyName && 
+      typeof r.sourceCompanyName === "string" &&
+      r.targetCompanyName && 
+      typeof r.targetCompanyName === "string" &&
+      r.relationshipType &&
+      typeof r.relationshipType === "string" &&
+      validTypes.has(r.relationshipType) &&
+      typeof r.confidence === "number" &&
+      r.confidence >= 70
+    );
+  } catch (error) {
+    console.error("Error extracting relationships:", error);
+    return [];
+  }
 }

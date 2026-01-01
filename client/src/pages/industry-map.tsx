@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
@@ -141,34 +141,34 @@ export function IndustryMapPage() {
     return ids;
   }, [filteredRelationships]);
 
-  const filteredCompanies = useMemo(() => {
-    return companies.filter(c => {
+  const { filteredCompanies, totalMatchingCount, isTruncated } = useMemo(() => {
+    const NODE_LIMIT = 200;
+    
+    let matching = companies.filter(c => {
       if (filterIndustry !== "all" && c.industry !== filterIndustry) return false;
       if (filteredRelationships.length > 0 && !relevantCompanyIds.has(c.id)) return false;
       return true;
     });
-  }, [companies, filterIndustry, filteredRelationships, relevantCompanyIds]);
+    
+    const total = matching.length;
+    
+    if (matching.length > NODE_LIMIT) {
+      matching.sort((a, b) => {
+        const aHasRel = relevantCompanyIds.has(a.id) ? 1 : 0;
+        const bHasRel = relevantCompanyIds.has(b.id) ? 1 : 0;
+        if (aHasRel !== bHasRel) return bHasRel - aHasRel;
+        return (signalCountMap[b.id] || 0) - (signalCountMap[a.id] || 0);
+      });
+      matching = matching.slice(0, NODE_LIMIT);
+    }
+    
+    return { filteredCompanies: matching, totalMatchingCount: total, isTruncated: total > NODE_LIMIT };
+  }, [companies, filterIndustry, filteredRelationships, relevantCompanyIds, signalCountMap]);
 
   const [nodes, setNodes] = useState<Node[]>([]);
-
-  useEffect(() => {
-    const newNodes = filteredCompanies.map((c, i) => {
-      const angle = (i / filteredCompanies.length) * 2 * Math.PI;
-      const radius = Math.min(dimensions.width, dimensions.height) * 0.35;
-      const existingNode = nodes.find(n => n.id === c.id);
-      return {
-        id: c.id,
-        name: c.name,
-        industry: c.industry,
-        x: existingNode?.x ?? dimensions.width / 2 + Math.cos(angle) * radius,
-        y: existingNode?.y ?? dimensions.height / 2 + Math.sin(angle) * radius,
-        vx: 0,
-        vy: 0,
-        signalCount: signalCountMap[c.id] || 0,
-      };
-    });
-    setNodes(newNodes);
-  }, [filteredCompanies, dimensions, signalCountMap]);
+  const nodePositionsRef = useRef<Map<number, { x: number; y: number }>>(new Map());
+  const animationIdRef = useRef<number | null>(null);
+  const iterationRef = useRef(0);
 
   const edges: Edge[] = useMemo(() => {
     return filteredRelationships.map(r => ({
@@ -198,22 +198,63 @@ export function IndustryMapPage() {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (nodes.length === 0 || edges.length === 0) return;
+  const visibleEdges = useMemo(() => {
+    const visibleIds = new Set(filteredCompanies.map(c => c.id));
+    return edges.filter(e => visibleIds.has(e.source) && visibleIds.has(e.target));
+  }, [edges, filteredCompanies]);
 
-    let animating = true;
-    const nodeMap = new Map(nodes.map(n => [n.id, { ...n }]));
+  useEffect(() => {
+    if (animationIdRef.current) {
+      cancelAnimationFrame(animationIdRef.current);
+      animationIdRef.current = null;
+    }
+
+    const MAX_NODES = 200;
+    const MAX_ITERATIONS = 200;
+    const limitedCompanies = filteredCompanies.slice(0, MAX_NODES);
+    
+    const newNodes = limitedCompanies.map((c, i) => {
+      const existing = nodePositionsRef.current.get(c.id);
+      const angle = (i / Math.max(limitedCompanies.length, 1)) * 2 * Math.PI;
+      const radius = Math.min(dimensions.width, dimensions.height) * 0.35;
+      return {
+        id: c.id,
+        name: c.name,
+        industry: c.industry,
+        x: existing?.x ?? dimensions.width / 2 + Math.cos(angle) * radius,
+        y: existing?.y ?? dimensions.height / 2 + Math.sin(angle) * radius,
+        vx: 0,
+        vy: 0,
+        signalCount: signalCountMap[c.id] || 0,
+      };
+    });
+
+    if (newNodes.length === 0 || visibleEdges.length === 0) {
+      setNodes(newNodes);
+      return;
+    }
+
+    iterationRef.current = 0;
+    const nodeMap = new Map(newNodes.map(n => [n.id, { ...n }]));
 
     const simulate = () => {
-      if (!animating) return;
+      iterationRef.current++;
+      if (iterationRef.current > MAX_ITERATIONS) {
+        const finalNodes = Array.from(nodeMap.values());
+        finalNodes.forEach(n => nodePositionsRef.current.set(n.id, { x: n.x, y: n.y }));
+        setNodes(finalNodes);
+        animationIdRef.current = null;
+        return;
+      }
 
-      const alpha = 0.1;
+      const alpha = 0.1 * Math.max(0, 1 - iterationRef.current / MAX_ITERATIONS);
       const nodeArr = Array.from(nodeMap.values());
 
       nodeArr.forEach(n => { n.vx = 0; n.vy = 0; });
 
-      for (let i = 0; i < nodeArr.length; i++) {
-        for (let j = i + 1; j < nodeArr.length; j++) {
+      const len = nodeArr.length;
+      for (let i = 0; i < len; i++) {
+        for (let j = i + 1; j < len; j++) {
           const dx = nodeArr[j].x - nodeArr[i].x;
           const dy = nodeArr[j].y - nodeArr[i].y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -227,7 +268,7 @@ export function IndustryMapPage() {
         }
       }
 
-      edges.forEach(e => {
+      visibleEdges.forEach(e => {
         const source = nodeMap.get(e.source);
         const target = nodeMap.get(e.target);
         if (!source || !target) return;
@@ -249,25 +290,29 @@ export function IndustryMapPage() {
       nodeArr.forEach(n => {
         n.vx += (centerX - n.x) * 0.001;
         n.vy += (centerY - n.y) * 0.001;
-      });
-
-      nodeArr.forEach(n => {
         n.x += n.vx * alpha;
         n.y += n.vy * alpha;
         n.x = Math.max(30, Math.min(dimensions.width - 30, n.x));
         n.y = Math.max(30, Math.min(dimensions.height - 30, n.y));
       });
 
-      setNodes([...nodeArr]);
-      requestAnimationFrame(simulate);
+      if (iterationRef.current % 10 === 0) {
+        nodeArr.forEach(n => nodePositionsRef.current.set(n.id, { x: n.x, y: n.y }));
+        setNodes([...nodeArr]);
+      }
+
+      animationIdRef.current = requestAnimationFrame(simulate);
     };
 
-    const timeout = setTimeout(() => simulate(), 100);
+    animationIdRef.current = requestAnimationFrame(simulate);
+
     return () => {
-      animating = false;
-      clearTimeout(timeout);
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
+        animationIdRef.current = null;
+      }
     };
-  }, [edges.length, dimensions]);
+  }, [filteredCompanies, visibleEdges, dimensions, signalCountMap]);
 
   const extractRelationshipsMutation = useMutation({
     mutationFn: async () => {
@@ -325,11 +370,16 @@ export function IndustryMapPage() {
             <Network className="h-5 w-5 text-muted-foreground" />
             <h1 className="text-xl font-semibold">Industry Map</h1>
             <Badge variant="secondary" className="ml-2">
-              {nodes.length} companies
+              {isTruncated ? `${nodes.length} of ${totalMatchingCount}` : nodes.length} companies
             </Badge>
             <Badge variant="outline">
-              {edges.length} relationships
+              {visibleEdges.length} relationships
             </Badge>
+            {isTruncated && (
+              <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-600">
+                Use filters to focus view
+              </Badge>
+            )}
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
@@ -431,7 +481,7 @@ export function IndustryMapPage() {
               style={{ cursor: 'grab' }}
             >
               <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
-                {edges.map(edge => {
+                {visibleEdges.map(edge => {
                   const source = nodeById.get(edge.source);
                   const target = nodeById.get(edge.target);
                   if (!source || !target) return null;
@@ -561,14 +611,14 @@ export function IndustryMapPage() {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Connections</span>
                   <Badge variant="secondary">
-                    {edges.filter(e => e.source === selectedNode.id || e.target === selectedNode.id).length}
+                    {visibleEdges.filter(e => e.source === selectedNode.id || e.target === selectedNode.id).length}
                   </Badge>
                 </div>
               </div>
               <Separator />
               <h4 className="font-medium text-sm">Relationships</h4>
               <div className="space-y-2">
-                {edges
+                {visibleEdges
                   .filter(e => e.source === selectedNode.id || e.target === selectedNode.id)
                   .map(e => {
                     const otherId = e.source === selectedNode.id ? e.target : e.source;
@@ -593,7 +643,7 @@ export function IndustryMapPage() {
                       </div>
                     );
                   })}
-                {edges.filter(e => e.source === selectedNode.id || e.target === selectedNode.id).length === 0 && (
+                {visibleEdges.filter(e => e.source === selectedNode.id || e.target === selectedNode.id).length === 0 && (
                   <p className="text-sm text-muted-foreground">No relationships found</p>
                 )}
               </div>

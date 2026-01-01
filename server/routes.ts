@@ -7,7 +7,7 @@ import {
   insertAlertSchema,
 } from "@shared/schema";
 import { z } from "zod";
-import { analyzeSignal, enrichSignal, batchEnrichSignals } from "./ai-analysis";
+import { analyzeSignal, enrichSignal, batchEnrichSignals, extractRelationshipsFromSignal } from "./ai-analysis";
 import { generateArticleFromSignal, exportArticleForCMS } from "./article-generator";
 import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany, monitorUSPoultryCompanies, monitorCompaniesByCountry, monitorCompaniesByIndustry } from "./perplexity-monitor";
 import { importCompanies, getUSPoultryCompanies } from "./import-companies";
@@ -340,6 +340,64 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error deleting relationship:", error);
       res.status(500).json({ error: "Failed to delete relationship" });
+    }
+  });
+
+  app.post("/api/relationships/extract-from-signals", async (req: Request, res: Response) => {
+    try {
+      const signals = await storage.getAllSignals();
+      const companies = await storage.getAllCompanies();
+      const existingRelationships = await storage.getAllRelationships();
+      
+      const existingPairs = new Set(
+        existingRelationships.map(r => `${r.sourceCompanyId}-${r.targetCompanyId}-${r.relationshipType}`)
+      );
+      
+      const companyNameToId = new Map<string, number>();
+      companies.forEach(c => {
+        companyNameToId.set(c.name.toLowerCase(), c.id);
+      });
+      
+      let relationshipsCreated = 0;
+      const recentSignals = signals.slice(0, 50);
+      
+      for (const signal of recentSignals) {
+        const extracted = await extractRelationshipsFromSignal(signal, companies);
+        
+        for (const rel of extracted) {
+          const sourceId = companyNameToId.get(rel.sourceCompanyName.toLowerCase());
+          const targetId = companyNameToId.get(rel.targetCompanyName.toLowerCase());
+          
+          if (sourceId && targetId && sourceId !== targetId) {
+            const pairKey = `${sourceId}-${targetId}-${rel.relationshipType}`;
+            const reversePairKey = `${targetId}-${sourceId}-${rel.relationshipType}`;
+            
+            if (!existingPairs.has(pairKey) && !existingPairs.has(reversePairKey)) {
+              await storage.createRelationship({
+                sourceCompanyId: sourceId,
+                targetCompanyId: targetId,
+                relationshipType: rel.relationshipType,
+                description: rel.description,
+                strength: 1,
+                sourceSignalId: signal.id,
+                isAiExtracted: true,
+                confidence: rel.confidence,
+              });
+              existingPairs.add(pairKey);
+              relationshipsCreated++;
+            }
+          }
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        signalsProcessed: recentSignals.length,
+        relationshipsCreated 
+      });
+    } catch (error) {
+      console.error("Error extracting relationships:", error);
+      res.status(500).json({ error: "Failed to extract relationships" });
     }
   });
 
