@@ -78,6 +78,7 @@ function MainLayout() {
           companies={companies}
           selectedCompanyId={selectedCompanyId}
           onSelectCompany={handleSelectCompany}
+          onClearSelection={() => setSelectedCompanyId(null)}
           onAddCompany={() => setShowAddCompanyDialog(true)}
           signalCounts={signalCounts}
         />

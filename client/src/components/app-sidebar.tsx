@@ -43,6 +43,7 @@ interface AppSidebarProps {
   companies: Company[];
   selectedCompanyId: number | null;
   onSelectCompany: (id: number) => void;
+  onClearSelection: () => void;
   onAddCompany: () => void;
   signalCounts: Record<number, number>;
 }
@@ -86,6 +87,7 @@ export function AppSidebar({
   companies,
   selectedCompanyId,
   onSelectCompany,
+  onClearSelection,
   onAddCompany,
   signalCounts,
 }: AppSidebarProps) {
@@ -199,7 +201,11 @@ export function AppSidebar({
                     asChild
                     isActive={location === item.url}
                   >
-                    <Link href={item.url} data-testid={`nav-${item.title.toLowerCase().replace(" ", "-")}`}>
+                    <Link 
+                      href={item.url} 
+                      data-testid={`nav-${item.title.toLowerCase().replace(" ", "-")}`}
+                      onClick={item.url === "/" ? onClearSelection : undefined}
+                    >
                       <item.icon className="w-4 h-4" />
                       <span>{item.title}</span>
                     </Link>
