@@ -163,6 +163,7 @@ export function DataManagementPage() {
                     <SelectItem value="Poultry">Poultry</SelectItem>
                     <SelectItem value="Feed">Feed</SelectItem>
                     <SelectItem value="Pet Food">Pet Food</SelectItem>
+                    <SelectItem value="Baking & Milling">Baking & Milling</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button

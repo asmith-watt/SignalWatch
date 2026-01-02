@@ -1213,6 +1213,14 @@ export async function registerRoutes(
         headers.forEach((h, idx) => { row[h] = values[idx] || ""; });
         
         try {
+          const parseTags = (val: string): string[] | null => {
+            if (!val) return null;
+            if (val.startsWith("[")) {
+              try { return JSON.parse(val); } catch { return null; }
+            }
+            return val.split(";").map(t => t.trim()).filter(Boolean);
+          };
+          
           await storage.createCompany({
             name: row.name,
             website: row.website || null,
@@ -1224,8 +1232,8 @@ export async function registerRoutes(
             country: row.country || null,
             size: row.size || null,
             founded: row.founded || null,
-            tags: row.tags ? JSON.parse(row.tags) : null,
-            productTypes: row.product_types ? JSON.parse(row.product_types) : null,
+            tags: parseTags(row.tags),
+            productTypes: parseTags(row.product_types),
             rssFeedUrl: row.rss_feed_url || null,
             linkedinUrl: row.linkedin_url || null,
             twitterHandle: row.twitter_handle || null,
