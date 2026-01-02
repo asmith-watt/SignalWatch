@@ -1356,6 +1356,99 @@ export async function registerRoutes(
     }
   });
 
+  // Export Baking & Milling data as JSON for production import
+  app.get("/api/export/baking-milling", async (req: Request, res: Response) => {
+    try {
+      const allCompanies = await storage.getAllCompanies();
+      const bakingCompanies = allCompanies.filter(c => 
+        c.industry?.toLowerCase().includes("baking") ||
+        c.industry?.toLowerCase().includes("milling") ||
+        c.industry?.toLowerCase().includes("flour") ||
+        c.industry?.toLowerCase().includes("grain") ||
+        c.industry?.toLowerCase().includes("mill")
+      );
+      
+      const companyIds = new Set(bakingCompanies.map(c => c.id));
+      const allSignals = await storage.getAllSignals();
+      const bakingSignals = allSignals.filter(s => companyIds.has(s.companyId));
+      
+      const exportData = {
+        exportedAt: new Date().toISOString(),
+        companies: bakingCompanies,
+        signals: bakingSignals,
+      };
+      
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Content-Disposition", "attachment; filename=baking-milling-export.json");
+      res.json(exportData);
+    } catch (error) {
+      console.error("Error exporting Baking & Milling data:", error);
+      res.status(500).json({ error: "Failed to export data" });
+    }
+  });
+
+  // Import Baking & Milling data from JSON export
+  app.post("/api/import/baking-milling", async (req: Request, res: Response) => {
+    try {
+      const { companies, signals } = req.body;
+      
+      if (!Array.isArray(companies) || !Array.isArray(signals)) {
+        return res.status(400).json({ error: "Invalid import data format" });
+      }
+      
+      const idMapping = new Map<number, number>();
+      let companiesImported = 0;
+      let signalsImported = 0;
+      
+      // Import companies first
+      for (const company of companies) {
+        try {
+          const existing = await storage.getCompanyByName(company.name);
+          if (existing) {
+            idMapping.set(company.id, existing.id);
+          } else {
+            const { id, ...companyData } = company;
+            const created = await storage.createCompany(companyData);
+            idMapping.set(company.id, created.id);
+            companiesImported++;
+          }
+        } catch (e) {
+          console.error(`Error importing company ${company.name}:`, e);
+        }
+      }
+      
+      // Import signals with new company IDs
+      for (const signal of signals) {
+        try {
+          const newCompanyId = idMapping.get(signal.companyId);
+          if (!newCompanyId) continue;
+          
+          const { id, companyId, createdAt, ...signalData } = signal;
+          await storage.createSignal({
+            ...signalData,
+            companyId: newCompanyId,
+            publishedAt: signal.publishedAt ? new Date(signal.publishedAt) : null,
+            citations: signal.citations || [],
+          });
+          signalsImported++;
+        } catch (e) {
+          console.error(`Error importing signal ${signal.title}:`, e);
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        companiesImported, 
+        signalsImported,
+        totalCompanies: companies.length,
+        totalSignals: signals.length,
+      });
+    } catch (error) {
+      console.error("Error importing Baking & Milling data:", error);
+      res.status(500).json({ error: "Failed to import data" });
+    }
+  });
+
   app.get("/api/rss", (req: Request, res: Response) => {
     const feeds = getAvailableFeeds();
     const baseUrl = `${req.protocol}://${req.get("host")}`;
