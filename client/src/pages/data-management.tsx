@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle, Sparkles } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScanHistory } from "@/components/scan-history";
 import type { Company, Signal } from "@shared/schema";
 
 export function DataManagementPage() {
@@ -273,6 +274,8 @@ export function DataManagementPage() {
             </Tabs>
           </CardContent>
         </Card>
+
+        <ScanHistory />
 
         <Card>
           <CardHeader>
