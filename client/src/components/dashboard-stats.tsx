@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Building2,
   Radio,
@@ -12,8 +12,20 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+
+interface MonitorProgress {
+  isRunning: boolean;
+  total: number;
+  current: number;
+  currentCompany: string | null;
+  startedAt: string | null;
+  type: 'all' | 'industry' | 'company' | null;
+  industryName?: string;
+  signalsFound: number;
+}
 
 interface DashboardStatsProps {
   companyCount: number;
@@ -85,12 +97,27 @@ export function DashboardStats({
   signalTrend,
 }: DashboardStatsProps) {
   const { toast } = useToast();
+  const [isMonitoring, setIsMonitoring] = useState(false);
+
+  const { data: progress } = useQuery<MonitorProgress>({
+    queryKey: ["/api/monitor/progress"],
+    refetchInterval: isMonitoring ? 1000 : false,
+    enabled: isMonitoring,
+  });
+
+  useEffect(() => {
+    if (progress && !progress.isRunning && isMonitoring) {
+      setIsMonitoring(false);
+    }
+  }, [progress, isMonitoring]);
 
   const updateAllMutation = useMutation({
     mutationFn: async () => {
+      setIsMonitoring(true);
       return apiRequest("POST", "/api/monitor/all");
     },
     onSuccess: (data: any) => {
+      setIsMonitoring(false);
       queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
       queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
       const totalSignals = data.results?.reduce((sum: number, r: any) => sum + r.signalsCreated, 0) || 0;
@@ -100,6 +127,7 @@ export function DashboardStats({
       });
     },
     onError: () => {
+      setIsMonitoring(false);
       toast({
         title: "Monitoring failed",
         description: "Could not update signals. Please try again.",
@@ -107,6 +135,8 @@ export function DashboardStats({
       });
     },
   });
+
+  const progressPercent = progress?.total ? Math.round((progress.current / progress.total) * 100) : 0;
 
   return (
     <div className="space-y-4">
@@ -116,13 +146,38 @@ export function DashboardStats({
           variant="outline"
           size="sm"
           onClick={() => updateAllMutation.mutate()}
-          disabled={updateAllMutation.isPending}
+          disabled={updateAllMutation.isPending || isMonitoring}
           data-testid="button-update-all-signals"
         >
-          <RefreshCw className={`w-4 h-4 mr-2 ${updateAllMutation.isPending ? "animate-spin" : ""}`} />
-          {updateAllMutation.isPending ? "Updating..." : "Update All Signals"}
+          <RefreshCw className={`w-4 h-4 mr-2 ${updateAllMutation.isPending || isMonitoring ? "animate-spin" : ""}`} />
+          {updateAllMutation.isPending || isMonitoring ? "Updating..." : "Update All Signals"}
         </Button>
       </div>
+
+      {isMonitoring && progress?.isRunning && (
+        <Card className="p-4 bg-muted/50" data-testid="progress-card">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium">
+                Checking companies for new signals...
+              </span>
+              <span className="text-muted-foreground">
+                {progress.current} / {progress.total} ({progressPercent}%)
+              </span>
+            </div>
+            <Progress value={progressPercent} className="h-2" />
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span className="truncate max-w-xs" data-testid="progress-current-company">
+                {progress.currentCompany ? `Checking: ${progress.currentCompany}` : "Starting..."}
+              </span>
+              <span data-testid="progress-signals-found">
+                {progress.signalsFound} signals found
+              </span>
+            </div>
+          </div>
+        </Card>
+      )}
+
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <StatCard
           title="Companies"
