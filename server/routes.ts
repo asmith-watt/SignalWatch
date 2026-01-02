@@ -1404,11 +1404,14 @@ export async function registerRoutes(
       let signalsImported = 0;
       let signalErrors: string[] = [];
       
-      // Import companies first
+      // Import companies first - force create for B&M industry
       for (const company of companies) {
         try {
           const existing = await storage.getCompanyByName(company.name);
-          if (existing) {
+          const isBakingMilling = company.industry?.includes("Baking") || company.industry?.includes("Milling");
+          
+          // If existing company has different industry or is B&M, create new
+          if (existing && existing.industry === company.industry) {
             idMapping.set(company.id, existing.id);
             companiesSkipped++;
           } else {
