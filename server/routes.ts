@@ -473,6 +473,58 @@ export async function registerRoutes(
     }
   });
 
+  // Analyze ALL unanalyzed signals
+  app.post("/api/signals/analyze-all", async (req: Request, res: Response) => {
+    try {
+      const allSignals = await storage.getAllSignals();
+      const unanalyzed = allSignals.filter(s => !s.aiAnalysis);
+      
+      console.log(`Starting batch analysis of ${unanalyzed.length} unanalyzed signals...`);
+      
+      let analyzed = 0;
+      let failed = 0;
+      
+      for (const signal of unanalyzed) {
+        try {
+          const company = await storage.getCompany(signal.companyId);
+          const enrichment = await enrichSignal({
+            title: signal.title,
+            summary: signal.summary,
+            content: signal.content,
+            type: signal.type,
+            companyName: company?.name,
+            industry: company?.industry || undefined,
+          });
+          
+          await storage.updateSignal(signal.id, {
+            entities: enrichment.entities,
+            aiAnalysis: enrichment.aiAnalysis,
+          });
+          
+          analyzed++;
+          console.log(`  Analyzed ${analyzed}/${unanalyzed.length}: ${signal.title}`);
+          
+          // Small delay to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 200));
+        } catch (err) {
+          console.error(`  Failed to analyze signal ${signal.id}:`, err);
+          failed++;
+        }
+      }
+      
+      res.json({
+        success: true,
+        totalUnanalyzed: unanalyzed.length,
+        analyzed,
+        failed,
+        message: `Analyzed ${analyzed} signals (${failed} failed)`
+      });
+    } catch (error) {
+      console.error("Error analyzing all signals:", error);
+      res.status(500).json({ error: "Failed to analyze signals" });
+    }
+  });
+
   // Batch enrich multiple signals
   app.post("/api/signals/enrich-batch", async (req: Request, res: Response) => {
     try {
