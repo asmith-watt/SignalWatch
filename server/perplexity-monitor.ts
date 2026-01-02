@@ -154,6 +154,11 @@ If no recent news found, return empty array: []`;
         return true;
       }
       
+      if (publishedDate > now) {
+        console.log(`  Fixing future date (${s.publishedAt} -> today): ${s.title}`);
+        s.publishedAt = now.toISOString().split('T')[0];
+      }
+      
       if (publishedDate < cutoffDate) {
         console.log(`  Skipping old signal (${s.publishedAt}): ${s.title}`);
         return false;
