@@ -1,6 +1,7 @@
 import type { Company, InsertSignal } from "@shared/schema";
 import { storage } from "./storage";
 import { enrichSignal } from "./ai-analysis";
+import { startMonitoring, updateProgress, finishMonitoring } from "./monitor-progress";
 
 const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
 
@@ -278,13 +279,22 @@ export async function monitorAllCompanies(): Promise<{ company: string; signalsC
 
   console.log(`Monitoring all ${targetCompanies.length} companies across Poultry, Feed, and Pet Food industries...`);
   
-  const results: { company: string; signalsCreated: number }[] = [];
+  startMonitoring(targetCompanies.length, 'all');
   
-  for (const company of targetCompanies) {
-    console.log(`[${results.length + 1}/${targetCompanies.length}] Monitoring ${company.name} (${company.industry})...`);
-    const result = await monitorCompany(company);
-    results.push({ company: company.name, signalsCreated: result.signalsCreated });
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  const results: { company: string; signalsCreated: number }[] = [];
+  let totalSignalsFound = 0;
+  
+  try {
+    for (const company of targetCompanies) {
+      console.log(`[${results.length + 1}/${targetCompanies.length}] Monitoring ${company.name} (${company.industry})...`);
+      updateProgress(results.length + 1, company.name, totalSignalsFound);
+      const result = await monitorCompany(company);
+      totalSignalsFound += result.signalsCreated;
+      results.push({ company: company.name, signalsCreated: result.signalsCreated });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  } finally {
+    finishMonitoring();
   }
 
   console.log(`Monitoring complete! Processed ${results.length} companies.`);
@@ -483,13 +493,22 @@ export async function monitorCompaniesByIndustry(industry: string): Promise<{ co
     return [];
   }
   
-  const results: { company: string; signalsCreated: number }[] = [];
+  startMonitoring(industryCompanies.length, 'industry', industry);
   
-  for (const company of industryCompanies) {
-    console.log(`[${results.length + 1}/${industryCompanies.length}] Monitoring ${company.name}...`);
-    const result = await monitorCompany(company);
-    results.push({ company: company.name, signalsCreated: result.signalsCreated });
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  const results: { company: string; signalsCreated: number }[] = [];
+  let totalSignalsFound = 0;
+  
+  try {
+    for (const company of industryCompanies) {
+      console.log(`[${results.length + 1}/${industryCompanies.length}] Monitoring ${company.name}...`);
+      updateProgress(results.length + 1, company.name, totalSignalsFound);
+      const result = await monitorCompany(company);
+      totalSignalsFound += result.signalsCreated;
+      results.push({ company: company.name, signalsCreated: result.signalsCreated });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  } finally {
+    finishMonitoring();
   }
 
   console.log(`${industry} monitoring complete! Processed ${results.length} companies.`);
