@@ -469,10 +469,20 @@ export async function registerRoutes(
         industry: company?.industry || undefined,
       });
 
-      const updated = await storage.updateSignal(id, {
+      const updateData: any = {
         entities: enrichment.entities,
         aiAnalysis: enrichment.aiAnalysis,
-      });
+      };
+      
+      if (!signal.publishedAt && enrichment.publicationDate) {
+        const pubDate = new Date(enrichment.publicationDate);
+        if (!isNaN(pubDate.getTime()) && pubDate <= new Date()) {
+          updateData.publishedAt = pubDate;
+          console.log(`  Updated publication date for signal ${id}: ${enrichment.publicationDate}`);
+        }
+      }
+
+      const updated = await storage.updateSignal(id, updateData);
 
       res.json({ signal: updated, enrichment });
     } catch (error) {
@@ -504,10 +514,19 @@ export async function registerRoutes(
             industry: company?.industry || undefined,
           });
           
-          await storage.updateSignal(signal.id, {
+          const updateData: any = {
             entities: enrichment.entities,
             aiAnalysis: enrichment.aiAnalysis,
-          });
+          };
+          
+          if (!signal.publishedAt && enrichment.publicationDate) {
+            const pubDate = new Date(enrichment.publicationDate);
+            if (!isNaN(pubDate.getTime()) && pubDate <= new Date()) {
+              updateData.publishedAt = pubDate;
+            }
+          }
+          
+          await storage.updateSignal(signal.id, updateData);
           
           analyzed++;
           console.log(`  Analyzed ${analyzed}/${unanalyzed.length}: ${signal.title}`);

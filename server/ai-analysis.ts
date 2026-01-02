@@ -104,6 +104,7 @@ export interface SignalEnrichment {
     suggestedFollowUp: string[];
     relevanceScore: number;
   };
+  publicationDate?: string | null;
 }
 
 export async function enrichSignal(signal: {
@@ -144,13 +145,15 @@ Return a JSON object with this exact structure:
     "storyAngles": ["2-3 potential article angles for editorial team"],
     "suggestedFollowUp": ["What to monitor next, who to contact, what to research"],
     "relevanceScore": 0-100
-  }
+  },
+  "publicationDate": "YYYY-MM-DD or null"
 }
 
 Rules:
 - Only include entities that are explicitly mentioned
 - Be specific with financial figures - include currency
 - relevanceScore: 90+ for major M&A/IPO/funding, 70-89 for exec changes/partnerships, 50-69 for general news, <50 for minor updates
+- publicationDate: Extract the EXACT article publication date if mentioned in the content. Use YYYY-MM-DD format. If no date is found, set to null. NEVER guess or invent dates.
 - Return ONLY valid JSON, no explanation`;
 
   try {
