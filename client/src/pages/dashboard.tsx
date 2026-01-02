@@ -11,6 +11,7 @@ import { SignalDetailPanel } from "@/components/signal-detail-panel";
 import { AddCompanyDialog } from "@/components/add-company-dialog";
 import { AlertConfigDialog } from "@/components/alert-config-dialog";
 import { DashboardStats } from "@/components/dashboard-stats";
+import { ScanHistory } from "@/components/scan-history";
 import {
   SignalFeedSkeleton,
   CompanyProfileSkeleton,
@@ -303,11 +304,18 @@ export function Dashboard({
         <div className="p-6 space-y-6 overflow-auto">
           {!selectedCompanyId ? (
             <>
-              {signalsLoading ? (
-                <DashboardStatsSkeleton />
-              ) : (
-                <DashboardStats {...stats} />
-              )}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="lg:col-span-3">
+                  {signalsLoading ? (
+                    <DashboardStatsSkeleton />
+                  ) : (
+                    <DashboardStats {...stats} />
+                  )}
+                </div>
+                <div className="lg:col-span-1">
+                  <ScanHistory />
+                </div>
+              </div>
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">

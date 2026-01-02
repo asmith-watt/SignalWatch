@@ -62,6 +62,9 @@ export interface IStorage {
   getRelationshipsByCompany(companyId: number): Promise<CompanyRelationship[]>;
   createRelationship(relationship: InsertCompanyRelationship): Promise<CompanyRelationship>;
   deleteRelationship(id: number): Promise<void>;
+
+  // Scan History
+  getScanHistory(days: number): Promise<{ date: string; industry: string; signalsFound: number }[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -245,6 +248,26 @@ export class DatabaseStorage implements IStorage {
 
   async deleteRelationship(id: number): Promise<void> {
     await db.delete(companyRelationships).where(eq(companyRelationships.id, id));
+  }
+
+  // Scan History
+  async getScanHistory(days: number): Promise<{ date: string; industry: string; signalsFound: number }[]> {
+    const result = await db.execute(sql`
+      SELECT 
+        TO_CHAR(DATE(s.created_at), 'YYYY-MM-DD') as date,
+        COALESCE(c.industry, 'Unknown') as industry,
+        COUNT(s.id)::integer as signals_found
+      FROM signals s
+      JOIN companies c ON s.company_id = c.id
+      WHERE s.created_at >= CURRENT_DATE - ${days} * INTERVAL '1 day'
+      GROUP BY DATE(s.created_at), c.industry
+      ORDER BY DATE(s.created_at) DESC, signals_found DESC
+    `);
+    return result.rows.map((row: any) => ({
+      date: row.date,
+      industry: row.industry,
+      signalsFound: row.signals_found,
+    }));
   }
 }
 

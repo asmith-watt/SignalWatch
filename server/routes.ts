@@ -761,6 +761,17 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/monitor/history", async (req: Request, res: Response) => {
+    try {
+      const days = parseInt(req.query.days as string) || 7;
+      const history = await storage.getScanHistory(days);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching scan history:", error);
+      res.status(500).json({ error: "Failed to fetch scan history" });
+    }
+  });
+
   app.post("/api/monitor/company/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
