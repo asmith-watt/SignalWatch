@@ -120,7 +120,7 @@ export function SignalCard({
     : "";
   
   const publishedDate = signal.publishedAt
-    ? new Date(signal.publishedAt).toLocaleDateString()
+    ? new Date(signal.publishedAt).toLocaleDateString('en-US', { timeZone: 'UTC' })
     : null;
   
   const citations = Array.isArray(signal.citations) ? signal.citations : [];

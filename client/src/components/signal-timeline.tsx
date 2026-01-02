@@ -22,6 +22,10 @@ interface TimelineGroup {
   signals: Signal[];
 }
 
+function getUTCDateKey(date: Date): string {
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+}
+
 function groupSignalsByDate(signals: Signal[]): TimelineGroup[] {
   const groups: Record<string, Signal[]> = {};
   const groupOrder: string[] = [];
@@ -30,7 +34,7 @@ function groupSignalsByDate(signals: Signal[]): TimelineGroup[] {
     const date = signal.publishedAt
       ? new Date(signal.publishedAt)
       : new Date(signal.createdAt);
-    const dateKey = format(date, "yyyy-MM-dd");
+    const dateKey = getUTCDateKey(date);
 
     if (!groups[dateKey]) {
       groups[dateKey] = [];
@@ -40,7 +44,8 @@ function groupSignalsByDate(signals: Signal[]): TimelineGroup[] {
   });
 
   return groupOrder.map((dateKey) => {
-    const date = new Date(dateKey);
+    const [year, month, day] = dateKey.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
     let label: string;
 
     if (isToday(date)) {
@@ -48,7 +53,7 @@ function groupSignalsByDate(signals: Signal[]): TimelineGroup[] {
     } else if (isYesterday(date)) {
       label = "Yesterday";
     } else if (isThisWeek(date)) {
-      label = format(date, "EEEE");
+      label = format(date, "EEEE", { useAdditionalDayOfYearTokens: false });
     } else if (isThisMonth(date)) {
       label = format(date, "MMMM d");
     } else {
