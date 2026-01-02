@@ -117,8 +117,7 @@ export function AppSidebar({
 
   const { data: progress } = useQuery<MonitorProgress>({
     queryKey: ["/api/monitor/progress"],
-    refetchInterval: isMonitoring ? 1000 : false,
-    enabled: isMonitoring,
+    refetchInterval: progress?.isRunning || isMonitoring ? 1000 : 5000,
   });
 
   useEffect(() => {
@@ -127,6 +126,7 @@ export function AppSidebar({
     }
   }, [progress, isMonitoring]);
 
+  const showProgressBar = progress?.isRunning || isMonitoring;
   const progressPercent = progress?.total ? Math.round((progress.current / progress.total) * 100) : 0;
 
   const updateGroupMutation = useMutation({
@@ -223,7 +223,7 @@ export function AppSidebar({
         </div>
       </SidebarHeader>
 
-      {isMonitoring && progress?.isRunning && (
+      {showProgressBar && progress?.isRunning && (
         <div className="px-4 py-3 border-b border-sidebar-border bg-muted/30" data-testid="sidebar-progress">
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs">
