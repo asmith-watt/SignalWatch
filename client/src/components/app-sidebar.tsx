@@ -74,16 +74,17 @@ const industryGroups: Record<string, string[]> = {
   Poultry: ["Poultry", "Chicken", "Turkey", "Egg", "Duck", "Broiler", "Layer", "Hatchery"],
   Feed: ["Feed", "Nutrition", "Premix", "Compound"],
   "Pet Food": ["Pet Food", "Pet", "Dog Food", "Cat Food"],
+  "Baking & Milling": ["Baking & Milling", "Baking", "Milling", "Flour", "Grain", "Mill"],
 };
 
 function getIndustryGroup(industry: string | null): string {
-  if (!industry) return "Poultry";
+  if (!industry) return "Other";
   for (const [group, industries] of Object.entries(industryGroups)) {
     if (industries.some((i) => industry.toLowerCase().includes(i.toLowerCase()))) {
       return group;
     }
   }
-  return "Poultry";
+  return "Other";
 }
 
 function getCompanyInitials(name: string): string {
@@ -107,9 +108,10 @@ export function AppSidebar({
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     Poultry: true,
-    Technology: true,
-    Finance: true,
-    Healthcare: true,
+    Feed: true,
+    "Pet Food": true,
+    "Baking & Milling": true,
+    Other: true,
   });
   const [updatingGroup, setUpdatingGroup] = useState<string | null>(null);
   const [updatingCompany, setUpdatingCompany] = useState<number | null>(null);
