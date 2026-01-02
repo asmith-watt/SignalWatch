@@ -111,8 +111,9 @@ export function IndustryMapPage() {
   }, [signals]);
 
   const industries = useMemo(() => {
+    const allowedIndustries = ["Poultry", "Feed", "Pet Food"];
     const set = new Set<string>();
-    companies.forEach(c => c.industry && set.add(c.industry));
+    companies.forEach(c => c.industry && allowedIndustries.includes(c.industry) && set.add(c.industry));
     return Array.from(set).sort();
   }, [companies]);
 
