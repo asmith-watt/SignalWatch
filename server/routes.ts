@@ -14,6 +14,7 @@ import { getProgress } from "./monitor-progress";
 import { importCompanies, getUSPoultryCompanies } from "./import-companies";
 import { importFeedCompanies } from "./import-feed-companies";
 import { importPetfoodCompanies } from "./import-petfood-companies";
+import { importBakingMillingCompanies } from "./import-baking-milling-companies";
 import { generateRssFeed, generateAllSignalsRssFeed, getAvailableFeeds } from "./rss-feeds";
 import { publishToWordPress, testWordPressConnection } from "./wordpress-publisher";
 import { selectStockImage, buildMediaSitePayload, publishToMediaSite } from "./media-site-publisher";
@@ -1092,6 +1093,23 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error importing pet food companies:", error);
       res.status(500).json({ error: "Failed to import pet food companies" });
+    }
+  });
+
+  app.post("/api/companies/import-baking-milling", async (req: Request, res: Response) => {
+    try {
+      console.log("Starting Baking & Milling companies import...");
+      const result = await importBakingMillingCompanies();
+      res.json({ 
+        success: true, 
+        message: `Import complete. Added ${result.imported} new Baking & Milling companies, updated ${result.updated}, skipped ${result.skipped}.`,
+        imported: result.imported,
+        updated: result.updated,
+        skipped: result.skipped
+      });
+    } catch (error) {
+      console.error("Error importing Baking & Milling companies:", error);
+      res.status(500).json({ error: "Failed to import Baking & Milling companies" });
     }
   });
 
