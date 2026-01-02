@@ -113,13 +113,13 @@ export function SignalCard({
   const sentimentColor = sentimentColors[signal.sentiment || "neutral"];
   const statusConfig = contentStatusConfig[signal.contentStatus || "new"];
 
-  const gatheredTime = signal.gatheredAt
-    ? formatDistanceToNow(new Date(signal.gatheredAt), { addSuffix: true })
+  const gatheredDate = signal.gatheredAt
+    ? new Date(signal.gatheredAt).toLocaleDateString('en-US', { timeZone: 'UTC' })
     : signal.createdAt
-    ? formatDistanceToNow(new Date(signal.createdAt), { addSuffix: true })
-    : "";
+    ? new Date(signal.createdAt).toLocaleDateString('en-US', { timeZone: 'UTC' })
+    : null;
   
-  const publishedDate = signal.publishedAt
+  const sourcePublishedDate = signal.publishedAt
     ? new Date(signal.publishedAt).toLocaleDateString('en-US', { timeZone: 'UTC' })
     : null;
   
@@ -158,17 +158,18 @@ export function SignalCard({
                   </>
                 )}
                 {signal.sourceName && <span>{signal.sourceName}</span>}
-                {publishedDate ? (
+                {sourcePublishedDate && (
                   <>
                     <span>-</span>
-                    <span className="font-medium">Published {publishedDate}</span>
+                    <span data-testid={`text-source-date-${signal.id}`}>Source: {sourcePublishedDate}</span>
                   </>
-                ) : gatheredTime ? (
+                )}
+                {gatheredDate && (
                   <>
                     <span>-</span>
-                    <span>{gatheredTime}</span>
+                    <span data-testid={`text-gathered-date-${signal.id}`}>Gathered: {gatheredDate}</span>
                   </>
-                ) : null}
+                )}
               </div>
             </div>
 
