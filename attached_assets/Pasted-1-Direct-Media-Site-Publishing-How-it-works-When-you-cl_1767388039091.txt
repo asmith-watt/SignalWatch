@@ -1,0 +1,80 @@
+1. Direct Media Site Publishing
+How it works: When you click "Publish" on a signal, the app:
+
+Generates an AI article from the signal
+Selects a stock image based on company industry
+POSTs the full payload to an external media website
+Environment Variables Needed:
+
+MEDIA_SITE_URL=https://your-media-site.replit.app
+MEDIA_SITE_API_KEY=optional-secret-key
+API Endpoint:
+
+POST /api/signals/:id/publish-to-media
+Payload Sent to Media Site:
+
+{
+  "headline": "Article title",
+  "subheadline": "Article subtitle",
+  "body": "Full article text with source attribution",
+  "keyTakeaways": ["point 1", "point 2", "point 3"],
+  "seoDescription": "150-160 char meta description",
+  "tags": ["M&A", "expansion"],
+  "author": "Your Publication Staff",
+  "imageUrl": "https://your-app.replit.app/stock-images/image.jpg",
+  "signal": {
+    "id": 123,
+    "type": "acquisition",
+    "relevanceScore": 85,
+    "sourceName": "Reuters",
+    "sourceUrl": "https://..."
+  },
+  "company": {
+    "id": 456,
+    "name": "Company Name",
+    "industry": "Poultry"
+  },
+  "generatedAt": "2025-01-02T..."
+}
+Media Site Receiver Endpoint:
+The receiving site needs:
+
+POST /api/articles/receive
+Headers: 
+  Content-Type: application/json
+  X-Source: b2b-intelligence-platform
+  X-API-Key: (optional)
+2. Stock Image Selection
+How it works: Images are pre-stored and selected based on company industry using deterministic rotation (signal ID modulo number of images).
+
+Setup:
+
+Create folder: public/stock-images/
+Add 3+ images per industry category
+Map industries to image filenames
+Code Pattern:
+
+const stockImages: Record<string, string[]> = {
+  "Poultry": [
+    "poultry_chicken_farm_001.jpg",
+    "poultry_chicken_farm_002.jpg",
+    "poultry_eggs_production_001.jpg",
+  ],
+  "Feed": [
+    "animal_feed_livestock_001.jpg",
+    "animal_feed_livestock_002.jpg",
+  ],
+  "Pet Food": [
+    "pet_food_dog_cat_001.jpg",
+    "pet_food_dog_cat_002.jpg",
+  ],
+};
+// Select image deterministically
+const industry = company?.industry || "Poultry";
+const images = stockImages[industry] || stockImages["Poultry"];
+const selectedImage = images[signal.id % images.length];
+const imageUrl = `${baseUrl}/stock-images/${selectedImage}`;
+Image Serving: Express serves static files:
+
+app.use("/stock-images", express.static("public/stock-images"));
+Want me to export these as files you can copy to your other app?

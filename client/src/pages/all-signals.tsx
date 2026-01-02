@@ -8,6 +8,7 @@ import { SignalDetailPanel } from "@/components/signal-detail-panel";
 import { SignalFeedSkeleton } from "@/components/loading-skeleton";
 import { EmptySignals, EmptyFilteredSignals } from "@/components/empty-states";
 import { WordPressPublishDialog } from "@/components/wordpress-publish-dialog";
+import { MediaSitePublishDialog } from "@/components/media-site-publish-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { Company, Signal } from "@shared/schema";
@@ -53,6 +54,7 @@ export function AllSignalsPage() {
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "timeline">("list");
   const [wpPublishSignalId, setWpPublishSignalId] = useState<number | null>(null);
+  const [mediaSitePublishSignalId, setMediaSitePublishSignalId] = useState<number | null>(null);
 
   const { data: signals = [], isLoading: signalsLoading } = useQuery<Signal[]>({
     queryKey: ["/api/signals"],
@@ -251,6 +253,7 @@ export function AllSignalsPage() {
                         onBookmark={handleBookmark}
                         onMarkRead={handleMarkRead}
                         onPublishWordPress={(id) => setWpPublishSignalId(id)}
+                        onPublishMediaSite={(id) => setMediaSitePublishSignalId(id)}
                         onEntitySelect={handleEntitySelect}
                         onClick={() => handleSignalClick(signal)}
                       />
@@ -303,6 +306,13 @@ export function AllSignalsPage() {
         signalTitle={signals.find((s) => s.id === wpPublishSignalId)?.title}
         open={wpPublishSignalId !== null}
         onOpenChange={(open) => !open && setWpPublishSignalId(null)}
+      />
+
+      <MediaSitePublishDialog
+        signalId={mediaSitePublishSignalId}
+        signalTitle={signals.find((s) => s.id === mediaSitePublishSignalId)?.title}
+        open={mediaSitePublishSignalId !== null}
+        onOpenChange={(open) => !open && setMediaSitePublishSignalId(null)}
       />
     </div>
   );

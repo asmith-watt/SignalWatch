@@ -51,6 +51,7 @@ interface SignalCardProps {
   onAssign?: (id: number) => void;
   onCreateContent?: (id: number) => void;
   onPublishWordPress?: (id: number) => void;
+  onPublishMediaSite?: (id: number) => void;
   onEntitySelect?: (entityName: string) => void;
   onClick?: () => void;
 }
@@ -102,6 +103,7 @@ export function SignalCard({
   onAssign,
   onCreateContent,
   onPublishWordPress,
+  onPublishMediaSite,
   onEntitySelect,
   onClick,
 }: SignalCardProps) {
@@ -225,6 +227,10 @@ export function SignalCard({
                   <DropdownMenuItem onClick={() => onPublishWordPress?.(signal.id)}>
                     <Globe className="w-4 h-4 mr-2" />
                     Publish to WordPress
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onPublishMediaSite?.(signal.id)}>
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Publish to Media Site
                   </DropdownMenuItem>
                   {signal.sourceUrl && (
                     <DropdownMenuItem asChild>

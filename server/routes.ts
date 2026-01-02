@@ -16,11 +16,17 @@ import { importFeedCompanies } from "./import-feed-companies";
 import { importPetfoodCompanies } from "./import-petfood-companies";
 import { generateRssFeed, generateAllSignalsRssFeed, getAvailableFeeds } from "./rss-feeds";
 import { publishToWordPress, testWordPressConnection } from "./wordpress-publisher";
+import { selectStockImage, buildMediaSitePayload, publishToMediaSite } from "./media-site-publisher";
+import express from "express";
+import path from "path";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Serve stock images from public/stock-images
+  app.use("/stock-images", express.static(path.resolve(process.cwd(), "public/stock-images")));
+
   // Companies CRUD
   app.get("/api/companies", async (req: Request, res: Response) => {
     try {
@@ -766,6 +772,68 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error publishing to WordPress:", error);
       res.status(500).json({ error: "Failed to publish to WordPress" });
+    }
+  });
+
+  // Media Site Publishing - Push to external media site
+  app.post("/api/signals/:id/publish-to-media", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { style = "news" } = req.body;
+
+      const signal = await storage.getSignal(id);
+      if (!signal) {
+        return res.status(404).json({ error: "Signal not found" });
+      }
+
+      const company = await storage.getCompany(signal.companyId) || null;
+      const article = await generateArticleFromSignal(signal, company, style);
+
+      const protocol = req.headers["x-forwarded-proto"] || "https";
+      const host = req.headers.host || "localhost:5000";
+      const baseUrl = `${protocol}://${host}`;
+      
+      const imageUrl = selectStockImage(signal, company, baseUrl);
+      const payload = buildMediaSitePayload(article, signal, company, imageUrl);
+
+      const result = await publishToMediaSite(payload);
+
+      if (result.success) {
+        await storage.updateSignal(id, { contentStatus: "published" });
+      }
+
+      res.json({
+        ...result,
+        payload: result.success ? payload : undefined,
+        article: result.success ? article : undefined,
+      });
+    } catch (error) {
+      console.error("Error publishing to media site:", error);
+      res.status(500).json({ error: "Failed to publish to media site" });
+    }
+  });
+
+  // Get stock image URL for a signal
+  app.get("/api/signals/:id/stock-image", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const signal = await storage.getSignal(id);
+      if (!signal) {
+        return res.status(404).json({ error: "Signal not found" });
+      }
+
+      const company = await storage.getCompany(signal.companyId) || null;
+      
+      const protocol = req.headers["x-forwarded-proto"] || "https";
+      const host = req.headers.host || "localhost:5000";
+      const baseUrl = `${protocol}://${host}`;
+      
+      const imageUrl = selectStockImage(signal, company, baseUrl);
+
+      res.json({ imageUrl, industry: company?.industry || "Poultry" });
+    } catch (error) {
+      console.error("Error getting stock image:", error);
+      res.status(500).json({ error: "Failed to get stock image" });
     }
   });
 
