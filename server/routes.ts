@@ -10,6 +10,7 @@ import { z } from "zod";
 import { analyzeSignal, enrichSignal, batchEnrichSignals, extractRelationshipsFromSignal } from "./ai-analysis";
 import { generateArticleFromSignal, exportArticleForCMS } from "./article-generator";
 import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany, monitorUSPoultryCompanies, monitorCompaniesByCountry, monitorCompaniesByIndustry, enrichCompanies } from "./perplexity-monitor";
+import { getProgress } from "./monitor-progress";
 import { importCompanies, getUSPoultryCompanies } from "./import-companies";
 import { importFeedCompanies } from "./import-feed-companies";
 import { importPetfoodCompanies } from "./import-petfood-companies";
@@ -747,6 +748,16 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error monitoring companies:", error);
       res.status(500).json({ error: "Failed to monitor companies" });
+    }
+  });
+
+  app.get("/api/monitor/progress", async (req: Request, res: Response) => {
+    try {
+      const progress = getProgress();
+      res.json(progress);
+    } catch (error) {
+      console.error("Error fetching progress:", error);
+      res.status(500).json({ error: "Failed to fetch progress" });
     }
   });
 
