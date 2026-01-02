@@ -1392,13 +1392,17 @@ export async function registerRoutes(
     try {
       const { companies, signals } = req.body;
       
+      console.log(`[Import] Received ${companies?.length || 0} companies and ${signals?.length || 0} signals`);
+      
       if (!Array.isArray(companies) || !Array.isArray(signals)) {
         return res.status(400).json({ error: "Invalid import data format" });
       }
       
       const idMapping = new Map<number, number>();
       let companiesImported = 0;
+      let companiesSkipped = 0;
       let signalsImported = 0;
+      let signalErrors: string[] = [];
       
       // Import companies first
       for (const company of companies) {
@@ -1406,22 +1410,28 @@ export async function registerRoutes(
           const existing = await storage.getCompanyByName(company.name);
           if (existing) {
             idMapping.set(company.id, existing.id);
+            companiesSkipped++;
           } else {
             const { id, ...companyData } = company;
             const created = await storage.createCompany(companyData);
             idMapping.set(company.id, created.id);
             companiesImported++;
           }
-        } catch (e) {
+        } catch (e: any) {
           console.error(`Error importing company ${company.name}:`, e);
         }
       }
+      
+      console.log(`[Import] Companies: ${companiesImported} imported, ${companiesSkipped} skipped`);
       
       // Import signals with new company IDs
       for (const signal of signals) {
         try {
           const newCompanyId = idMapping.get(signal.companyId);
-          if (!newCompanyId) continue;
+          if (!newCompanyId) {
+            signalErrors.push(`No company mapping for signal ${signal.id}`);
+            continue;
+          }
           
           const { id, companyId, createdAt, ...signalData } = signal;
           await storage.createSignal({
@@ -1431,15 +1441,19 @@ export async function registerRoutes(
             citations: signal.citations || [],
           });
           signalsImported++;
-        } catch (e) {
-          console.error(`Error importing signal ${signal.title}:`, e);
+        } catch (e: any) {
+          signalErrors.push(`Signal ${signal.id}: ${e.message}`);
         }
       }
+      
+      console.log(`[Import] Signals: ${signalsImported} imported, ${signalErrors.length} errors`);
       
       res.json({ 
         success: true, 
         companiesImported, 
+        companiesSkipped,
         signalsImported,
+        signalErrors: signalErrors.slice(0, 10),
         totalCompanies: companies.length,
         totalSignals: signals.length,
       });
