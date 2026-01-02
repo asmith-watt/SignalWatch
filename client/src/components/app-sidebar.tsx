@@ -91,7 +91,7 @@ export function AppSidebar({
   onAddCompany,
   signalCounts,
 }: AppSidebarProps) {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     Poultry: true,
@@ -197,19 +197,32 @@ export function AppSidebar({
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location === item.url}
-                  >
-                    <Link 
-                      href={item.url} 
+                  {item.url === "/" ? (
+                    <SidebarMenuButton
+                      isActive={location === item.url}
+                      onClick={() => {
+                        onClearSelection();
+                        setLocation("/");
+                      }}
                       data-testid={`nav-${item.title.toLowerCase().replace(" ", "-")}`}
-                      onClick={item.url === "/" ? onClearSelection : undefined}
                     >
                       <item.icon className="w-4 h-4" />
                       <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+                    </SidebarMenuButton>
+                  ) : (
+                    <SidebarMenuButton
+                      asChild
+                      isActive={location === item.url}
+                    >
+                      <Link 
+                        href={item.url} 
+                        data-testid={`nav-${item.title.toLowerCase().replace(" ", "-")}`}
+                      >
+                        <item.icon className="w-4 h-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
