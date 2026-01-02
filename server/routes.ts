@@ -761,6 +761,17 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/monitor/stop", async (req: Request, res: Response) => {
+    try {
+      const { requestStop } = await import("./monitor-progress");
+      requestStop();
+      res.json({ success: true, message: "Stop requested" });
+    } catch (error) {
+      console.error("Error stopping monitor:", error);
+      res.status(500).json({ error: "Failed to stop monitoring" });
+    }
+  });
+
   app.get("/api/monitor/history", async (req: Request, res: Response) => {
     try {
       const days = parseInt(req.query.days as string) || 7;

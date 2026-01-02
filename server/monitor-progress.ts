@@ -7,6 +7,7 @@ export interface MonitorProgress {
   type: 'all' | 'industry' | 'company' | null;
   industryName?: string;
   signalsFound: number;
+  stopRequested?: boolean;
 }
 
 let progress: MonitorProgress = {
@@ -17,9 +18,13 @@ let progress: MonitorProgress = {
   startedAt: null,
   type: null,
   signalsFound: 0,
+  stopRequested: false,
 };
 
+let stopRequested = false;
+
 export function startMonitoring(total: number, type: 'all' | 'industry' | 'company', industryName?: string): void {
+  stopRequested = false;
   progress = {
     isRunning: true,
     total,
@@ -29,7 +34,17 @@ export function startMonitoring(total: number, type: 'all' | 'industry' | 'compa
     type,
     industryName,
     signalsFound: 0,
+    stopRequested: false,
   };
+}
+
+export function requestStop(): void {
+  stopRequested = true;
+  progress.stopRequested = true;
+}
+
+export function shouldStop(): boolean {
+  return stopRequested;
 }
 
 export function updateProgress(current: number, currentCompany: string, signalsFound: number): void {

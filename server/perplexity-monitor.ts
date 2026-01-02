@@ -1,7 +1,7 @@
 import type { Company, InsertSignal } from "@shared/schema";
 import { storage } from "./storage";
 import { enrichSignal } from "./ai-analysis";
-import { startMonitoring, updateProgress, finishMonitoring } from "./monitor-progress";
+import { startMonitoring, updateProgress, finishMonitoring, shouldStop } from "./monitor-progress";
 
 const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
 
@@ -345,6 +345,10 @@ export async function monitorAllCompanies(): Promise<{ company: string; signalsC
   
   try {
     for (const company of targetCompanies) {
+      if (shouldStop()) {
+        console.log("Monitoring stopped by user request");
+        break;
+      }
       console.log(`[${results.length + 1}/${targetCompanies.length}] Monitoring ${company.name} (${company.industry})...`);
       updateProgress(results.length + 1, company.name, totalSignalsFound);
       const result = await monitorCompany(company);
@@ -559,6 +563,10 @@ export async function monitorCompaniesByIndustry(industry: string): Promise<{ co
   
   try {
     for (const company of industryCompanies) {
+      if (shouldStop()) {
+        console.log("Monitoring stopped by user request");
+        break;
+      }
       console.log(`[${results.length + 1}/${industryCompanies.length}] Monitoring ${company.name}...`);
       updateProgress(results.length + 1, company.name, totalSignalsFound);
       const result = await monitorCompany(company);

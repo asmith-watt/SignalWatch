@@ -16,6 +16,7 @@ import {
   RefreshCw,
   Database,
   Network,
+  Square,
 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -132,6 +133,19 @@ export function AppSidebar({
   const showProgressBar = progress?.isRunning || isMonitoring;
   const progressPercent = progress?.total ? Math.round((progress.current / progress.total) * 100) : 0;
 
+  const stopMonitorMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/monitor/stop");
+    },
+    onSuccess: () => {
+      toast({
+        title: "Sync stopped",
+        description: "The monitoring process has been stopped",
+      });
+      setIsMonitoring(false);
+    },
+  });
+
   const updateGroupMutation = useMutation({
     mutationFn: async (industry: string) => {
       setUpdatingGroup(industry);
@@ -229,13 +243,25 @@ export function AppSidebar({
       {showProgressBar && progress?.isRunning && (
         <div className="px-4 py-3 border-b border-sidebar-border bg-muted/30" data-testid="sidebar-progress">
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center justify-between gap-2 text-xs">
               <span className="font-medium text-foreground">
                 Syncing {progress.industryName || "companies"}...
               </span>
-              <span className="text-muted-foreground">
-                {progressPercent}%
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">
+                  {progressPercent}%
+                </span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => stopMonitorMutation.mutate()}
+                  disabled={stopMonitorMutation.isPending}
+                  data-testid="button-stop-sync"
+                >
+                  <Square className="h-3 w-3" />
+                  Stop
+                </Button>
+              </div>
             </div>
             <Progress value={progressPercent} className="h-1.5" />
             <div className="flex items-center justify-between text-xs text-muted-foreground">
