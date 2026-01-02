@@ -56,7 +56,15 @@ async function runDailyMonitoring() {
 }
 
 export function initializeScheduler() {
-  console.log("[Scheduler] Initializing scheduled tasks...");
+  const isProduction = process.env.NODE_ENV === "production" || process.env.REPL_DEPLOYMENT === "1";
+  
+  if (!isProduction) {
+    console.log("[Scheduler] Skipping scheduler initialization - development environment");
+    console.log("[Scheduler] Scheduler will only run in production deployment");
+    return;
+  }
+  
+  console.log("[Scheduler] Initializing scheduled tasks (PRODUCTION)...");
   
   cron.schedule("0 6 * * *", async () => {
     console.log("[Scheduler] Running daily monitoring at 6 AM UTC...");
@@ -71,7 +79,7 @@ export function initializeScheduler() {
   // });
   
   console.log("[Scheduler] Scheduled tasks initialized:");
-  console.log("  - Daily monitoring: 6:00 AM UTC");
+  console.log("  - Daily monitoring: 6:00 AM UTC (Poultry companies only)");
   console.log("  - Signal retention: Forever (no automatic cleanup)");
 }
 
