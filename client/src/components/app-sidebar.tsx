@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Building2,
   Radio,
@@ -37,7 +37,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Progress } from "@/components/ui/progress";
 import type { Company } from "@shared/schema";
+
+interface MonitorProgress {
+  isRunning: boolean;
+  total: number;
+  current: number;
+  currentCompany: string | null;
+  signalsFound: number;
+  type?: string | null;
+  industryName?: string;
+}
 
 interface AppSidebarProps {
   companies: Company[];
@@ -101,11 +112,27 @@ export function AppSidebar({
   });
   const [updatingGroup, setUpdatingGroup] = useState<string | null>(null);
   const [updatingCompany, setUpdatingCompany] = useState<number | null>(null);
+  const [isMonitoring, setIsMonitoring] = useState(false);
   const { toast } = useToast();
+
+  const { data: progress } = useQuery<MonitorProgress>({
+    queryKey: ["/api/monitor/progress"],
+    refetchInterval: isMonitoring ? 1000 : false,
+    enabled: isMonitoring,
+  });
+
+  useEffect(() => {
+    if (progress && !progress.isRunning && isMonitoring) {
+      setIsMonitoring(false);
+    }
+  }, [progress, isMonitoring]);
+
+  const progressPercent = progress?.total ? Math.round((progress.current / progress.total) * 100) : 0;
 
   const updateGroupMutation = useMutation({
     mutationFn: async (industry: string) => {
       setUpdatingGroup(industry);
+      setIsMonitoring(true);
       return apiRequest("POST", `/api/monitor/industry/${encodeURIComponent(industry)}`);
     },
     onSuccess: (data: any, industry: string) => {
@@ -125,6 +152,7 @@ export function AppSidebar({
         });
       }
       setUpdatingGroup(null);
+      setIsMonitoring(false);
     },
     onError: () => {
       toast({
@@ -133,12 +161,14 @@ export function AppSidebar({
         variant: "destructive",
       });
       setUpdatingGroup(null);
+      setIsMonitoring(false);
     },
   });
 
   const updateCompanyMutation = useMutation({
     mutationFn: async (companyId: number) => {
       setUpdatingCompany(companyId);
+      setIsMonitoring(true);
       return apiRequest("POST", `/api/monitor/company/${companyId}`);
     },
     onSuccess: (data: any) => {
@@ -148,6 +178,7 @@ export function AppSidebar({
         description: data.message || `Found ${data.signalsCreated || 0} new signals for ${data.company}`,
       });
       setUpdatingCompany(null);
+      setIsMonitoring(false);
     },
     onError: () => {
       toast({
@@ -156,6 +187,7 @@ export function AppSidebar({
         variant: "destructive",
       });
       setUpdatingCompany(null);
+      setIsMonitoring(false);
     },
   });
 
@@ -190,6 +222,30 @@ export function AppSidebar({
           </div>
         </div>
       </SidebarHeader>
+
+      {isMonitoring && progress?.isRunning && (
+        <div className="px-4 py-3 border-b border-sidebar-border bg-muted/30" data-testid="sidebar-progress">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-medium text-foreground">
+                Syncing {progress.industryName || "companies"}...
+              </span>
+              <span className="text-muted-foreground">
+                {progressPercent}%
+              </span>
+            </div>
+            <Progress value={progressPercent} className="h-1.5" />
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span className="truncate max-w-[140px]">
+                {progress.currentCompany || "Starting..."}
+              </span>
+              <span>
+                {progress.signalsFound} found
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <SidebarContent>
         <SidebarGroup>
