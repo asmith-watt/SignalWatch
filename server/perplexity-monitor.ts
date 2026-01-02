@@ -27,6 +27,20 @@ interface ExtractedSignal {
   citations: string[] | null;
   sentiment: "positive" | "negative" | "neutral";
   priority: "high" | "medium" | "low";
+  publishedAt?: string;
+}
+
+const DEFAULT_MAX_SIGNAL_AGE_DAYS = 7;
+
+function getMaxSignalAgeDays(): number {
+  const envValue = process.env.MAX_SIGNAL_AGE_DAYS;
+  if (envValue) {
+    const parsed = parseInt(envValue, 10);
+    if (!isNaN(parsed) && parsed > 0) {
+      return parsed;
+    }
+  }
+  return DEFAULT_MAX_SIGNAL_AGE_DAYS;
 }
 
 function generateHash(content: string): string {
@@ -59,8 +73,11 @@ For each news item found, provide:
 3. The type (funding, executive_change, product_launch, partnership, news, press_release)
 4. Whether sentiment is positive, negative, or neutral
 5. Priority level (high for major announcements, medium for notable news, low for minor updates)
+6. The publication date in ISO format (YYYY-MM-DD) - REQUIRED, extract from source
 
-Return as JSON array: [{"title": "...", "summary": "...", "type": "...", "sentiment": "...", "priority": "..."}]
+IMPORTANT: Only include articles published within the last 7 days. Each item MUST have a publishedAt date.
+
+Return as JSON array: [{"title": "...", "summary": "...", "type": "...", "sentiment": "...", "priority": "...", "publishedAt": "YYYY-MM-DD"}]
 If no recent news found, return empty array: []`;
 
   try {
@@ -111,13 +128,45 @@ If no recent news found, return empty array: []`;
     let signals: ExtractedSignal[] = [];
     try {
       const parsed = JSON.parse(jsonContent);
-      signals = Array.isArray(parsed) ? parsed : [];
+      const rawSignals = Array.isArray(parsed) ? parsed : [];
+      signals = rawSignals.map((s: any) => ({
+        ...s,
+        publishedAt: s.publishedAt || s.published_at || s.publishedDate || s.date || null,
+      }));
     } catch (e) {
       console.error(`Failed to parse Perplexity response for ${company.name}:`, content);
       return [];
     }
 
-    return signals.map((s) => {
+    const now = new Date();
+    const maxAgeDays = getMaxSignalAgeDays();
+    const cutoffDate = new Date(now.getTime() - maxAgeDays * 24 * 60 * 60 * 1000);
+
+    const filteredSignals = signals.filter((s) => {
+      if (!s.publishedAt) {
+        console.log(`  Warning: Signal without date (will include anyway): ${s.title}`);
+        return true;
+      }
+      
+      const publishedDate = new Date(s.publishedAt);
+      if (isNaN(publishedDate.getTime())) {
+        console.log(`  Warning: Signal with invalid date "${s.publishedAt}" (will include anyway): ${s.title}`);
+        return true;
+      }
+      
+      if (publishedDate < cutoffDate) {
+        console.log(`  Skipping old signal (${s.publishedAt}): ${s.title}`);
+        return false;
+      }
+      
+      return true;
+    });
+
+    if (filteredSignals.length < signals.length) {
+      console.log(`  Filtered out ${signals.length - filteredSignals.length} old signals for ${company.name}`);
+    }
+
+    return filteredSignals.map((s) => {
       let sourceUrl: string | null = null;
       let sourceName = "Perplexity AI";
       
@@ -184,7 +233,7 @@ export async function monitorCompany(company: Company): Promise<MonitorResult> {
       sourceUrl: signal.sourceUrl,
       sourceName: signal.sourceName,
       citations: signal.citations || [],
-      publishedAt: null,
+      publishedAt: signal.publishedAt ? new Date(signal.publishedAt) : null,
       sentiment: signal.sentiment,
       priority: signal.priority,
       isRead: false,

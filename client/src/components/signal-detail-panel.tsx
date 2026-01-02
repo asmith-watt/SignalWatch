@@ -146,9 +146,10 @@ export function SignalDetailPanel({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const publishedDate = signal.publishedAt
+  const displayDate = signal.publishedAt
     ? new Date(signal.publishedAt)
     : new Date(signal.createdAt);
+  const hasPublishedDate = !!signal.publishedAt;
 
   const entities = signal.entities as {
     people?: (string | { name: string; role?: string; company?: string })[];
@@ -203,7 +204,8 @@ export function SignalDetailPanel({
               )}
               <span className="flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" />
-                {format(publishedDate, "MMM d, yyyy 'at' h:mm a")}
+                {hasPublishedDate ? "Published " : "Gathered "}
+                {format(displayDate, "MMM d, yyyy")}
               </span>
             </div>
 

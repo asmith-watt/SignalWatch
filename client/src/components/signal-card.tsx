@@ -156,18 +156,17 @@ export function SignalCard({
                   </>
                 )}
                 {signal.sourceName && <span>{signal.sourceName}</span>}
-                {gatheredTime && (
+                {publishedDate ? (
                   <>
                     <span>-</span>
-                    <span>Gathered {gatheredTime}</span>
+                    <span className="font-medium">Published {publishedDate}</span>
                   </>
-                )}
-                {publishedDate && (
+                ) : gatheredTime ? (
                   <>
                     <span>-</span>
-                    <span>Published {publishedDate}</span>
+                    <span>{gatheredTime}</span>
                   </>
-                )}
+                ) : null}
               </div>
             </div>
 
