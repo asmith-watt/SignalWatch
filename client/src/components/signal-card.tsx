@@ -230,7 +230,8 @@ export function SignalCard({
                   {signal.sourceUrl && (
                     <DropdownMenuItem asChild>
                       <a
-                        href={signal.sourceUrl}
+                        href={signal.sourceUrl.startsWith("//") ? "https:" + signal.sourceUrl : 
+                              (!signal.sourceUrl.startsWith("http") ? "https://" + signal.sourceUrl : signal.sourceUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
                       >

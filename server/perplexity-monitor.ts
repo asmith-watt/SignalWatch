@@ -123,10 +123,17 @@ If no recent news found, return empty array: []`;
       
       if (citations.length > 0 && citations[0]) {
         try {
-          sourceUrl = citations[0];
-          sourceName = new URL(citations[0]).hostname.replace("www.", "");
+          let url = citations[0];
+          if (url.startsWith("//")) {
+            url = "https:" + url;
+          } else if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "https://" + url;
+          }
+          sourceUrl = url;
+          sourceName = new URL(url).hostname.replace("www.", "");
         } catch {
-          sourceUrl = citations[0];
+          sourceUrl = citations[0].startsWith("//") ? "https:" + citations[0] : 
+                      (!citations[0].startsWith("http") ? "https://" + citations[0] : citations[0]);
         }
       }
       
@@ -134,7 +141,10 @@ If no recent news found, return empty array: []`;
         ...s,
         sourceUrl,
         sourceName,
-        citations: citations.length > 0 ? citations : [],
+        citations: citations.length > 0 ? citations.map(c => 
+          c.startsWith("//") ? "https:" + c : 
+          (!c.startsWith("http") ? "https://" + c : c)
+        ) : [],
       };
     });
   } catch (error) {

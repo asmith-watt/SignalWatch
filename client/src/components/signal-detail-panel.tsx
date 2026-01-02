@@ -253,7 +253,8 @@ export function SignalDetailPanel({
               {signal.sourceUrl && (
                 <Button variant="outline" size="sm" asChild>
                   <a
-                    href={signal.sourceUrl}
+                    href={signal.sourceUrl.startsWith("//") ? "https:" + signal.sourceUrl : 
+                          (!signal.sourceUrl.startsWith("http") ? "https://" + signal.sourceUrl : signal.sourceUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
