@@ -49,7 +49,7 @@ export function MediaSitePublishDialog({
     onSuccess: (data) => {
       if (data.success) {
         toast({
-          title: "Published to Media Site",
+          title: "Published to BakingMilling",
           description: data.articleUrl
             ? `Article published successfully. View at: ${data.articleUrl}`
             : "Article published successfully.",
@@ -83,7 +83,7 @@ export function MediaSitePublishDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Publish to Media Site</DialogTitle>
+          <DialogTitle>Publish to BakingMilling</DialogTitle>
           <DialogDescription>
             {signalTitle
               ? `Publish "${signalTitle}" to your external media site`

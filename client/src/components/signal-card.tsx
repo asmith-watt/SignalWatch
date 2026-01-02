@@ -230,7 +230,7 @@ export function SignalCard({
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onPublishMediaSite?.(signal.id)}>
                     <ExternalLink className="w-4 h-4 mr-2" />
-                    Publish to Media Site
+                    Publish to BakingMilling
                   </DropdownMenuItem>
                   {signal.sourceUrl && (
                     <DropdownMenuItem asChild>
