@@ -117,7 +117,10 @@ export function AppSidebar({
 
   const { data: progress } = useQuery<MonitorProgress>({
     queryKey: ["/api/monitor/progress"],
-    refetchInterval: progress?.isRunning || isMonitoring ? 1000 : 5000,
+    refetchInterval: (query) => {
+      const data = query.state.data as MonitorProgress | undefined;
+      return data?.isRunning || isMonitoring ? 1000 : 5000;
+    },
   });
 
   useEffect(() => {
