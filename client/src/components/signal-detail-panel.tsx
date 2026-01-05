@@ -37,6 +37,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Signal, Company } from "@shared/schema";
+import { MediaSitePublishDialog } from "./media-site-publish-dialog";
 
 interface SignalDetailPanelProps {
   signal: Signal;
@@ -69,6 +70,7 @@ export function SignalDetailPanel({
   const [notes, setNotes] = useState(signal.notes || "");
   const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showMediaSiteDialog, setShowMediaSiteDialog] = useState(false);
   const [generatedArticle, setGeneratedArticle] = useState<{
     headline: string;
     subheadline: string;
@@ -542,8 +544,27 @@ export function SignalDetailPanel({
                       JSON
                     </Button>
                   </div>
+                  <div className="pt-2 border-t">
+                    <p className="text-xs text-muted-foreground mb-2">Publish to Media Site:</p>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => setShowMediaSiteDialog(true)}
+                      data-testid="button-send-to-media-site"
+                    >
+                      <Send className="w-3.5 h-3.5 mr-1.5" />
+                      Send to Media Site
+                    </Button>
+                  </div>
                 </div>
               )}
+
+              <MediaSitePublishDialog
+                signalId={signal.id}
+                signalTitle={signal.title}
+                open={showMediaSiteDialog}
+                onOpenChange={setShowMediaSiteDialog}
+              />
             </div>
           </div>
 
