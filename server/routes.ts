@@ -813,9 +813,10 @@ export async function registerRoutes(
       const company = await storage.getCompany(signal.companyId) || null;
       const article = await generateArticleFromSignal(signal, company, style);
 
-      const protocol = req.headers["x-forwarded-proto"] || "https";
+      const replitDomain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS;
+      const protocol = req.headers["x-forwarded-proto"] || req.protocol || "http";
       const host = req.headers.host || "localhost:5000";
-      const baseUrl = `${protocol}://${host}`;
+      const baseUrl = replitDomain ? `https://${replitDomain}` : `${protocol}://${host}`;
       
       let imageUrl: string;
       let imageCredit: string | undefined;

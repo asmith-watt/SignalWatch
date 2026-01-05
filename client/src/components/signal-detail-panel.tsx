@@ -117,10 +117,24 @@ export function SignalDetailPanel({
       return res.json();
     },
     onSuccess: (data) => {
-      toast({ 
-        title: "Published to Media Site", 
-        description: data.message || "Article sent successfully" 
-      });
+      if (data.warning) {
+        toast({ 
+          title: "Article Sent - Please Verify", 
+          description: data.warning,
+          variant: "default"
+        });
+      } else if (data.articleUrl) {
+        toast({ 
+          title: "Published Successfully", 
+          description: `Article published: ${data.articleUrl}` 
+        });
+      } else {
+        toast({ 
+          title: "Published to Media Site", 
+          description: data.message || "Article sent successfully" 
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
     },
     onError: () => {
       toast({ title: "Failed to publish to media site", variant: "destructive" });

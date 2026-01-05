@@ -33,6 +33,7 @@ export interface MediaSitePayload {
 export interface MediaSitePublishResult {
   success: boolean;
   error?: string;
+  warning?: string;
   articleId?: string;
   articleUrl?: string;
 }
@@ -202,11 +203,24 @@ export async function publishToMediaSite(
     }
 
     const result = await response.json();
+    
+    const articleId = result.id?.toString() || result.articleId?.toString();
+    const articleUrl = result.url || result.articleUrl;
+    
+    if (!articleId && !articleUrl) {
+      console.warn("Media site returned success but no article ID or URL - article may not have been saved");
+      return {
+        success: true,
+        articleId: undefined,
+        articleUrl: undefined,
+        warning: "Article was accepted but no confirmation ID was returned. Please verify on the media site.",
+      };
+    }
 
     return {
       success: true,
-      articleId: result.id?.toString() || result.articleId?.toString(),
-      articleUrl: result.url || result.articleUrl,
+      articleId,
+      articleUrl,
     };
   } catch (error) {
     console.error("Media site publish error:", error);
