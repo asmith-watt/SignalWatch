@@ -1405,22 +1405,23 @@ export async function registerRoutes(
       let signalErrors: string[] = [];
       
       // Import companies first - force create for B&M industry
+      let companyErrors: string[] = [];
       for (const company of companies) {
         try {
           const existing = await storage.getCompanyByName(company.name);
-          const isBakingMilling = company.industry?.includes("Baking") || company.industry?.includes("Milling");
           
-          // If existing company has different industry or is B&M, create new
+          // If existing company has same industry, skip; otherwise create new
           if (existing && existing.industry === company.industry) {
             idMapping.set(company.id, existing.id);
             companiesSkipped++;
           } else {
-            const { id, ...companyData } = company;
+            const { id, createdAt, updatedAt, ...companyData } = company;
             const created = await storage.createCompany(companyData);
             idMapping.set(company.id, created.id);
             companiesImported++;
           }
         } catch (e: any) {
+          companyErrors.push(`${company.name}: ${e.message}`);
           console.error(`Error importing company ${company.name}:`, e);
         }
       }
@@ -1436,12 +1437,28 @@ export async function registerRoutes(
             continue;
           }
           
-          const { id, companyId, createdAt, ...signalData } = signal;
+          // Explicitly construct signal to avoid date serialization issues
           await storage.createSignal({
-            ...signalData,
             companyId: newCompanyId,
-            publishedAt: signal.publishedAt ? new Date(signal.publishedAt) : null,
+            type: signal.type,
+            title: signal.title,
+            content: signal.content || null,
+            summary: signal.summary || null,
+            sourceUrl: signal.sourceUrl || null,
+            sourceName: signal.sourceName || null,
             citations: signal.citations || [],
+            publishedAt: signal.publishedAt ? new Date(signal.publishedAt) : null,
+            gatheredAt: signal.gatheredAt ? new Date(signal.gatheredAt) : new Date(),
+            sentiment: signal.sentiment || null,
+            entities: signal.entities || null,
+            priority: signal.priority || "medium",
+            isRead: signal.isRead || false,
+            isBookmarked: signal.isBookmarked || false,
+            assignedTo: signal.assignedTo || null,
+            contentStatus: signal.contentStatus || "new",
+            notes: signal.notes || null,
+            aiAnalysis: signal.aiAnalysis || null,
+            hash: signal.hash || null,
           });
           signalsImported++;
         } catch (e: any) {
@@ -1455,6 +1472,7 @@ export async function registerRoutes(
         success: true, 
         companiesImported, 
         companiesSkipped,
+        companyErrors: companyErrors.slice(0, 10),
         signalsImported,
         signalErrors: signalErrors.slice(0, 10),
         totalCompanies: companies.length,
