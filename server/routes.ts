@@ -19,6 +19,7 @@ import { importBakingMillingSignals } from "./import-signals-by-company-name";
 import { generateRssFeed, generateAllSignalsRssFeed, getAvailableFeeds } from "./rss-feeds";
 import { publishToWordPress, testWordPressConnection } from "./wordpress-publisher";
 import { selectStockImage, buildMediaSitePayload, publishToMediaSite, generateAIImage } from "./media-site-publisher";
+import { verifySignalDates, fixSignalDates } from "./date-verifier";
 import express from "express";
 import path from "path";
 
@@ -139,6 +140,47 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching signals:", error);
       res.status(500).json({ error: "Failed to fetch signals" });
+    }
+  });
+
+  // Date verification endpoints (must be before /api/signals/:id)
+  app.get("/api/signals/verify-dates", async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const companyId = req.query.companyId ? parseInt(req.query.companyId as string) : undefined;
+      const onlyMismatches = req.query.onlyMismatches === 'true';
+
+      const results = await verifySignalDates({ limit, companyId, onlyMismatches });
+      
+      const mismatches = results.filter(r => !r.match && r.extractedDate);
+      const couldNotExtract = results.filter(r => !r.extractedDate && !r.error);
+      const errors = results.filter(r => r.error);
+      
+      res.json({
+        total: results.length,
+        mismatches: mismatches.length,
+        couldNotExtract: couldNotExtract.length,
+        errors: errors.length,
+        results,
+      });
+    } catch (error) {
+      console.error("Error verifying dates:", error);
+      res.status(500).json({ error: "Failed to verify dates" });
+    }
+  });
+
+  app.post("/api/signals/fix-dates", async (req: Request, res: Response) => {
+    try {
+      const { signalIds } = req.body;
+      if (!Array.isArray(signalIds) || signalIds.length === 0) {
+        return res.status(400).json({ error: "signalIds array required" });
+      }
+
+      const result = await fixSignalDates(signalIds);
+      res.json(result);
+    } catch (error) {
+      console.error("Error fixing dates:", error);
+      res.status(500).json({ error: "Failed to fix dates" });
     }
   });
 
