@@ -75,6 +75,9 @@ export function SignalDetailPanel({
     headline: string;
     subheadline: string;
     body: string;
+    whyItMatters?: string;
+    keyDetails?: string[];
+    whatsNext?: string;
     keyTakeaways: string[];
     seoDescription: string;
     sourceAttribution?: string;
@@ -447,6 +450,15 @@ export function SignalDetailPanel({
                 >
                   Analysis
                 </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => generateArticleMutation.mutate({ signalId: signal.id, style: "signal" })}
+                  disabled={generateArticleMutation.isPending}
+                  data-testid="button-generate-signal-article"
+                >
+                  Signal-First
+                </Button>
               </div>
 
               {generatedArticle && (
@@ -463,6 +475,14 @@ export function SignalDetailPanel({
                     </p>
                     <p className="text-sm text-muted-foreground">{generatedArticle.subheadline}</p>
                   </div>
+                  {generatedArticle.whyItMatters && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                        Why It Matters
+                      </p>
+                      <p className="text-sm">{generatedArticle.whyItMatters}</p>
+                    </div>
+                  )}
                   <div>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                       Article Body
@@ -471,6 +491,29 @@ export function SignalDetailPanel({
                       {generatedArticle.body}
                     </p>
                   </div>
+                  {generatedArticle.keyDetails && generatedArticle.keyDetails.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                        Key Details
+                      </p>
+                      <ul className="text-sm space-y-1">
+                        {generatedArticle.keyDetails.map((detail, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
+                            {detail}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {generatedArticle.whatsNext && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                        What's Next
+                      </p>
+                      <p className="text-sm">{generatedArticle.whatsNext}</p>
+                    </div>
+                  )}
                   <div>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                       Key Takeaways
