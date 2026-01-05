@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle, Sparkles, Calendar, AlertTriangle, Check, RefreshCw } from "lucide-react";
+import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle, Sparkles, Calendar, AlertTriangle, Check, RefreshCw, Link2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScanHistory } from "@/components/scan-history";
 import type { Company, Signal } from "@shared/schema";
@@ -31,6 +31,24 @@ interface DateVerificationResponse {
   results: DateVerificationResult[];
 }
 
+interface SourceVerificationResult {
+  signalId: number;
+  signalTitle: string;
+  sourceUrl: string;
+  articleTitle: string | null;
+  matchScore: number;
+  isMatch: boolean;
+  error?: string;
+}
+
+interface SourceVerificationResponse {
+  total: number;
+  matches: number;
+  mismatches: number;
+  errors: number;
+  results: SourceVerificationResult[];
+}
+
 export function DataManagementPage() {
   const { toast } = useToast();
   const [companiesCSV, setCompaniesCSV] = useState("");
@@ -39,6 +57,8 @@ export function DataManagementPage() {
   const [dateVerifyLimit, setDateVerifyLimit] = useState<string>("50");
   const [dateVerificationResults, setDateVerificationResults] = useState<DateVerificationResponse | null>(null);
   const [selectedMismatches, setSelectedMismatches] = useState<Set<number>>(new Set());
+  const [sourceVerifyLimit, setSourceVerifyLimit] = useState<string>("50");
+  const [sourceVerificationResults, setSourceVerificationResults] = useState<SourceVerificationResponse | null>(null);
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
@@ -128,6 +148,24 @@ export function DataManagementPage() {
     },
     onError: () => {
       toast({ title: "Failed to fix dates", variant: "destructive" });
+    },
+  });
+
+  const verifySourcesMutation = useMutation({
+    mutationFn: async (limit: number) => {
+      const response = await fetch(`/api/signals/verify-sources?limit=${limit}&onlyMismatches=true`);
+      if (!response.ok) throw new Error("Failed to verify sources");
+      return response.json() as Promise<SourceVerificationResponse>;
+    },
+    onSuccess: (data) => {
+      setSourceVerificationResults(data);
+      toast({ 
+        title: "Source Verification Complete", 
+        description: `Found ${data.mismatches} mismatches out of ${data.total} checked` 
+      });
+    },
+    onError: () => {
+      toast({ title: "Failed to verify sources", variant: "destructive" });
     },
   });
 
@@ -330,6 +368,9 @@ export function DataManagementPage() {
                   )}
                   Import Signals
                 </Button>
+                <p className="text-xs text-muted-foreground mt-2">
+                  After importing, use the Date Verification and Source URL Verification sections below to check data quality.
+                </p>
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -475,6 +516,110 @@ export function DataManagementPage() {
                         </tbody>
                       </table>
                     </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Link2 className="h-5 w-5 text-muted-foreground" />
+              <CardTitle>Source URL Verification</CardTitle>
+            </div>
+            <CardDescription>
+              Verify source URLs by checking if article headlines match signal titles. Helps identify signals pointing to wrong articles.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="source-verify-limit">Signals to check:</Label>
+                <Select value={sourceVerifyLimit} onValueChange={setSourceVerifyLimit}>
+                  <SelectTrigger className="w-24" data-testid="select-source-verify-limit">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                onClick={() => verifySourcesMutation.mutate(parseInt(sourceVerifyLimit))}
+                disabled={verifySourcesMutation.isPending}
+                data-testid="button-verify-sources"
+              >
+                {verifySourcesMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                )}
+                Scan for Mismatches
+              </Button>
+            </div>
+
+            {sourceVerificationResults && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 flex-wrap">
+                  <Badge variant="secondary">
+                    {sourceVerificationResults.total} scanned
+                  </Badge>
+                  <Badge variant="default" className="bg-green-600 flex items-center gap-1">
+                    <Check className="h-3 w-3" />
+                    {sourceVerificationResults.matches} matches
+                  </Badge>
+                  <Badge variant="destructive" className="flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    {sourceVerificationResults.mismatches} mismatches
+                  </Badge>
+                  <Badge variant="outline">
+                    {sourceVerificationResults.errors} errors
+                  </Badge>
+                </div>
+
+                {sourceVerificationResults.results.length > 0 && (
+                  <div className="max-h-64 overflow-y-auto border rounded-md">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted sticky top-0">
+                        <tr>
+                          <th className="p-2 text-left">Signal Title</th>
+                          <th className="p-2 text-left">Article Title</th>
+                          <th className="p-2 text-left w-20">Score</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sourceVerificationResults.results.map((result) => (
+                          <tr key={result.signalId} className="border-t">
+                            <td className="p-2">
+                              <div className="truncate max-w-xs" title={result.signalTitle}>
+                                {result.signalTitle}
+                              </div>
+                            </td>
+                            <td className="p-2">
+                              {result.error ? (
+                                <span className="text-muted-foreground italic">{result.error}</span>
+                              ) : (
+                                <div className="truncate max-w-xs" title={result.articleTitle || ""}>
+                                  {result.articleTitle || "N/A"}
+                                </div>
+                              )}
+                            </td>
+                            <td className="p-2">
+                              <Badge 
+                                variant={result.isMatch ? "default" : "destructive"}
+                                className={result.isMatch ? "bg-green-600" : ""}
+                              >
+                                {result.matchScore}%
+                              </Badge>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 )}
               </div>

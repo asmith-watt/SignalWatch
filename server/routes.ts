@@ -19,7 +19,7 @@ import { importBakingMillingSignals } from "./import-signals-by-company-name";
 import { generateRssFeed, generateAllSignalsRssFeed, getAvailableFeeds } from "./rss-feeds";
 import { publishToWordPress, testWordPressConnection } from "./wordpress-publisher";
 import { selectStockImage, buildMediaSitePayload, publishToMediaSite, generateAIImage } from "./media-site-publisher";
-import { verifySignalDates, fixSignalDates, verifySourceUrl } from "./date-verifier";
+import { verifySignalDates, fixSignalDates, verifySourceUrl, verifySourceUrls } from "./date-verifier";
 import express from "express";
 import path from "path";
 
@@ -198,6 +198,20 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error verifying source:", error);
       res.status(500).json({ error: "Failed to verify source" });
+    }
+  });
+
+  // Batch source URL verification
+  app.get("/api/signals/verify-sources", async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const onlyMismatches = req.query.onlyMismatches === 'true';
+
+      const result = await verifySourceUrls({ limit, onlyMismatches });
+      res.json(result);
+    } catch (error) {
+      console.error("Error batch verifying sources:", error);
+      res.status(500).json({ error: "Failed to verify sources" });
     }
   });
 

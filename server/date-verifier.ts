@@ -401,3 +401,109 @@ export async function fixSignalDates(signalIds: number[]): Promise<{ fixed: numb
 
   return { fixed, errors };
 }
+
+// Helper to verify a single signal object without re-fetching
+async function verifySignalSource(signal: { id: number; title: string; sourceUrl: string | null }): Promise<SourceVerificationResult> {
+  if (!signal.sourceUrl || !signal.sourceUrl.startsWith('http')) {
+    return {
+      signalId: signal.id,
+      signalTitle: signal.title,
+      sourceUrl: signal.sourceUrl || '',
+      articleTitle: null,
+      matchScore: 0,
+      isMatch: false,
+      error: 'No valid source URL'
+    };
+  }
+  
+  const pageContent = await fetchPageContent(signal.sourceUrl);
+  if (!pageContent) {
+    return {
+      signalId: signal.id,
+      signalTitle: signal.title,
+      sourceUrl: signal.sourceUrl,
+      articleTitle: null,
+      matchScore: 0,
+      isMatch: false,
+      error: 'Could not fetch source page'
+    };
+  }
+  
+  const articleTitle = extractArticleTitle(pageContent.$);
+  if (!articleTitle) {
+    return {
+      signalId: signal.id,
+      signalTitle: signal.title,
+      sourceUrl: signal.sourceUrl,
+      articleTitle: null,
+      matchScore: 0,
+      isMatch: false,
+      error: 'Could not extract article title'
+    };
+  }
+  
+  const matchScore = calculateTitleSimilarity(signal.title, articleTitle);
+  const isMatch = matchScore >= 40;
+  
+  return {
+    signalId: signal.id,
+    signalTitle: signal.title,
+    sourceUrl: signal.sourceUrl,
+    articleTitle,
+    matchScore,
+    isMatch
+  };
+}
+
+// Batch verify source URLs for multiple signals
+export async function verifySourceUrls(options?: {
+  limit?: number;
+  onlyMismatches?: boolean;
+}): Promise<{
+  total: number;
+  matches: number;
+  mismatches: number;
+  errors: number;
+  results: SourceVerificationResult[];
+}> {
+  const limit = options?.limit || 50;
+  const results: SourceVerificationResult[] = [];
+  let matches = 0;
+  let mismatches = 0;
+  let errorsCount = 0;
+
+  // Fetch all signals once
+  const allSignals = await storage.getAllSignals();
+  const signals = allSignals
+    .filter(s => s.sourceUrl && s.sourceUrl.startsWith('http'))
+    .slice(0, limit);
+
+  console.log(`Verifying source URLs for ${signals.length} signals...`);
+
+  for (const signal of signals) {
+    const result = await verifySignalSource(signal);
+    
+    if (result.error) {
+      errorsCount++;
+    } else if (result.isMatch) {
+      matches++;
+    } else {
+      mismatches++;
+    }
+
+    if (!options?.onlyMismatches || !result.isMatch) {
+      results.push(result);
+    }
+
+    // Add small delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 300));
+  }
+
+  return {
+    total: signals.length,
+    matches,
+    mismatches,
+    errors: errorsCount,
+    results
+  };
+}
