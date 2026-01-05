@@ -73,6 +73,7 @@ export function WordPressPublishDialog({
     onSuccess: (result) => {
       if (result.success) {
         queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/signals", signalId, "articles"] });
         toast({
           title: "Published to WordPress",
           description: (
