@@ -74,6 +74,8 @@ export function SignalDetailPanel({
   const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [articleStyle, setArticleStyle] = useState<"news" | "brief" | "analysis" | "signal">("signal");
+  const [aiProvider, setAiProvider] = useState<"openai" | "claude">("openai");
+  const [claudeModel, setClaudeModel] = useState<"claude-sonnet-4-5" | "claude-opus-4-5" | "claude-haiku-4-5">("claude-sonnet-4-5");
   const [imageType, setImageType] = useState<"stock" | "ai">("stock");
   const [dateVerification, setDateVerification] = useState<{
     status: "idle" | "checking" | "mismatch" | "match" | "error";
@@ -200,13 +202,23 @@ export function SignalDetailPanel({
   });
 
   const generateArticleMutation = useMutation({
-    mutationFn: async ({ signalId, style }: { signalId: number; style: string }) => {
-      const res = await apiRequest("POST", `/api/signals/${signalId}/generate-article`, { style });
+    mutationFn: async ({ signalId, style, provider, claudeModel }: { 
+      signalId: number; 
+      style: string; 
+      provider: "openai" | "claude";
+      claudeModel?: string;
+    }) => {
+      const res = await apiRequest("POST", `/api/signals/${signalId}/generate-article`, { 
+        style, 
+        provider,
+        claudeModel 
+      });
       return res.json();
     },
     onSuccess: (data) => {
       setGeneratedArticle(data.article);
-      toast({ title: "Article draft generated" });
+      const modelName = data.provider === "claude" ? data.model : "GPT-4o";
+      toast({ title: `Article generated with ${modelName}` });
     },
     onError: () => {
       toast({ title: "Failed to generate article", variant: "destructive" });
@@ -628,12 +640,12 @@ export function SignalDetailPanel({
               Content Publishing
             </h4>
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Select
                   value={articleStyle}
                   onValueChange={(value: "news" | "brief" | "analysis" | "signal") => setArticleStyle(value)}
                 >
-                  <SelectTrigger className="w-40" data-testid="select-article-style">
+                  <SelectTrigger className="w-36" data-testid="select-article-style">
                     <SelectValue placeholder="Article style" />
                   </SelectTrigger>
                   <SelectContent>
@@ -643,10 +655,42 @@ export function SignalDetailPanel({
                     <SelectItem value="signal">Signal-First</SelectItem>
                   </SelectContent>
                 </Select>
+                <Select
+                  value={aiProvider}
+                  onValueChange={(value: "openai" | "claude") => setAiProvider(value)}
+                >
+                  <SelectTrigger className="w-28" data-testid="select-ai-provider">
+                    <SelectValue placeholder="AI Provider" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="openai">OpenAI</SelectItem>
+                    <SelectItem value="claude">Claude</SelectItem>
+                  </SelectContent>
+                </Select>
+                {aiProvider === "claude" && (
+                  <Select
+                    value={claudeModel}
+                    onValueChange={(value: "claude-sonnet-4-5" | "claude-opus-4-5" | "claude-haiku-4-5") => setClaudeModel(value)}
+                  >
+                    <SelectTrigger className="w-32" data-testid="select-claude-model">
+                      <SelectValue placeholder="Model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="claude-sonnet-4-5">Sonnet 4.5</SelectItem>
+                      <SelectItem value="claude-opus-4-5">Opus 4.5</SelectItem>
+                      <SelectItem value="claude-haiku-4-5">Haiku 4.5</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
                 <Button
                   variant="default"
                   size="default"
-                  onClick={() => generateArticleMutation.mutate({ signalId: signal.id, style: articleStyle })}
+                  onClick={() => generateArticleMutation.mutate({ 
+                    signalId: signal.id, 
+                    style: articleStyle,
+                    provider: aiProvider,
+                    claudeModel: aiProvider === "claude" ? claudeModel : undefined
+                  })}
                   disabled={generateArticleMutation.isPending}
                   data-testid="button-generate-article"
                 >
@@ -655,7 +699,7 @@ export function SignalDetailPanel({
                   ) : (
                     <FileText className="w-4 h-4 mr-1.5" />
                   )}
-                  {generateArticleMutation.isPending ? "Generating..." : "Generate Article"}
+                  {generateArticleMutation.isPending ? "Generating..." : "Generate"}
                 </Button>
               </div>
 

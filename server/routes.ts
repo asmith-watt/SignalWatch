@@ -9,6 +9,7 @@ import {
 import { z } from "zod";
 import { analyzeSignal, enrichSignal, batchEnrichSignals, extractRelationshipsFromSignal } from "./ai-analysis";
 import { generateArticleFromSignal, exportArticleForCMS } from "./article-generator";
+import { generateArticleWithClaude, type ClaudeModel } from "./claude-article-generator";
 import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany, monitorUSPoultryCompanies, monitorCompaniesByCountry, monitorCompaniesByIndustry, enrichCompanies } from "./perplexity-monitor";
 import { getProgress } from "./monitor-progress";
 import { importCompanies, getUSPoultryCompanies } from "./import-companies";
@@ -697,9 +698,15 @@ export async function registerRoutes(
       const id = parseInt(req.params.id);
       const requestedStyle = req.body.style || "news";
       const validStyles = ["news", "analysis", "brief", "signal"];
+      const provider = req.body.provider || "openai";
+      const claudeModel = req.body.claudeModel || "claude-sonnet-4-5";
       
       if (!validStyles.includes(requestedStyle)) {
         return res.status(400).json({ error: `Invalid style. Must be one of: ${validStyles.join(", ")}` });
+      }
+      
+      if (!["openai", "claude"].includes(provider)) {
+        return res.status(400).json({ error: "Invalid provider. Must be 'openai' or 'claude'" });
       }
       
       const style = requestedStyle as "news" | "analysis" | "brief" | "signal";
@@ -710,10 +717,21 @@ export async function registerRoutes(
       }
 
       const company = await storage.getCompany(signal.companyId);
-      const article = await generateArticleFromSignal(signal, company, style);
+      
+      let article;
+      if (provider === "claude") {
+        const validModels = ["claude-sonnet-4-5", "claude-opus-4-5", "claude-haiku-4-5"];
+        if (!validModels.includes(claudeModel)) {
+          return res.status(400).json({ error: `Invalid Claude model. Must be one of: ${validModels.join(", ")}` });
+        }
+        article = await generateArticleWithClaude(signal, company, style, claudeModel as ClaudeModel);
+      } else {
+        article = await generateArticleFromSignal(signal, company, style);
+      }
+      
       const exports = exportArticleForCMS(article, signal, company);
 
-      res.json({ article, exports });
+      res.json({ article, exports, provider, model: provider === "claude" ? claudeModel : "gpt-4o" });
     } catch (error) {
       console.error("Error generating article:", error);
       res.status(500).json({ error: "Failed to generate article" });

@@ -6,6 +6,13 @@ SignalWatch is a B2B business intelligence platform designed for editorial teams
 
 ## Recent Changes
 
+### Claude Integration for Article Generation (January 2026)
+- Added Anthropic Claude as alternative AI provider for article generation
+- Supports Claude Sonnet 4.5, Opus 4.5, and Haiku 4.5 models
+- UI selector in Content Publishing section to choose between OpenAI and Claude
+- Lazy-loaded client to avoid startup failures when Anthropic credentials not configured
+- Uses Replit AI Integrations (charges to Replit credits, no separate API key needed)
+
 ### Industry Map Feature (January 2026)
 - Added interactive network visualization showing company relationships
 - Relationships extracted by AI from signal text (partner, competitor, supplier, customer, etc.)
@@ -73,6 +80,10 @@ Core entities defined in `shared/schema.ts`:
   - Signal analysis: entity extraction, sentiment, priority
   - Article generation: news articles, briefs, analysis pieces from signals
   - CMS export: WordPress, Contentful, Markdown, JSON formats
+- **Anthropic Claude API**: Alternative AI provider for article generation
+  - Configured via `AI_INTEGRATIONS_ANTHROPIC_API_KEY` and `AI_INTEGRATIONS_ANTHROPIC_BASE_URL`
+  - Supports Sonnet 4.5, Opus 4.5, and Haiku 4.5 models
+  - Lazy-loaded to avoid startup failures when not configured
 
 ### Third-Party Libraries
 - **Radix UI**: Accessible component primitives (dialogs, dropdowns, tabs, etc.)
