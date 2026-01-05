@@ -73,14 +73,16 @@ For each news item found, provide:
 3. The type (funding, executive_change, product_launch, partnership, news, press_release)
 4. Whether sentiment is positive, negative, or neutral
 5. Priority level (high for major announcements, medium for notable news, low for minor updates)
-6. The EXACT publication date from the source article in ISO format (YYYY-MM-DD)
+6. The publication date - READ IT DIRECTLY FROM THE ARTICLE PAGE (look for date bylines like "10 December 2025" or "Dec 10, 2025")
 
-CRITICAL DATE RULES:
-- ONLY use the actual publication date shown in the source article
-- DO NOT guess or estimate dates - extract them directly from the article
-- If you cannot find the exact publication date in the article, set publishedAt to null
-- NEVER invent or hallucinate dates
-- Only include articles published within the last 7 days
+EXTREMELY IMPORTANT - DATE EXTRACTION:
+- Look at the actual article page and find the date shown near the headline/byline
+- The date is usually displayed near the author name or at the top of the article
+- Convert whatever format you see to ISO format: YYYY-MM-DD
+- If the article shows "10 December 2025", return "2025-12-10"
+- If you cannot visually locate a publication date on the article, set publishedAt to null
+- NEVER make up dates - if uncertain, use null
+- Do not confuse dates mentioned IN the article content with the article's publication date
 
 Return as JSON array: [{"title": "...", "summary": "...", "type": "...", "sentiment": "...", "priority": "...", "publishedAt": "YYYY-MM-DD or null"}]
 If no recent news found, return empty array: []`;
@@ -97,7 +99,7 @@ If no recent news found, return empty array: []`;
         messages: [
           {
             role: "system",
-            content: "You are a business intelligence analyst. Return only valid JSON arrays. No markdown, no explanation text."
+            content: "You are a business intelligence analyst. Return only valid JSON arrays. No markdown, no explanation text. CRITICAL: For publishedAt dates, you MUST extract the exact date shown on the article page (near the byline/headline). Never estimate or guess dates - use null if you cannot find the exact publication date on the source page."
           },
           {
             role: "user",
