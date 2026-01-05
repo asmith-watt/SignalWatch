@@ -228,6 +228,51 @@ export const insertCompanyRelationshipSchema = createInsertSchema(companyRelatio
 export type InsertCompanyRelationship = z.infer<typeof insertCompanyRelationshipSchema>;
 export type CompanyRelationship = typeof companyRelationships.$inferSelect;
 
+// Published destinations for articles
+export const publishDestinations = [
+  "media_site",
+  "wordpress",
+  "export_markdown",
+  "export_json",
+] as const;
+
+export type PublishDestination = (typeof publishDestinations)[number];
+
+// Generated articles table - tracks article history
+export const articles = pgTable("articles", {
+  id: serial("id").primaryKey(),
+  signalId: integer("signal_id").notNull().references(() => signals.id, { onDelete: "cascade" }),
+  companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
+  headline: text("headline").notNull(),
+  subheadline: text("subheadline"),
+  body: text("body").notNull(),
+  style: text("style").notNull(),
+  publishedTo: text("published_to"),
+  externalUrl: text("external_url"),
+  externalId: text("external_id"),
+  imageUrl: text("image_url"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const articlesRelations = relations(articles, ({ one }) => ({
+  signal: one(signals, {
+    fields: [articles.signalId],
+    references: [signals.id],
+  }),
+  company: one(companies, {
+    fields: [articles.companyId],
+    references: [companies.id],
+  }),
+}));
+
+export const insertArticleSchema = createInsertSchema(articles).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertArticle = z.infer<typeof insertArticleSchema>;
+export type Article = typeof articles.$inferSelect;
+
 // Activity log for team collaboration
 export const activityLog = pgTable("activity_log", {
   id: serial("id").primaryKey(),

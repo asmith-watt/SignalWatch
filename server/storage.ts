@@ -11,12 +11,15 @@ import {
   type InsertActivityLog,
   type CompanyRelationship,
   type InsertCompanyRelationship,
+  type Article,
+  type InsertArticle,
   users,
   companies,
   signals,
   alerts,
   activityLog,
   companyRelationships,
+  articles,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike, sql } from "drizzle-orm";
@@ -66,6 +69,12 @@ export interface IStorage {
 
   // Scan History
   getScanHistory(days: number): Promise<{ date: string; industry: string; signalsFound: number }[]>;
+
+  // Articles
+  getArticle(id: number): Promise<Article | undefined>;
+  getArticlesBySignal(signalId: number): Promise<Article[]>;
+  getArticlesByCompany(companyId: number): Promise<Article[]>;
+  createArticle(article: InsertArticle): Promise<Article>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -274,6 +283,33 @@ export class DatabaseStorage implements IStorage {
       industry: row.industry,
       signalsFound: row.signals_found,
     }));
+  }
+
+  // Articles
+  async getArticle(id: number): Promise<Article | undefined> {
+    const [article] = await db.select().from(articles).where(eq(articles.id, id));
+    return article || undefined;
+  }
+
+  async getArticlesBySignal(signalId: number): Promise<Article[]> {
+    return db
+      .select()
+      .from(articles)
+      .where(eq(articles.signalId, signalId))
+      .orderBy(desc(articles.createdAt));
+  }
+
+  async getArticlesByCompany(companyId: number): Promise<Article[]> {
+    return db
+      .select()
+      .from(articles)
+      .where(eq(articles.companyId, companyId))
+      .orderBy(desc(articles.createdAt));
+  }
+
+  async createArticle(article: InsertArticle): Promise<Article> {
+    const [created] = await db.insert(articles).values(article).returning();
+    return created;
   }
 }
 
