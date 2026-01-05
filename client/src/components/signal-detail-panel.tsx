@@ -23,7 +23,7 @@ import {
   AlertTriangle,
   Link2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -89,7 +89,7 @@ export function SignalDetailPanel({
   }>({ status: "idle" });
 
   // Reset verification states when signal changes
-  React.useEffect(() => {
+  useEffect(() => {
     setDateVerification({ status: "idle" });
     setSourceVerification({ status: "idle" });
   }, [signal.id, signal.sourceUrl]);
