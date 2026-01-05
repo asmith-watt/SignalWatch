@@ -8,16 +8,37 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle, Sparkles } from "lucide-react";
+import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle, Sparkles, Calendar, AlertTriangle, Check, RefreshCw } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScanHistory } from "@/components/scan-history";
 import type { Company, Signal } from "@shared/schema";
+
+interface DateVerificationResult {
+  signalId: number;
+  title: string;
+  sourceUrl: string;
+  storedDate: string | null;
+  extractedDate: string | null;
+  match: boolean;
+  error?: string;
+}
+
+interface DateVerificationResponse {
+  total: number;
+  mismatches: number;
+  couldNotExtract: number;
+  errors: number;
+  results: DateVerificationResult[];
+}
 
 export function DataManagementPage() {
   const { toast } = useToast();
   const [companiesCSV, setCompaniesCSV] = useState("");
   const [signalsCSV, setSignalsCSV] = useState("");
   const [enrichIndustry, setEnrichIndustry] = useState<string>("all");
+  const [dateVerifyLimit, setDateVerifyLimit] = useState<string>("50");
+  const [dateVerificationResults, setDateVerificationResults] = useState<DateVerificationResponse | null>(null);
+  const [selectedMismatches, setSelectedMismatches] = useState<Set<number>>(new Set());
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
@@ -69,6 +90,44 @@ export function DataManagementPage() {
     },
     onError: () => {
       toast({ title: "Failed to enrich companies", variant: "destructive" });
+    },
+  });
+
+  const verifyDatesMutation = useMutation({
+    mutationFn: async (limit: number) => {
+      const response = await fetch(`/api/signals/verify-dates?limit=${limit}&onlyMismatches=true`);
+      if (!response.ok) throw new Error("Failed to verify dates");
+      return response.json() as Promise<DateVerificationResponse>;
+    },
+    onSuccess: (data) => {
+      setDateVerificationResults(data);
+      const fixable = data.results.filter(r => r.extractedDate !== null);
+      setSelectedMismatches(new Set(fixable.map(r => r.signalId)));
+      toast({ 
+        title: "Date Verification Complete", 
+        description: `Found ${data.mismatches} mismatches, ${fixable.length} fixable` 
+      });
+    },
+    onError: () => {
+      toast({ title: "Failed to verify dates", variant: "destructive" });
+    },
+  });
+
+  const fixDatesMutation = useMutation({
+    mutationFn: async (signalIds: number[]) => {
+      return apiRequest("POST", "/api/signals/fix-dates", { signalIds });
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      toast({ 
+        title: "Dates Fixed", 
+        description: `Fixed ${data.fixed} signals, ${data.errors} errors` 
+      });
+      setDateVerificationResults(null);
+      setSelectedMismatches(new Set());
+    },
+    onError: () => {
+      toast({ title: "Failed to fix dates", variant: "destructive" });
     },
   });
 
@@ -277,6 +336,151 @@ export function DataManagementPage() {
         </Card>
 
         <ScanHistory />
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-muted-foreground" />
+              <CardTitle>Date Verification</CardTitle>
+            </div>
+            <CardDescription>
+              Verify publication dates by checking source articles. Fixes incorrect dates that AI may have extracted.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="verify-limit">Signals to check:</Label>
+                <Select value={dateVerifyLimit} onValueChange={setDateVerifyLimit}>
+                  <SelectTrigger className="w-24" data-testid="select-verify-limit">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                    <SelectItem value="200">200</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                onClick={() => verifyDatesMutation.mutate(parseInt(dateVerifyLimit))}
+                disabled={verifyDatesMutation.isPending}
+                data-testid="button-verify-dates"
+              >
+                {verifyDatesMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                )}
+                Scan for Mismatches
+              </Button>
+            </div>
+
+            {dateVerificationResults && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 flex-wrap">
+                  <Badge variant="secondary">
+                    {dateVerificationResults.total} scanned
+                  </Badge>
+                  <Badge variant="destructive" className="flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    {dateVerificationResults.mismatches} mismatches
+                  </Badge>
+                  <Badge variant="outline">
+                    {dateVerificationResults.couldNotExtract} unreadable
+                  </Badge>
+                </div>
+
+                {dateVerificationResults.results.filter(r => r.extractedDate).length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium">
+                        Fixable mismatches ({selectedMismatches.size} selected):
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => fixDatesMutation.mutate(Array.from(selectedMismatches))}
+                        disabled={selectedMismatches.size === 0 || fixDatesMutation.isPending}
+                        data-testid="button-fix-dates"
+                      >
+                        {fixDatesMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Check className="h-4 w-4 mr-2" />
+                        )}
+                        Fix Selected
+                      </Button>
+                    </div>
+
+                    <div className="max-h-64 overflow-y-auto border rounded-md">
+                      <table className="w-full text-sm">
+                        <thead className="bg-muted sticky top-0">
+                          <tr>
+                            <th className="p-2 text-left w-8">
+                              <input
+                                type="checkbox"
+                                checked={selectedMismatches.size === dateVerificationResults.results.filter(r => r.extractedDate).length}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedMismatches(new Set(
+                                      dateVerificationResults.results
+                                        .filter(r => r.extractedDate)
+                                        .map(r => r.signalId)
+                                    ));
+                                  } else {
+                                    setSelectedMismatches(new Set());
+                                  }
+                                }}
+                              />
+                            </th>
+                            <th className="p-2 text-left">Signal</th>
+                            <th className="p-2 text-left">Stored</th>
+                            <th className="p-2 text-left">Actual</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {dateVerificationResults.results
+                            .filter(r => r.extractedDate)
+                            .map((result) => (
+                              <tr key={result.signalId} className="border-t">
+                                <td className="p-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedMismatches.has(result.signalId)}
+                                    onChange={(e) => {
+                                      const newSet = new Set(selectedMismatches);
+                                      if (e.target.checked) {
+                                        newSet.add(result.signalId);
+                                      } else {
+                                        newSet.delete(result.signalId);
+                                      }
+                                      setSelectedMismatches(newSet);
+                                    }}
+                                  />
+                                </td>
+                                <td className="p-2">
+                                  <div className="truncate max-w-xs" title={result.title}>
+                                    {result.title}
+                                  </div>
+                                </td>
+                                <td className="p-2 text-destructive whitespace-nowrap">
+                                  {result.storedDate || "None"}
+                                </td>
+                                <td className="p-2 text-green-600 dark:text-green-400 whitespace-nowrap">
+                                  {result.extractedDate}
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
