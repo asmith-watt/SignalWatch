@@ -787,6 +787,19 @@ export async function registerRoutes(
 
       if (result.success) {
         await storage.updateSignal(id, { contentStatus: "published" });
+        
+        await storage.createArticle({
+          signalId: signal.id,
+          companyId: signal.companyId,
+          headline: article.headline,
+          subheadline: article.subheadline,
+          body: article.body,
+          style: style,
+          publishedTo: "wordpress",
+          externalUrl: result.postUrl || null,
+          externalId: result.postId?.toString() || null,
+          imageUrl: null,
+        });
       }
 
       res.json({
@@ -840,6 +853,19 @@ export async function registerRoutes(
 
       if (result.success) {
         await storage.updateSignal(id, { contentStatus: "published" });
+        
+        await storage.createArticle({
+          signalId: signal.id,
+          companyId: signal.companyId,
+          headline: article.headline,
+          subheadline: article.subheadline,
+          body: article.body,
+          style: style,
+          publishedTo: "media_site",
+          externalUrl: result.articleUrl || null,
+          externalId: result.articleId || null,
+          imageUrl: imageUrl,
+        });
       }
 
       res.json({
@@ -874,6 +900,29 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error getting stock image:", error);
       res.status(500).json({ error: "Failed to get stock image" });
+    }
+  });
+
+  // Article history endpoints
+  app.get("/api/signals/:id/articles", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const articles = await storage.getArticlesBySignal(id);
+      res.json(articles);
+    } catch (error) {
+      console.error("Error getting articles by signal:", error);
+      res.status(500).json({ error: "Failed to get articles" });
+    }
+  });
+
+  app.get("/api/companies/:id/articles", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const articles = await storage.getArticlesByCompany(id);
+      res.json(articles);
+    } catch (error) {
+      console.error("Error getting articles by company:", error);
+      res.status(500).json({ error: "Failed to get articles" });
     }
   });
 
