@@ -623,13 +623,13 @@ export async function registerRoutes(
     try {
       const id = parseInt(req.params.id);
       const requestedStyle = req.body.style || "news";
-      const validStyles = ["news", "analysis", "brief"];
+      const validStyles = ["news", "analysis", "brief", "signal"];
       
       if (!validStyles.includes(requestedStyle)) {
         return res.status(400).json({ error: `Invalid style. Must be one of: ${validStyles.join(", ")}` });
       }
       
-      const style = requestedStyle as "news" | "analysis" | "brief";
+      const style = requestedStyle as "news" | "analysis" | "brief" | "signal";
       
       const signal = await storage.getSignal(id);
       if (!signal) {
