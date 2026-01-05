@@ -164,6 +164,7 @@ export async function verifySignalDates(options?: {
   limit?: number;
   companyId?: number;
   onlyMismatches?: boolean;
+  signalId?: number;
 }): Promise<DateVerificationResult[]> {
   const limit = options?.limit || 50;
   const results: DateVerificationResult[] = [];
@@ -171,15 +172,20 @@ export async function verifySignalDates(options?: {
   // Get signals with source URLs
   let signals = await storage.getAllSignals();
   
-  if (options?.companyId) {
+  // If a specific signalId is provided, filter to just that one
+  if (options?.signalId) {
+    signals = signals.filter(s => s.id === options.signalId);
+  } else if (options?.companyId) {
     signals = signals.filter(s => s.companyId === options.companyId);
   }
 
   // Filter to only those with sourceUrl
   signals = signals.filter(s => s.sourceUrl && s.sourceUrl.startsWith('http'));
   
-  // Limit the number to process
-  signals = signals.slice(0, limit);
+  // Limit the number to process (unless specific signalId)
+  if (!options?.signalId) {
+    signals = signals.slice(0, limit);
+  }
 
   console.log(`Verifying dates for ${signals.length} signals...`);
 

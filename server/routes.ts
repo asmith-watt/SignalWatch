@@ -146,11 +146,12 @@ export async function registerRoutes(
   // Date verification endpoints (must be before /api/signals/:id)
   app.get("/api/signals/verify-dates", async (req: Request, res: Response) => {
     try {
+      const signalId = req.query.signalId ? parseInt(req.query.signalId as string) : undefined;
       const limit = parseInt(req.query.limit as string) || 20;
       const companyId = req.query.companyId ? parseInt(req.query.companyId as string) : undefined;
       const onlyMismatches = req.query.onlyMismatches === 'true';
 
-      const results = await verifySignalDates({ limit, companyId, onlyMismatches });
+      const results = await verifySignalDates({ limit, companyId, onlyMismatches, signalId });
       
       const mismatches = results.filter(r => !r.match && r.extractedDate);
       const couldNotExtract = results.filter(r => !r.extractedDate && !r.error);

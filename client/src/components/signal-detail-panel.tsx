@@ -19,6 +19,8 @@ import {
   Download,
   Send,
   History,
+  CalendarCheck,
+  AlertTriangle,
 } from "lucide-react";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -72,6 +74,11 @@ export function SignalDetailPanel({
   const [copied, setCopied] = useState(false);
   const [articleStyle, setArticleStyle] = useState<"news" | "brief" | "analysis" | "signal">("signal");
   const [imageType, setImageType] = useState<"stock" | "ai">("stock");
+  const [dateVerification, setDateVerification] = useState<{
+    status: "idle" | "checking" | "mismatch" | "match" | "error";
+    extractedDate?: string | null;
+    storedDate?: string | null;
+  }>({ status: "idle" });
   const [generatedArticle, setGeneratedArticle] = useState<{
     headline: string;
     subheadline: string;
@@ -104,6 +111,51 @@ export function SignalDetailPanel({
     },
     onError: () => {
       toast({ title: "Failed to analyze signal", variant: "destructive" });
+    },
+  });
+
+  const verifyDateMutation = useMutation({
+    mutationFn: async (signalId: number) => {
+      const response = await fetch(`/api/signals/verify-dates?signalId=${signalId}`);
+      if (!response.ok) throw new Error("Failed to verify date");
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.results && data.results.length > 0) {
+        const result = data.results[0];
+        if (result.error || result.extractedDate === null) {
+          setDateVerification({ status: "error" });
+          toast({ title: "Could not extract date from source", variant: "destructive" });
+        } else if (result.match) {
+          setDateVerification({ status: "match", storedDate: result.storedDate, extractedDate: result.extractedDate });
+          toast({ title: "Date is correct" });
+        } else {
+          setDateVerification({ status: "mismatch", storedDate: result.storedDate, extractedDate: result.extractedDate });
+          toast({ title: "Date mismatch found", description: `Actual: ${result.extractedDate}` });
+        }
+      }
+    },
+    onError: () => {
+      setDateVerification({ status: "error" });
+      toast({ title: "Failed to verify date", variant: "destructive" });
+    },
+  });
+
+  const fixDateMutation = useMutation({
+    mutationFn: async (signalId: number) => {
+      return apiRequest("POST", "/api/signals/fix-dates", { signalIds: [signalId] });
+    },
+    onSuccess: (data: any) => {
+      if (data.fixed > 0) {
+        queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+        setDateVerification({ status: "match" });
+        toast({ title: "Date corrected successfully" });
+      } else {
+        toast({ title: "Could not fix date", variant: "destructive" });
+      }
+    },
+    onError: () => {
+      toast({ title: "Failed to fix date", variant: "destructive" });
     },
   });
 
@@ -252,7 +304,53 @@ export function SignalDetailPanel({
                 <Clock className="w-3.5 h-3.5" />
                 {hasPublishedDate ? "Published " : "Gathered "}
                 {format(displayDate, "MMM d, yyyy")}
+                {signal.sourceUrl && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-1.5 ml-1"
+                    onClick={() => {
+                      setDateVerification({ status: "checking" });
+                      verifyDateMutation.mutate(signal.id);
+                    }}
+                    disabled={verifyDateMutation.isPending || dateVerification.status === "checking"}
+                    data-testid="button-verify-date"
+                    title="Verify publication date"
+                  >
+                    {verifyDateMutation.isPending || dateVerification.status === "checking" ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : dateVerification.status === "match" ? (
+                      <Check className="w-3 h-3 text-green-600" />
+                    ) : dateVerification.status === "mismatch" ? (
+                      <AlertTriangle className="w-3 h-3 text-amber-500" />
+                    ) : (
+                      <CalendarCheck className="w-3 h-3" />
+                    )}
+                  </Button>
+                )}
               </span>
+              {dateVerification.status === "mismatch" && dateVerification.extractedDate && (
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-amber-600 dark:text-amber-400">
+                    Actual date: {dateVerification.extractedDate}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-5 px-2 text-xs"
+                    onClick={() => fixDateMutation.mutate(signal.id)}
+                    disabled={fixDateMutation.isPending}
+                    data-testid="button-fix-date"
+                  >
+                    {fixDateMutation.isPending ? (
+                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                    ) : (
+                      <Check className="w-3 h-3 mr-1" />
+                    )}
+                    Fix
+                  </Button>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-2">
