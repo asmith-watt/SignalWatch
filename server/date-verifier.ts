@@ -86,7 +86,35 @@ function parseExtractedDate(text: string): string | null {
   return null;
 }
 
-async function fetchAndExtractDate(url: string): Promise<string | null> {
+interface SourceVerificationResult {
+  signalId: number;
+  signalTitle: string;
+  sourceUrl: string;
+  articleTitle: string | null;
+  matchScore: number;
+  isMatch: boolean;
+  error?: string;
+}
+
+// Simple word-based similarity score
+function calculateTitleSimilarity(signalTitle: string, articleTitle: string): number {
+  const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2);
+  
+  const signalWords = new Set(normalize(signalTitle));
+  const articleWords = new Set(normalize(articleTitle));
+  
+  if (signalWords.size === 0 || articleWords.size === 0) return 0;
+  
+  let matches = 0;
+  for (const word of signalWords) {
+    if (articleWords.has(word)) matches++;
+  }
+  
+  // Score based on how many signal words appear in article title
+  return Math.round((matches / signalWords.size) * 100);
+}
+
+async function fetchPageContent(url: string): Promise<{ html: string; $: cheerio.CheerioAPI } | null> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
@@ -105,59 +133,167 @@ async function fetchAndExtractDate(url: string): Promise<string | null> {
 
     const html = await response.text();
     const $ = cheerio.load(html);
-
-    // Try meta tags first (most reliable)
-    const metaDate = $('meta[property="article:published_time"]').attr('content') ||
-                     $('meta[name="date"]').attr('content') ||
-                     $('meta[name="publish-date"]').attr('content') ||
-                     $('meta[name="pubdate"]').attr('content') ||
-                     $('meta[property="og:article:published_time"]').attr('content') ||
-                     $('meta[itemprop="datePublished"]').attr('content');
-
-    if (metaDate) {
-      const parsed = parseExtractedDate(metaDate);
-      if (parsed) return parsed;
-      // Try direct ISO extraction
-      const dateOnly = metaDate.split('T')[0];
-      if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
-        return dateOnly;
-      }
-    }
-
-    // Try time/date elements with datetime attribute
-    const timeEl = $('time[datetime]').first().attr('datetime');
-    if (timeEl) {
-      const dateOnly = timeEl.split('T')[0];
-      if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
-        return dateOnly;
-      }
-    }
-
-    // Try common date selectors in article headers
-    const dateSelectors = [
-      '.article-date', '.post-date', '.publish-date', '.date', '.byline-date',
-      '.article-meta time', '.post-meta time', '.entry-date', '.published',
-      '[class*="date"]', '[class*="publish"]', '.timestamp',
-    ];
-
-    for (const selector of dateSelectors) {
-      const text = $(selector).first().text().trim();
-      if (text) {
-        const parsed = parseExtractedDate(text);
-        if (parsed) return parsed;
-      }
-    }
-
-    // Last resort: look in the first 500 chars of visible text near the title
-    const headerArea = $('header, .article-header, .post-header, h1').first().parent().text();
-    const parsed = parseExtractedDate(headerArea.slice(0, 1000));
-    if (parsed) return parsed;
-
-    return null;
+    return { html, $ };
   } catch (error) {
     console.error(`Error fetching ${url}:`, error);
     return null;
   }
+}
+
+function extractArticleTitle($: cheerio.CheerioAPI): string | null {
+  // Try meta og:title first (most reliable)
+  const ogTitle = $('meta[property="og:title"]').attr('content');
+  if (ogTitle) return ogTitle.trim();
+  
+  // Try twitter:title
+  const twitterTitle = $('meta[name="twitter:title"]').attr('content');
+  if (twitterTitle) return twitterTitle.trim();
+  
+  // Try the page title
+  const pageTitle = $('title').text();
+  if (pageTitle) return pageTitle.trim();
+  
+  // Try h1
+  const h1 = $('h1').first().text();
+  if (h1) return h1.trim();
+  
+  // Try article headline selectors
+  const headlineSelectors = [
+    '.article-title', '.post-title', '.entry-title', '.headline',
+    '[class*="headline"]', '[class*="title"]', 'article h1', 'article h2'
+  ];
+  
+  for (const selector of headlineSelectors) {
+    const text = $(selector).first().text().trim();
+    if (text && text.length > 10) return text;
+  }
+  
+  return null;
+}
+
+async function fetchAndExtractDate(url: string): Promise<string | null> {
+  const pageContent = await fetchPageContent(url);
+  if (!pageContent) return null;
+  
+  const { $ } = pageContent;
+
+  // Try meta tags first (most reliable)
+  const metaDate = $('meta[property="article:published_time"]').attr('content') ||
+                   $('meta[name="date"]').attr('content') ||
+                   $('meta[name="publish-date"]').attr('content') ||
+                   $('meta[name="pubdate"]').attr('content') ||
+                   $('meta[property="og:article:published_time"]').attr('content') ||
+                   $('meta[itemprop="datePublished"]').attr('content');
+
+  if (metaDate) {
+    const parsed = parseExtractedDate(metaDate);
+    if (parsed) return parsed;
+    // Try direct ISO extraction
+    const dateOnly = metaDate.split('T')[0];
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
+      return dateOnly;
+    }
+  }
+
+  // Try time/date elements with datetime attribute
+  const timeEl = $('time[datetime]').first().attr('datetime');
+  if (timeEl) {
+    const dateOnly = timeEl.split('T')[0];
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
+      return dateOnly;
+    }
+  }
+
+  // Try common date selectors in article headers
+  const dateSelectors = [
+    '.article-date', '.post-date', '.publish-date', '.date', '.byline-date',
+    '.article-meta time', '.post-meta time', '.entry-date', '.published',
+    '[class*="date"]', '[class*="publish"]', '.timestamp',
+  ];
+
+  for (const selector of dateSelectors) {
+    const text = $(selector).first().text().trim();
+    if (text) {
+      const parsed = parseExtractedDate(text);
+      if (parsed) return parsed;
+    }
+  }
+
+  // Last resort: look in the first 500 chars of visible text near the title
+  const headerArea = $('header, .article-header, .post-header, h1').first().parent().text();
+  const parsed = parseExtractedDate(headerArea.slice(0, 1000));
+  if (parsed) return parsed;
+
+  return null;
+}
+
+// Verify if source URL matches the signal content
+export async function verifySourceUrl(signalId: number): Promise<SourceVerificationResult> {
+  const signals = await storage.getAllSignals();
+  const signal = signals.find(s => s.id === signalId);
+  
+  if (!signal) {
+    return {
+      signalId,
+      signalTitle: '',
+      sourceUrl: '',
+      articleTitle: null,
+      matchScore: 0,
+      isMatch: false,
+      error: 'Signal not found'
+    };
+  }
+  
+  if (!signal.sourceUrl || !signal.sourceUrl.startsWith('http')) {
+    return {
+      signalId,
+      signalTitle: signal.title,
+      sourceUrl: signal.sourceUrl || '',
+      articleTitle: null,
+      matchScore: 0,
+      isMatch: false,
+      error: 'No valid source URL'
+    };
+  }
+  
+  const pageContent = await fetchPageContent(signal.sourceUrl);
+  if (!pageContent) {
+    return {
+      signalId,
+      signalTitle: signal.title,
+      sourceUrl: signal.sourceUrl,
+      articleTitle: null,
+      matchScore: 0,
+      isMatch: false,
+      error: 'Could not fetch source page'
+    };
+  }
+  
+  const articleTitle = extractArticleTitle(pageContent.$);
+  if (!articleTitle) {
+    return {
+      signalId,
+      signalTitle: signal.title,
+      sourceUrl: signal.sourceUrl,
+      articleTitle: null,
+      matchScore: 0,
+      isMatch: false,
+      error: 'Could not extract article title'
+    };
+  }
+  
+  const matchScore = calculateTitleSimilarity(signal.title, articleTitle);
+  // Consider it a match if at least 40% of signal title words appear in article title
+  const isMatch = matchScore >= 40;
+  
+  return {
+    signalId,
+    signalTitle: signal.title,
+    sourceUrl: signal.sourceUrl,
+    articleTitle,
+    matchScore,
+    isMatch
+  };
 }
 
 export async function verifySignalDates(options?: {

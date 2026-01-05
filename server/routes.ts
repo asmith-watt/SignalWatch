@@ -19,7 +19,7 @@ import { importBakingMillingSignals } from "./import-signals-by-company-name";
 import { generateRssFeed, generateAllSignalsRssFeed, getAvailableFeeds } from "./rss-feeds";
 import { publishToWordPress, testWordPressConnection } from "./wordpress-publisher";
 import { selectStockImage, buildMediaSitePayload, publishToMediaSite, generateAIImage } from "./media-site-publisher";
-import { verifySignalDates, fixSignalDates } from "./date-verifier";
+import { verifySignalDates, fixSignalDates, verifySourceUrl } from "./date-verifier";
 import express from "express";
 import path from "path";
 
@@ -182,6 +182,22 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fixing dates:", error);
       res.status(500).json({ error: "Failed to fix dates" });
+    }
+  });
+
+  // Source URL verification - checks if article headline matches signal title
+  app.get("/api/signals/verify-source", async (req: Request, res: Response) => {
+    try {
+      const signalId = parseInt(req.query.signalId as string);
+      if (isNaN(signalId)) {
+        return res.status(400).json({ error: "signalId required" });
+      }
+
+      const result = await verifySourceUrl(signalId);
+      res.json(result);
+    } catch (error) {
+      console.error("Error verifying source:", error);
+      res.status(500).json({ error: "Failed to verify source" });
     }
   });
 

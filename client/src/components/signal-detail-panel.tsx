@@ -21,6 +21,7 @@ import {
   History,
   CalendarCheck,
   AlertTriangle,
+  Link2,
 } from "lucide-react";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -79,6 +80,17 @@ export function SignalDetailPanel({
     extractedDate?: string | null;
     storedDate?: string | null;
   }>({ status: "idle" });
+  const [sourceVerification, setSourceVerification] = useState<{
+    status: "idle" | "checking" | "mismatch" | "match" | "error";
+    articleTitle?: string | null;
+    matchScore?: number;
+  }>({ status: "idle" });
+
+  // Reset verification states when signal changes
+  React.useEffect(() => {
+    setDateVerification({ status: "idle" });
+    setSourceVerification({ status: "idle" });
+  }, [signal.id, signal.sourceUrl]);
   const [generatedArticle, setGeneratedArticle] = useState<{
     headline: string;
     subheadline: string;
@@ -156,6 +168,34 @@ export function SignalDetailPanel({
     },
     onError: () => {
       toast({ title: "Failed to fix date", variant: "destructive" });
+    },
+  });
+
+  const verifySourceMutation = useMutation({
+    mutationFn: async (signalId: number) => {
+      const response = await fetch(`/api/signals/verify-source?signalId=${signalId}`);
+      if (!response.ok) throw new Error("Failed to verify source");
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.error) {
+        setSourceVerification({ status: "error" });
+        toast({ title: data.error, variant: "destructive" });
+      } else if (data.isMatch) {
+        setSourceVerification({ status: "match", articleTitle: data.articleTitle, matchScore: data.matchScore });
+        toast({ title: "Source URL verified", description: `${data.matchScore}% match` });
+      } else {
+        setSourceVerification({ status: "mismatch", articleTitle: data.articleTitle, matchScore: data.matchScore });
+        toast({ 
+          title: "Source may not match", 
+          description: `Only ${data.matchScore}% title match`,
+          variant: "destructive" 
+        });
+      }
+    },
+    onError: () => {
+      setSourceVerification({ status: "error" });
+      toast({ title: "Failed to verify source", variant: "destructive" });
     },
   });
 
@@ -298,7 +338,37 @@ export function SignalDetailPanel({
                 <span className="flex items-center gap-1">
                   <Globe className="w-3.5 h-3.5" />
                   {signal.sourceName}
+                  {signal.sourceUrl && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="ml-1"
+                      onClick={() => {
+                        setSourceVerification({ status: "checking" });
+                        verifySourceMutation.mutate(signal.id);
+                      }}
+                      disabled={verifySourceMutation.isPending || sourceVerification.status === "checking"}
+                      data-testid="button-verify-source"
+                      title="Verify source URL matches signal"
+                    >
+                      {verifySourceMutation.isPending || sourceVerification.status === "checking" ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : sourceVerification.status === "match" ? (
+                        <Check className="w-3 h-3 text-green-600" />
+                      ) : sourceVerification.status === "mismatch" ? (
+                        <AlertTriangle className="w-3 h-3 text-amber-500" />
+                      ) : (
+                        <Link2 className="w-3 h-3" />
+                      )}
+                    </Button>
+                  )}
                 </span>
+              )}
+              {sourceVerification.status === "mismatch" && sourceVerification.articleTitle && (
+                <div className="w-full text-xs text-amber-600 dark:text-amber-400 mt-1">
+                  <span className="font-medium">Source article title:</span> {sourceVerification.articleTitle}
+                  <span className="ml-2 text-muted-foreground">({sourceVerification.matchScore}% match)</span>
+                </div>
               )}
               <span className="flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" />
