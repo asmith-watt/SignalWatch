@@ -854,6 +854,15 @@ export async function registerRoutes(
       if (result.success) {
         await storage.updateSignal(id, { contentStatus: "published" });
         
+        // Build full external URL if the result contains a relative path
+        let fullExternalUrl: string | null = null;
+        if (result.articleUrl) {
+          const mediaSiteUrl = process.env.MEDIA_SITE_URL?.replace(/\/$/, "") || "";
+          fullExternalUrl = result.articleUrl.startsWith("http") 
+            ? result.articleUrl 
+            : `${mediaSiteUrl}${result.articleUrl.startsWith("/") ? "" : "/"}${result.articleUrl}`;
+        }
+        
         await storage.createArticle({
           signalId: signal.id,
           companyId: signal.companyId,
@@ -862,7 +871,7 @@ export async function registerRoutes(
           body: article.body,
           style: style,
           publishedTo: "media_site",
-          externalUrl: result.articleUrl || null,
+          externalUrl: fullExternalUrl,
           externalId: result.articleId || null,
           imageUrl: imageUrl,
         });
