@@ -18,9 +18,10 @@ import {
   FileText,
   Download,
   Send,
+  History,
 } from "lucide-react";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,7 +37,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Signal, Company } from "@shared/schema";
+import type { Signal, Company, Article } from "@shared/schema";
 
 interface SignalDetailPanelProps {
   signal: Signal;
@@ -83,6 +84,15 @@ export function SignalDetailPanel({
     sourceAttribution?: string;
     sourceUrl?: string | null;
   } | null>(null);
+
+  const { data: articleHistory = [] } = useQuery<Article[]>({
+    queryKey: ["/api/signals", signal.id, "articles"],
+    queryFn: async () => {
+      const res = await fetch(`/api/signals/${signal.id}/articles`);
+      if (!res.ok) throw new Error("Failed to fetch articles");
+      return res.json();
+    },
+  });
 
   const analyzeSignalMutation = useMutation({
     mutationFn: async (signalId: number) => {
@@ -135,6 +145,7 @@ export function SignalDetailPanel({
         });
       }
       queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/signals", signal.id, "articles"] });
     },
     onError: () => {
       toast({ title: "Failed to publish to media site", variant: "destructive" });
@@ -650,6 +661,51 @@ export function SignalDetailPanel({
               )}
             </div>
           </div>
+
+          {articleHistory.length > 0 && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium flex items-center gap-2">
+                  <History className="w-4 h-4" />
+                  Article History ({articleHistory.length})
+                </h4>
+                <div className="space-y-2">
+                  {articleHistory.map((article) => (
+                    <div
+                      key={article.id}
+                      className="p-3 bg-muted/50 rounded-md space-y-1"
+                      data-testid={`article-history-${article.id}`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm font-medium line-clamp-2">{article.headline}</p>
+                        <Badge variant="outline" className="shrink-0 text-xs">
+                          {article.publishedTo === "media_site" ? "Media Site" : 
+                           article.publishedTo === "wordpress" ? "WordPress" : 
+                           article.publishedTo || "Export"}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{format(new Date(article.createdAt), "MMM d, yyyy h:mm a")}</span>
+                        <span className="capitalize">{article.style} style</span>
+                      </div>
+                      {article.externalUrl && (
+                        <a
+                          href={article.externalUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary hover:underline flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          View Published Article
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
 
           <Separator />
 

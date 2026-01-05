@@ -23,7 +23,10 @@ import {
 } from "@/components/empty-states";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Company, Signal, Alert, InsertCompany, InsertAlert } from "@shared/schema";
+import type { Company, Signal, Alert, InsertCompany, InsertAlert, Article } from "@shared/schema";
+import { format } from "date-fns";
+import { ExternalLink, History, FileText } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface DashboardProps {
   selectedCompanyId: number | null;
@@ -89,6 +92,17 @@ export function Dashboard({
 
   const { data: alerts = [] } = useQuery<Alert[]>({
     queryKey: ["/api/alerts"],
+  });
+
+  const { data: companyArticles = [] } = useQuery<Article[]>({
+    queryKey: ["/api/companies", selectedCompanyId, "articles"],
+    queryFn: async () => {
+      if (!selectedCompanyId) return [];
+      const res = await fetch(`/api/companies/${selectedCompanyId}/articles`);
+      if (!res.ok) throw new Error("Failed to fetch articles");
+      return res.json();
+    },
+    enabled: !!selectedCompanyId,
   });
 
   const updateSignalMutation = useMutation({
@@ -371,6 +385,9 @@ export function Dashboard({
                   <TabsTrigger value="timeline" data-testid="tab-timeline">
                     Timeline
                   </TabsTrigger>
+                  <TabsTrigger value="articles" data-testid="tab-articles">
+                    Articles ({companyArticles.length})
+                  </TabsTrigger>
                   <TabsTrigger value="alerts" data-testid="tab-alerts">
                     Alerts ({stats.alertCount})
                   </TabsTrigger>
@@ -419,6 +436,53 @@ export function Dashboard({
                       onSignalClick={handleSignalClick}
                       onEntitySelect={handleEntitySelect}
                     />
+                  )}
+                </TabsContent>
+
+                <TabsContent value="articles" className="mt-4">
+                  {companyArticles.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No articles generated yet for {selectedCompany.name}</p>
+                      <p className="text-sm mt-2">Articles will appear here when you publish content from signals.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {companyArticles.map((article) => (
+                        <div
+                          key={article.id}
+                          className="p-4 border rounded-md space-y-2 hover-elevate"
+                          data-testid={`company-article-${article.id}`}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="font-medium">{article.headline}</h4>
+                            <Badge variant="outline" className="shrink-0">
+                              {article.publishedTo === "media_site" ? "Media Site" : 
+                               article.publishedTo === "wordpress" ? "WordPress" : 
+                               article.publishedTo || "Export"}
+                            </Badge>
+                          </div>
+                          {article.subheadline && (
+                            <p className="text-sm text-muted-foreground line-clamp-2">{article.subheadline}</p>
+                          )}
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span>{format(new Date(article.createdAt), "MMM d, yyyy h:mm a")}</span>
+                            <span className="capitalize">{article.style} style</span>
+                          </div>
+                          {article.externalUrl && (
+                            <a
+                              href={article.externalUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-primary hover:underline flex items-center gap-1"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              View Published Article
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </TabsContent>
 
