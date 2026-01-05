@@ -522,14 +522,6 @@ export function SignalDetailPanel({
                     <Button
                       variant="secondary"
                       size="sm"
-                      onClick={() => handleExportArticle("contentful")}
-                    >
-                      <Download className="w-3.5 h-3.5 mr-1.5" />
-                      Contentful
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
                       onClick={() => handleExportArticle("markdown")}
                     >
                       <Download className="w-3.5 h-3.5 mr-1.5" />
