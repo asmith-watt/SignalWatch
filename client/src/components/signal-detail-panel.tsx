@@ -37,7 +37,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Signal, Company } from "@shared/schema";
-import { MediaSitePublishDialog } from "./media-site-publish-dialog";
 
 interface SignalDetailPanelProps {
   signal: Signal;
@@ -70,7 +69,8 @@ export function SignalDetailPanel({
   const [notes, setNotes] = useState(signal.notes || "");
   const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [showMediaSiteDialog, setShowMediaSiteDialog] = useState(false);
+  const [articleStyle, setArticleStyle] = useState<"news" | "brief" | "analysis" | "signal">("signal");
+  const [imageType, setImageType] = useState<"stock" | "ai">("stock");
   const [generatedArticle, setGeneratedArticle] = useState<{
     headline: string;
     subheadline: string;
@@ -108,6 +108,22 @@ export function SignalDetailPanel({
     },
     onError: () => {
       toast({ title: "Failed to generate article", variant: "destructive" });
+    },
+  });
+
+  const mediaSitePublishMutation = useMutation({
+    mutationFn: async ({ signalId, imageType }: { signalId: number; imageType: "stock" | "ai" }) => {
+      const res = await apiRequest("POST", `/api/signals/${signalId}/publish-to-media`, { imageType });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      toast({ 
+        title: "Published to Media Site", 
+        description: data.message || "Article sent successfully" 
+      });
+    },
+    onError: () => {
+      toast({ title: "Failed to publish to media site", variant: "destructive" });
     },
   });
 
@@ -419,11 +435,25 @@ export function SignalDetailPanel({
               Content Publishing
             </h4>
             <div className="space-y-3">
-              <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Select
+                  value={articleStyle}
+                  onValueChange={(value: "news" | "brief" | "analysis" | "signal") => setArticleStyle(value)}
+                >
+                  <SelectTrigger className="w-40" data-testid="select-article-style">
+                    <SelectValue placeholder="Article style" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="news">Standard Article</SelectItem>
+                    <SelectItem value="brief">Brief</SelectItem>
+                    <SelectItem value="analysis">Analysis</SelectItem>
+                    <SelectItem value="signal">Signal-First</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => generateArticleMutation.mutate({ signalId: signal.id, style: "news" })}
+                  variant="default"
+                  size="default"
+                  onClick={() => generateArticleMutation.mutate({ signalId: signal.id, style: articleStyle })}
                   disabled={generateArticleMutation.isPending}
                   data-testid="button-generate-article"
                 >
@@ -432,32 +462,7 @@ export function SignalDetailPanel({
                   ) : (
                     <FileText className="w-4 h-4 mr-1.5" />
                   )}
-                  {generateArticleMutation.isPending ? "Generating..." : "Draft Article"}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => generateArticleMutation.mutate({ signalId: signal.id, style: "brief" })}
-                  disabled={generateArticleMutation.isPending}
-                >
-                  Brief
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => generateArticleMutation.mutate({ signalId: signal.id, style: "analysis" })}
-                  disabled={generateArticleMutation.isPending}
-                >
-                  Analysis
-                </Button>
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => generateArticleMutation.mutate({ signalId: signal.id, style: "signal" })}
-                  disabled={generateArticleMutation.isPending}
-                  data-testid="button-generate-signal-article"
-                >
-                  Signal-First
+                  {generateArticleMutation.isPending ? "Generating..." : "Generate Article"}
                 </Button>
               </div>
 
@@ -581,25 +586,54 @@ export function SignalDetailPanel({
                   </div>
                   <div className="pt-2 border-t">
                     <p className="text-xs text-muted-foreground mb-2">Publish to Media Site:</p>
+                    <div className="flex items-center gap-3 mb-2">
+                      <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                        <input
+                          type="radio"
+                          name="imageType"
+                          value="stock"
+                          checked={imageType === "stock"}
+                          onChange={() => setImageType("stock")}
+                          className="w-4 h-4"
+                          data-testid="radio-image-stock"
+                        />
+                        Stock Image
+                      </label>
+                      <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                        <input
+                          type="radio"
+                          name="imageType"
+                          value="ai"
+                          checked={imageType === "ai"}
+                          onChange={() => setImageType("ai")}
+                          className="w-4 h-4"
+                          data-testid="radio-image-ai"
+                        />
+                        AI Generated
+                      </label>
+                    </div>
                     <Button
                       variant="default"
                       size="sm"
-                      onClick={() => setShowMediaSiteDialog(true)}
+                      onClick={() => {
+                        mediaSitePublishMutation.mutate({ 
+                          signalId: signal.id, 
+                          imageType 
+                        });
+                      }}
+                      disabled={mediaSitePublishMutation.isPending}
                       data-testid="button-send-to-media-site"
                     >
-                      <Send className="w-3.5 h-3.5 mr-1.5" />
-                      Send to Media Site
+                      {mediaSitePublishMutation.isPending ? (
+                        <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                      ) : (
+                        <Send className="w-3.5 h-3.5 mr-1.5" />
+                      )}
+                      {mediaSitePublishMutation.isPending ? "Publishing..." : "Send to Media Site"}
                     </Button>
                   </div>
                 </div>
               )}
-
-              <MediaSitePublishDialog
-                signalId={signal.id}
-                signalTitle={signal.title}
-                open={showMediaSiteDialog}
-                onOpenChange={setShowMediaSiteDialog}
-              />
             </div>
           </div>
 
