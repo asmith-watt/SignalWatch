@@ -18,7 +18,7 @@ import { importBakingMillingCompanies } from "./import-baking-milling-companies"
 import { importBakingMillingSignals } from "./import-signals-by-company-name";
 import { generateRssFeed, generateAllSignalsRssFeed, getAvailableFeeds } from "./rss-feeds";
 import { publishToWordPress, testWordPressConnection } from "./wordpress-publisher";
-import { selectStockImage, buildMediaSitePayload, publishToMediaSite } from "./media-site-publisher";
+import { selectStockImage, buildMediaSitePayload, publishToMediaSite, generateAIImage } from "./media-site-publisher";
 import express from "express";
 import path from "path";
 
@@ -28,6 +28,9 @@ export async function registerRoutes(
 ): Promise<Server> {
   // Serve stock images from public/stock-images
   app.use("/stock-images", express.static(path.resolve(process.cwd(), "public/stock-images")));
+  
+  // Serve AI-generated images from public/generated-images
+  app.use("/generated-images", express.static(path.resolve(process.cwd(), "public/generated-images")));
 
   // Companies CRUD
   app.get("/api/companies", async (req: Request, res: Response) => {
@@ -800,7 +803,7 @@ export async function registerRoutes(
   app.post("/api/signals/:id/publish-to-media", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const { style = "news" } = req.body;
+      const { style = "news", imageType = "stock" } = req.body;
 
       const signal = await storage.getSignal(id);
       if (!signal) {
@@ -814,8 +817,23 @@ export async function registerRoutes(
       const host = req.headers.host || "localhost:5000";
       const baseUrl = `${protocol}://${host}`;
       
-      const imageUrl = selectStockImage(signal, company, baseUrl);
-      const payload = buildMediaSitePayload(article, signal, company, imageUrl);
+      let imageUrl: string;
+      let imageCredit: string | undefined;
+      
+      if (imageType === "ai") {
+        const aiImage = await generateAIImage(signal, company, baseUrl);
+        if (aiImage) {
+          imageUrl = aiImage.imageUrl;
+          imageCredit = aiImage.credit;
+        } else {
+          imageUrl = selectStockImage(signal, company, baseUrl);
+          imageCredit = undefined;
+        }
+      } else {
+        imageUrl = selectStockImage(signal, company, baseUrl);
+      }
+      
+      const payload = buildMediaSitePayload(article, signal, company, imageUrl, imageCredit);
 
       const result = await publishToMediaSite(payload);
 
