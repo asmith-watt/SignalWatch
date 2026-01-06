@@ -314,5 +314,123 @@ export const insertMonitorRunSchema = createInsertSchema(monitorRuns).omit({
 export type InsertMonitorRun = z.infer<typeof insertMonitorRunSchema>;
 export type MonitorRun = typeof monitorRuns.$inferSelect;
 
+// ============================================
+// Signal Graph Tables (Phase 1)
+// ============================================
+
+// Entity types for the graph
+export const entityTypes = [
+  "company",
+  "regulator",
+  "commodity",
+  "ingredient",
+  "product",
+  "facility",
+  "disease",
+  "geography",
+  "person",
+  "standard_program",
+] as const;
+
+export type EntityType = (typeof entityTypes)[number];
+
+// Entity roles in signals
+export const entityRoles = [
+  "subject",
+  "investor",
+  "competitor",
+  "partner",
+  "supplier",
+  "customer",
+  "acquired",
+  "actor",
+  "target",
+  "location",
+  "other",
+] as const;
+
+export type EntityRole = (typeof entityRoles)[number];
+
+// Canonical entities table - shared nodes across signals
+export const entities = pgTable("entities", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  type: text("type").notNull(),
+  canonicalKey: text("canonical_key").notNull().unique(),
+  description: text("description"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const entitiesRelations = relations(entities, ({ many }) => ({
+  aliases: many(entityAliases),
+  signalLinks: many(signalEntities),
+}));
+
+export const insertEntitySchema = createInsertSchema(entities).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertEntity = z.infer<typeof insertEntitySchema>;
+export type Entity = typeof entities.$inferSelect;
+
+// Entity aliases for fuzzy matching
+export const entityAliases = pgTable("entity_aliases", {
+  id: serial("id").primaryKey(),
+  entityId: integer("entity_id").notNull().references(() => entities.id, { onDelete: "cascade" }),
+  alias: text("alias").notNull(),
+  aliasKey: text("alias_key").notNull().unique(),
+  source: text("source"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const entityAliasesRelations = relations(entityAliases, ({ one }) => ({
+  entity: one(entities, {
+    fields: [entityAliases.entityId],
+    references: [entities.id],
+  }),
+}));
+
+export const insertEntityAliasSchema = createInsertSchema(entityAliases).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertEntityAlias = z.infer<typeof insertEntityAliasSchema>;
+export type EntityAlias = typeof entityAliases.$inferSelect;
+
+// Signal-entity links (many-to-many with role and confidence)
+export const signalEntities = pgTable("signal_entities", {
+  id: serial("id").primaryKey(),
+  signalId: integer("signal_id").notNull().references(() => signals.id, { onDelete: "cascade" }),
+  entityId: integer("entity_id").notNull().references(() => entities.id, { onDelete: "cascade" }),
+  role: text("role").notNull(),
+  confidence: integer("confidence").notNull().default(80),
+  surface: text("surface"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const signalEntitiesRelations = relations(signalEntities, ({ one }) => ({
+  signal: one(signals, {
+    fields: [signalEntities.signalId],
+    references: [signals.id],
+  }),
+  entity: one(entities, {
+    fields: [signalEntities.entityId],
+    references: [entities.id],
+  }),
+}));
+
+export const insertSignalEntitySchema = createInsertSchema(signalEntities).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertSignalEntity = z.infer<typeof insertSignalEntitySchema>;
+export type SignalEntity = typeof signalEntities.$inferSelect;
+
 // Re-export chat models for OpenAI integration
 export * from "./models/chat";

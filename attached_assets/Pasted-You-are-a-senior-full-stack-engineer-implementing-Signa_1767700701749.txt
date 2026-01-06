@@ -1,0 +1,255 @@
+You are a senior full-stack engineer implementing “Signal Graph” in SignalWatch (Express + TypeScript + Drizzle + Neon + React). Implement in phases so the app remains stable. Existing monitoring, dedupe, and scheduler must keep working.
+
+CURRENT CODEBASE NOTES
+- signals.entities is jsonb with shape like:
+  {
+    dates: [{date,event}],
+    people: [],
+    companies: [{name,relationship}],
+    locations: [string],
+    financials: {...}
+  }
+- signals.aiAnalysis is jsonb with relevanceScore 0–100 (example: 70)
+- Signal detail UI lives at: client/src/components/signal-detail-panel.tsx
+- storage.createSignal() has no hooks; call graph linking explicitly in server/perplexity-monitor.ts after signal creation.
+- We want canonical entity nodes for ALL companies automatically.
+
+GOAL
+Implement a true Signal Graph with:
+1) Canonical Entities (shared nodes across signals) — Phase 1
+2) Relationships / Edges with provenance & confidence — Phase 2
+3) Clusters/Events — Phase 3 (optional but outlined)
+
+DEFINITION OF DONE (Phase 1)
+- New tables exist: entities, entity_aliases, signal_entities
+- Every new signal inserts signal_entities rows.
+- Backfill populates signal_entities for historical signals.
+- Related signals endpoint works (shared entities).
+- UI shows related signals panel on the signal detail view.
+
+------------------------------------------------------------
+PHASE 1 — Canonical Entities + Signal Links
+------------------------------------------------------------
+
+A) Add new tables (Drizzle schema + migration). Use snake_case names.
+
+1) entities
+- id serial pk
+- name text not null
+- type text not null
+- canonical_key text not null unique
+- description text null
+- metadata jsonb null
+- created_at timestamptz not null default now()
+- updated_at timestamptz not null default now()
+Indexes: unique(canonical_key), index(type,name)
+
+2) entity_aliases
+- id serial pk
+- entity_id int not null references entities(id) on delete cascade
+- alias text not null
+- alias_key text not null unique
+- source text null  // manual | ai | imported
+- created_at timestamptz not null default now()
+Indexes: unique(alias_key), index(entity_id)
+
+3) signal_entities
+- id serial pk
+- signal_id int not null references signals(id) on delete cascade
+- entity_id int not null references entities(id) on delete cascade
+- role text not null
+- confidence int not null default 80
+- surface text null
+- created_at timestamptz not null default now()
+Constraints/indexes:
+- unique(signal_id, entity_id, role)
+- index(signal_id)
+- index(entity_id)
+
+Entity Types (store as text, validate in code):
+- company
+- regulator
+- commodity
+- ingredient
+- product
+- facility
+- disease
+- geography
+- person
+- standard_program
+
+Roles (store as text, validate in code):
+- subject
+- investor
+- competitor
+- partner
+- supplier
+- customer
+- acquired
+- actor
+- target
+- location
+- other
+
+B) Canonicalization utilities (server/graph/normalize.ts)
+Implement:
+- normalizeKey(s): lowercase, trim, collapse whitespace, remove punctuation except spaces/alphanumerics
+- normalizeCompanySuffixes: remove inc, llc, ltd, co, corp, corporation, company
+- canonicalKey(type,name): `${type}:${normalizeKey(normalizedName)}`
+Use normalizeCompanySuffixes for type=company only.
+
+C) Entity upsert helpers (server/graph/entities.ts)
+Implement:
+- upsertEntity({ type, name, description?, metadata? })
+  - compute canonical_key
+  - insert on conflict(canonical_key) do update set updated_at=now()
+  - return entity row
+- upsertAlias(entityId, alias, source="ai")
+  - alias_key = normalizeKey(alias)
+  - insert ignore on conflict(alias_key)
+
+D) Extraction mapping from signals.entities (server/graph/extract.ts)
+Write a mapper specifically for the known structure:
+
+Input: entitiesJson (unknown)
+Output: candidates: Array<{ type, name, role, confidence, surface?, metadata? }>
+
+Rules:
+1) Always include the subject company as a canonical entity link:
+- type: company
+- name: company.name (from companies table for signal.companyId)
+- role: subject
+- confidence: 100
+
+2) From entitiesJson.companies (array of {name, relationship}):
+- Map each item to type=company, name=item.name
+- role:
+  - if relationship present use it (subject/investor/competitor/partner/supplier/customer/acquired)
+  - else role=other
+- confidence: 90
+- surface: item.name
+
+3) From entitiesJson.people (array or empty):
+- If it’s array of strings or objects:
+  - type=person
+  - name=string or obj.name
+  - role=other
+  - confidence=80
+
+4) From entitiesJson.locations (array of strings):
+- type=geography
+- name=location string
+- role=location
+- confidence=80
+
+5) From entitiesJson.dates (array of {date,event}):
+- Do NOT create entities for dates by default.
+- Instead store this as metadata on the signal->entity links only if needed later.
+- For now ignore dates for graph nodes.
+
+6) From entitiesJson.financials (object):
+- Do NOT create entities for financial numbers.
+- Later they can become event attributes or cluster metadata.
+- For now ignore financials for graph nodes.
+
+7) Deduplicate candidates within a single signal by canonicalKey(type,name)+role.
+
+E) Link entities after signal creation (server/perplexity-monitor.ts)
+After creating a signal (createdSignal.id):
+- call linkSignalToEntities(createdSignal.id, company, signal.entities)
+Create new module server/graph/link.ts:
+- linkSignalToEntities(signalId, companyRow, entitiesJson):
+  - candidates = extractCandidates(companyRow, entitiesJson)
+  - for each candidate:
+    - entity = upsertEntity(...)
+    - if surface differs meaningfully from entity.name, upsertAlias(entity.id, surface)
+    - insert into signal_entities(signal_id, entity_id, role, confidence, surface) with ON CONFLICT DO NOTHING
+Important: linking failures must not fail monitoring; catch/log and continue.
+
+F) Backfill existing signals (admin-only endpoint)
+Add:
+POST /api/admin/graph/backfill?startAfterId=0&limit=200
+- Require header: x-admin-token equals process.env.ADMIN_TOKEN
+- Load signals in ascending id, join companies for company name
+- Skip signals that already have signal_entities rows
+- Call linkSignalToEntities for each
+Return: { scanned, linkedSignals, linksCreated, skipped, errors, lastId }
+
+G) Related signals endpoint
+Add:
+GET /api/signals/:id/related?limit=10&days=30
+Implementation:
+- Find entity_ids for signal_id
+- Find other signals sharing those entity_ids within lookback days
+- Score = count(shared_entities)
+- Return signals ordered by score desc then publishedAt/gatheredAt desc
+Exclude the original signal.
+Return: [{ signal, sharedEntityCount, sharedEntitiesPreview: [entityName...] }]
+
+H) UI: Related signals panel (client/src/components/signal-detail-panel.tsx)
+- Add a “Related signals” section:
+  - calls /api/signals/:id/related
+  - shows top 5–10 items with title, company name, publishedAt, priority
+  - show “shared entities: X” and a few entity names
+
+Acceptance criteria Phase 1:
+- New tables exist and migrations apply.
+- New signals create signal_entities.
+- Backfill works on historical signals.
+- Related endpoint returns good results.
+- UI shows related items.
+
+------------------------------------------------------------
+PHASE 2 — Entity Relationships (edges with provenance)
+------------------------------------------------------------
+
+A) Add entity_relationships table (migration + Drizzle schema)
+Fields:
+- id serial pk
+- source_entity_id int not null references entities(id) on delete cascade
+- target_entity_id int not null references entities(id) on delete cascade
+- relationship_type text not null
+- strength int not null default 1
+- confidence int not null default 80
+- source_signal_id int references signals(id) on delete set null
+- metadata jsonb null
+- created_at timestamptz not null default now()
+
+Relationship types (validate in code):
+- acquired
+- partners_with
+- invested_in
+- competes_with
+- supplies
+- buys
+- produces
+- operates
+- located_in
+- regulates
+(We can add recalls/outbreak_in later when those entity types exist reliably in extraction.)
+
+B) Relationship extraction (server/graph/relationships.ts)
+Create edges based on entitiesJson.companies relationships and signal.type:
+- For each company entry in entitiesJson.companies:
+  - if relationship == "investor": create edge investor -> subjectCompany: invested_in
+  - if relationship == "competitor": create edge company <-> subjectCompany: competes_with
+  - if relationship == "partner": partners_with (bidirectional or store one direction consistently)
+  - if signal.type == "acquisition" and there are >=2 companies: acquired
+Use source_signal_id for provenance. Use confidence 80–90.
+
+Add function:
+- createRelationshipsForSignal(signalId, companyRow, entitiesJson)
+Call it after linkSignalToEntities in perplexity-monitor.ts (Phase 2 only).
+
+------------------------------------------------------------
+PHASE 3 — Clusters/Events (optional)
+------------------------------------------------------------
+Define clusters + cluster_signals later, using shared entities + existing Jaccard title similarity. Do not implement unless requested after Phase 1 and 2 are stable.
+
+DELIVERABLES
+- Phase 1 fully implemented + UI related panel + admin backfill
+- Phase 2 relationships table + extraction
+- Unit tests for normalizeKey, canonicalKey, extractCandidates
+- Keep monitoring, dedupe, scheduler intact
+
+Start with Phase 1 only. After Phase 1 is deployed and verified, proceed to Phase 2.
