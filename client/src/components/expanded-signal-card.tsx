@@ -336,32 +336,32 @@ export function ExpandedSignalCard({
                   AI Analysis
                 </h4>
                 <div className="space-y-3 text-sm">
-                  {analysis.keyTakeaways && Array.isArray(analysis.keyTakeaways) && (
+                  {Array.isArray(analysis.keyTakeaways) && analysis.keyTakeaways.length > 0 ? (
                     <div>
                       <span className="font-medium text-muted-foreground">Key Takeaways:</span>
                       <ul className="list-disc list-inside mt-1 space-y-1">
                         {(analysis.keyTakeaways as string[]).map((t, i) => (
-                          <li key={i}>{t}</li>
+                          <li key={i}>{String(t)}</li>
                         ))}
                       </ul>
                     </div>
-                  )}
-                  {analysis.industryImpact && (
+                  ) : null}
+                  {typeof analysis.industryImpact === "string" ? (
                     <div>
                       <span className="font-medium text-muted-foreground">Industry Impact:</span>
-                      <p className="mt-1">{analysis.industryImpact as string}</p>
+                      <p className="mt-1">{analysis.industryImpact}</p>
                     </div>
-                  )}
-                  {analysis.storyAngles && Array.isArray(analysis.storyAngles) && (
+                  ) : null}
+                  {Array.isArray(analysis.storyAngles) && analysis.storyAngles.length > 0 ? (
                     <div>
                       <span className="font-medium text-muted-foreground">Story Angles:</span>
                       <ul className="list-disc list-inside mt-1 space-y-1">
                         {(analysis.storyAngles as string[]).map((a, i) => (
-                          <li key={i}>{a}</li>
+                          <li key={i}>{String(a)}</li>
                         ))}
                       </ul>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             )}
