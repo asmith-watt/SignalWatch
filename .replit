@@ -45,6 +45,7 @@ integrations = ["javascript_openai_ai_integrations:2.0.0", "javascript_database:
 
 [userenv.production]
 NODE_ENV = "production"
+PRODUCTION_APP_URL = "https://media-horizon--andrewniu.replit.app"
 
 [userenv.shared]
 MEDIA_SITE_URL = "https://baking-and-milling-industry-news--andrewniu.replit.app"

@@ -956,10 +956,12 @@ export async function registerRoutes(
       const company = await storage.getCompany(signal.companyId) || null;
       const article = await generateArticleFromSignal(signal, company, style);
 
+      // Use production URL if available (set during deployment), otherwise fall back to current domain
+      const productionAppUrl = process.env.PRODUCTION_APP_URL;
       const replitDomain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS;
       const protocol = req.headers["x-forwarded-proto"] || req.protocol || "http";
       const host = req.headers.host || "localhost:5000";
-      const baseUrl = replitDomain ? `https://${replitDomain}` : `${protocol}://${host}`;
+      const baseUrl = productionAppUrl || (replitDomain ? `https://${replitDomain}` : `${protocol}://${host}`);
       
       let imageUrl: string;
       let imageCredit: string | undefined;
