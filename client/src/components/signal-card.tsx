@@ -1,465 +1,492 @@
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import {
-  Newspaper,
-  Megaphone,
-  Briefcase,
-  DollarSign,
-  UserCheck,
-  Package,
-  Handshake,
-  Building2,
-  Globe,
-  MessageSquare,
-  FileText,
-  TrendingUp,
   Bookmark,
   BookmarkCheck,
-  User,
-  ExternalLink,
   MoreHorizontal,
-  FileEdit,
-  Sparkles,
+  Building2,
   MapPin,
-  Users,
-  Calendar,
+  FileEdit,
+  Loader2,
+  ExternalLink,
+  User,
+  Globe,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import type { Signal } from "@shared/schema";
+import type { Signal, Company } from "@shared/schema";
 
 interface SignalCardProps {
   signal: Signal;
-  companyName?: string;
-  showCompany?: boolean;
-  onBookmark?: (id: number, bookmarked: boolean) => void;
+  company?: Company | null;
+  mode: "compact" | "editorial";
+  onOpen?: () => void;
+  relatedCount?: number;
+  onToggleBookmark?: (id: number, bookmarked: boolean) => void;
   onMarkRead?: (id: number, read: boolean) => void;
   onAssign?: (id: number) => void;
   onCreateContent?: (id: number) => void;
   onPublishWordPress?: (id: number) => void;
   onPublishMediaSite?: (id: number) => void;
-  onEntitySelect?: (entityName: string) => void;
-  onClick?: () => void;
+  isGeneratingArticle?: boolean;
+  onGenerateArticle?: () => void;
 }
 
-const signalTypeConfig: Record<
-  string,
-  { icon: typeof Newspaper; label: string; color: string }
-> = {
-  news: { icon: Newspaper, label: "News", color: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
-  press_release: { icon: Megaphone, label: "Press Release", color: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
-  job_posting: { icon: Briefcase, label: "Job Posting", color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-  funding: { icon: DollarSign, label: "Funding", color: "bg-green-500/10 text-green-600 dark:text-green-400" },
-  executive_change: { icon: UserCheck, label: "Executive Change", color: "bg-orange-500/10 text-orange-600 dark:text-orange-400" },
-  product_launch: { icon: Package, label: "Product Launch", color: "bg-pink-500/10 text-pink-600 dark:text-pink-400" },
-  partnership: { icon: Handshake, label: "Partnership", color: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400" },
-  acquisition: { icon: Building2, label: "Acquisition", color: "bg-red-500/10 text-red-600 dark:text-red-400" },
-  website_change: { icon: Globe, label: "Website Change", color: "bg-slate-500/10 text-slate-600 dark:text-slate-400" },
-  social_media: { icon: MessageSquare, label: "Social Media", color: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" },
-  regulatory: { icon: FileText, label: "Regulatory", color: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-  earnings: { icon: TrendingUp, label: "Earnings", color: "bg-teal-500/10 text-teal-600 dark:text-teal-400" },
-  other: { icon: FileText, label: "Other", color: "bg-gray-500/10 text-gray-600 dark:text-gray-400" },
-};
+interface EntityChip {
+  label: string;
+  type: "company" | "location" | "related";
+}
 
-const priorityColors: Record<string, string> = {
-  high: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
-  medium: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-  low: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20",
-};
+interface SignalEntities {
+  companies?: Array<{ name: string; relationship?: string }>;
+  locations?: string[];
+  people?: Array<{ name: string; role?: string }>;
+  dates?: Array<{ date: string; event?: string }>;
+  financials?: {
+    funding?: string | null;
+    revenue?: string | null;
+    valuation?: string | null;
+    growth?: string | null;
+  };
+}
 
-const sentimentColors: Record<string, string> = {
-  positive: "text-green-600 dark:text-green-400",
-  negative: "text-red-600 dark:text-red-400",
-  neutral: "text-muted-foreground",
-};
+interface AIAnalysis {
+  keyTakeaways?: string[];
+  keyPoints?: string[];
+  industryImpact?: string;
+  storyAngles?: string[];
+  suggestedFollowUp?: string[];
+  suggestedActions?: string[];
+  relevanceScore?: number;
+  priorityScore?: number;
+  noveltyScore?: number;
+  recommendedFormat?: "ignore" | "brief" | "news" | "analysis";
+}
 
-const contentStatusConfig: Record<string, { label: string; color: string }> = {
-  new: { label: "New", color: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
-  reviewing: { label: "Reviewing", color: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-  writing: { label: "Writing", color: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
-  published: { label: "Published", color: "bg-green-500/10 text-green-600 dark:text-green-400" },
-};
+function formatMetaLine(
+  company: Company | null | undefined,
+  sourceName: string | null | undefined,
+  sourceUrl: string | null | undefined,
+  publishedAt: Date | string | null | undefined,
+  gatheredAt: Date | string | null | undefined
+): string {
+  const parts: string[] = [];
+  
+  if (company?.name) {
+    parts.push(company.name);
+  }
+  
+  if (sourceName) {
+    parts.push(sourceName);
+  } else if (sourceUrl) {
+    try {
+      const url = new URL(sourceUrl.startsWith("http") ? sourceUrl : `https://${sourceUrl}`);
+      parts.push(url.hostname.replace("www.", ""));
+    } catch {
+      parts.push("Source");
+    }
+  }
+  
+  if (publishedAt) {
+    const date = typeof publishedAt === "string" ? new Date(publishedAt) : publishedAt;
+    parts.push(`Source: ${format(date, "MMM d, yyyy")}`);
+  }
+  
+  if (gatheredAt) {
+    const date = typeof gatheredAt === "string" ? new Date(gatheredAt) : gatheredAt;
+    parts.push(`Gathered: ${format(date, "MMM d, yyyy")}`);
+  }
+  
+  return parts.join(" \u2022 ");
+}
+
+function deriveEntityChips(signal: Signal, company?: Company | null): EntityChip[] {
+  const chips: EntityChip[] = [];
+  const entities = signal.entities as SignalEntities | null;
+  
+  if (company?.name) {
+    chips.push({ label: company.name, type: "company" });
+  }
+  
+  if (entities?.locations && entities.locations.length > 0) {
+    const locations = entities.locations.slice(0, 2);
+    for (const loc of locations) {
+      if (chips.length < 4) {
+        chips.push({ label: loc, type: "location" });
+      }
+    }
+  }
+  
+  if (entities?.companies && entities.companies.length > 0) {
+    const relatedCompanies = entities.companies.filter(
+      (c) => c.relationship !== "subject" && c.name !== company?.name
+    );
+    if (relatedCompanies.length > 0 && chips.length < 4) {
+      chips.push({ label: relatedCompanies[0].name, type: "related" });
+    }
+  }
+  
+  return chips.slice(0, 4);
+}
+
+function renderBadges(signal: Signal): JSX.Element[] {
+  const badges: JSX.Element[] = [];
+  const aiAnalysis = signal.aiAnalysis as AIAnalysis | null;
+  
+  badges.push(
+    <Badge key="type" variant="secondary" data-testid={`badge-type-${signal.id}`}>
+      {signal.type.replace(/_/g, " ")}
+    </Badge>
+  );
+  
+  if (signal.priority === "high") {
+    badges.push(
+      <Badge key="priority" variant="default" data-testid={`badge-priority-${signal.id}`}>
+        high priority
+      </Badge>
+    );
+  } else if (signal.priority === "low") {
+    badges.push(
+      <Badge key="priority" variant="outline" data-testid={`badge-priority-${signal.id}`}>
+        low priority
+      </Badge>
+    );
+  }
+  
+  if (signal.sentiment === "negative") {
+    badges.push(
+      <Badge key="sentiment" variant="destructive" data-testid={`badge-sentiment-${signal.id}`}>
+        negative
+      </Badge>
+    );
+  }
+  
+  if (signal.contentStatus) {
+    badges.push(
+      <Badge key="status" variant="outline" data-testid={`badge-status-${signal.id}`}>
+        {signal.contentStatus}
+      </Badge>
+    );
+  }
+  
+  if (aiAnalysis?.recommendedFormat) {
+    const formatVariant = aiAnalysis.recommendedFormat === "ignore" ? "outline" : "secondary";
+    badges.push(
+      <Badge key="format" variant={formatVariant} data-testid={`badge-format-${signal.id}`}>
+        {aiAnalysis.recommendedFormat}
+      </Badge>
+    );
+  }
+  
+  if (aiAnalysis?.priorityScore !== undefined && badges.length < 5) {
+    badges.push(
+      <Badge key="score" variant="outline" data-testid={`badge-score-${signal.id}`}>
+        Score: {aiAnalysis.priorityScore}
+      </Badge>
+    );
+  }
+  
+  return badges.slice(0, 5);
+}
 
 export function SignalCard({
   signal,
-  companyName,
-  showCompany = false,
-  onBookmark,
+  company,
+  mode,
+  onOpen,
+  relatedCount = 0,
+  onToggleBookmark,
   onMarkRead,
   onAssign,
   onCreateContent,
   onPublishWordPress,
   onPublishMediaSite,
-  onEntitySelect,
-  onClick,
+  isGeneratingArticle,
+  onGenerateArticle,
 }: SignalCardProps) {
-  const typeConfig = signalTypeConfig[signal.type] || signalTypeConfig.other;
-  const TypeIcon = typeConfig.icon;
-  const priorityColor = priorityColors[signal.priority || "medium"];
-  const sentimentColor = sentimentColors[signal.sentiment || "neutral"];
-  const statusConfig = contentStatusConfig[signal.contentStatus || "new"];
+  const aiAnalysis = signal.aiAnalysis as AIAnalysis | null;
+  const entityChips = deriveEntityChips(signal, company);
+  const metaLine = formatMetaLine(
+    company,
+    signal.sourceName,
+    signal.sourceUrl,
+    signal.publishedAt,
+    signal.gatheredAt
+  );
+  
+  const keyTakeaways = aiAnalysis?.keyTakeaways || aiAnalysis?.keyPoints || [];
+  const suggestedFollowUp = aiAnalysis?.suggestedFollowUp || aiAnalysis?.suggestedActions || [];
 
-  const gatheredDate = signal.gatheredAt
-    ? new Date(signal.gatheredAt).toLocaleDateString('en-US', { timeZone: 'UTC' })
-    : signal.createdAt
-    ? new Date(signal.createdAt).toLocaleDateString('en-US', { timeZone: 'UTC' })
-    : null;
-  
-  const sourcePublishedDate = signal.publishedAt
-    ? new Date(signal.publishedAt).toLocaleDateString('en-US', { timeZone: 'UTC' })
-    : null;
-  
-  const citations = Array.isArray(signal.citations) ? signal.citations : [];
+  const handleCardClick = () => {
+    if (mode === "compact" && onOpen) {
+      onOpen();
+    }
+  };
+
+  const handleBookmarkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onToggleBookmark) {
+      onToggleBookmark(signal.id, !signal.isBookmarked);
+    }
+  };
+
+  const handleMenuClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
 
   return (
     <Card
-      className={`p-4 transition-colors hover-elevate cursor-pointer ${
-        !signal.isRead ? "border-l-2 border-l-primary" : ""
+      className={`${mode === "compact" ? "hover-elevate active-elevate-2 cursor-pointer" : ""} ${
+        !signal.isRead && mode === "compact" ? "border-l-2 border-l-primary" : ""
       }`}
-      onClick={onClick}
+      onClick={handleCardClick}
       data-testid={`signal-card-${signal.id}`}
     >
-      <div className="flex gap-3">
-        <div
-          className={`flex-shrink-0 w-9 h-9 rounded-md flex items-center justify-center ${typeConfig.color}`}
-        >
-          <TypeIcon className="w-4 h-4" />
-        </div>
-
-        <div className="flex-1 min-w-0 space-y-2">
-          <div className="flex items-start justify-between gap-2">
-            <div className="space-y-1">
-              <h3
-                className={`text-sm font-medium leading-snug line-clamp-2 ${
-                  !signal.isRead ? "text-foreground" : "text-muted-foreground"
-                }`}
-              >
-                {signal.title}
-              </h3>
-              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                {showCompany && companyName && (
-                  <>
-                    <span className="font-medium text-foreground">{companyName}</span>
-                    <span>-</span>
-                  </>
-                )}
-                {signal.sourceName && <span>{signal.sourceName}</span>}
-                {sourcePublishedDate && (
-                  <>
-                    <span>-</span>
-                    <span data-testid={`text-source-date-${signal.id}`}>Source: {sourcePublishedDate}</span>
-                  </>
-                )}
-                {gatheredDate && (
-                  <>
-                    <span>-</span>
-                    <span data-testid={`text-gathered-date-${signal.id}`}>Gathered: {gatheredDate}</span>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onBookmark?.(signal.id, !signal.isBookmarked);
-                    }}
-                    data-testid={`button-bookmark-${signal.id}`}
-                  >
-                    {signal.isBookmarked ? (
-                      <BookmarkCheck className="w-4 h-4 text-primary" />
-                    ) : (
-                      <Bookmark className="w-4 h-4" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {signal.isBookmarked ? "Remove bookmark" : "Bookmark"}
-                </TooltipContent>
-              </Tooltip>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={(e) => e.stopPropagation()}
-                    data-testid={`button-signal-menu-${signal.id}`}
-                  >
-                    <MoreHorizontal className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => onMarkRead?.(signal.id, !signal.isRead)}
-                  >
-                    {signal.isRead ? "Mark as unread" : "Mark as read"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onAssign?.(signal.id)}>
-                    <User className="w-4 h-4 mr-2" />
-                    Assign to team member
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => onCreateContent?.(signal.id)}>
-                    <FileEdit className="w-4 h-4 mr-2" />
-                    Create content
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onPublishWordPress?.(signal.id)}>
-                    <Globe className="w-4 h-4 mr-2" />
-                    Publish to WordPress
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onPublishMediaSite?.(signal.id)}>
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Publish to BakingMilling
-                  </DropdownMenuItem>
-                  {signal.sourceUrl && (
-                    <DropdownMenuItem asChild>
-                      <a
-                        href={signal.sourceUrl.startsWith("//") ? "https:" + signal.sourceUrl : 
-                              (!signal.sourceUrl.startsWith("http") ? "https://" + signal.sourceUrl : signal.sourceUrl)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        View source
-                      </a>
-                    </DropdownMenuItem>
-                  )}
-                  {citations.length > 0 && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuLabel className="text-xs text-muted-foreground">
-                        Citations
-                      </DropdownMenuLabel>
-                      {citations.slice(0, 5).map((url, index) => {
-                        try {
-                          const hostname = new URL(url).hostname.replace("www.", "");
-                          return (
-                            <DropdownMenuItem key={index} asChild>
-                              <a
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-xs"
-                              >
-                                <ExternalLink className="w-3 h-3 mr-2" />
-                                {hostname}
-                              </a>
-                            </DropdownMenuItem>
-                          );
-                        } catch {
-                          return null;
-                        }
-                      })}
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-
-          {/* Original Signal Content */}
-          {signal.summary && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {signal.summary}
-            </p>
-          )}
-
-          {/* Signal Metadata Badges */}
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="secondary" className={`text-xs ${typeConfig.color}`}>
-              {typeConfig.label}
-            </Badge>
-
-            {signal.priority && (
-              <Badge variant="outline" className={`text-xs ${priorityColor}`}>
-                {signal.priority.charAt(0).toUpperCase() + signal.priority.slice(1)} Priority
-              </Badge>
-            )}
-
-            {signal.sentiment && signal.sentiment !== "neutral" && (
-              <span className={`text-xs font-medium ${sentimentColor}`}>
-                {signal.sentiment.charAt(0).toUpperCase() + signal.sentiment.slice(1)}
-              </span>
-            )}
-
-            {signal.contentStatus && signal.contentStatus !== "new" && (
-              <Badge variant="secondary" className={`text-xs ${statusConfig.color}`}>
-                {statusConfig.label}
-              </Badge>
-            )}
-
-            {/* AI Relevance Score - Prominent */}
-            {signal.aiAnalysis && typeof signal.aiAnalysis === 'object' && (signal.aiAnalysis as any).relevanceScore && (
-              <Badge className="text-xs h-5 px-1.5 gap-1 bg-primary/10 text-primary border-primary/20">
-                <Sparkles className="w-2.5 h-2.5" />
-                Score: {(signal.aiAnalysis as any).relevanceScore}
-              </Badge>
-            )}
-
-            {signal.assignedTo && (
-              <div className="flex items-center gap-1">
-                <Avatar className="h-5 w-5">
-                  <AvatarFallback className="text-xs">
-                    {signal.assignedTo.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-            )}
-          </div>
-
-          {/* AI Insights Section */}
-          {signal.aiAnalysis && typeof signal.aiAnalysis === 'object' && (() => {
-            const analysis = signal.aiAnalysis as any;
-            const takeaways = analysis.keyTakeaways || analysis.keyPoints || [];
-            const industryImpact = analysis.industryImpact;
-            const storyAngles = analysis.storyAngles || [];
+      <CardContent className={mode === "compact" ? "p-4" : "p-5"}>
+        <div className="flex items-start justify-between gap-3">
+          <h3
+            className={`font-medium ${mode === "compact" ? "text-sm line-clamp-1" : "text-base"}`}
+            data-testid={`signal-title-${signal.id}`}
+          >
+            {signal.title}
+          </h3>
+          
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleBookmarkClick}
+              data-testid={`button-bookmark-${signal.id}`}
+            >
+              {signal.isBookmarked ? (
+                <BookmarkCheck className="w-4 h-4 text-primary" />
+              ) : (
+                <Bookmark className="w-4 h-4" />
+              )}
+            </Button>
             
-            return (
-              <div className="mt-2 p-2.5 rounded-md bg-primary/5 border border-primary/10 space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-xs font-semibold text-primary">AI Analysis</span>
-                  </div>
-                  <span className="text-[10px] text-muted-foreground">Powered by Perplexity</span>
-                </div>
-                
-                {/* Key Takeaways */}
-                {takeaways.length > 0 && (
-                  <div className="space-y-1">
-                    <span className="text-xs font-medium text-muted-foreground">Key Takeaways:</span>
-                    <ul className="text-xs text-foreground space-y-0.5 pl-4">
-                      {(takeaways as string[]).slice(0, 3).map((takeaway, i) => (
-                        <li key={i} className="list-disc">{takeaway}</li>
-                      ))}
-                    </ul>
-                  </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleMenuClick}
+                  data-testid={`button-menu-${signal.id}`}
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMarkRead?.(signal.id, !signal.isRead);
+                  }}
+                >
+                  {signal.isRead ? "Mark as unread" : "Mark as read"}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAssign?.(signal.id);
+                  }}
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Assign to team member
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCreateContent?.(signal.id);
+                  }}
+                >
+                  <FileEdit className="w-4 h-4 mr-2" />
+                  Create content
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPublishWordPress?.(signal.id);
+                  }}
+                >
+                  <Globe className="w-4 h-4 mr-2" />
+                  Publish to WordPress
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPublishMediaSite?.(signal.id);
+                  }}
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Publish to BakingMilling
+                </DropdownMenuItem>
+                {signal.sourceUrl && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const srcUrl = signal.sourceUrl!;
+                        const url = srcUrl.startsWith("//") 
+                          ? "https:" + srcUrl 
+                          : (!srcUrl.startsWith("http") ? "https://" + srcUrl : srcUrl);
+                        window.open(url, "_blank");
+                      }}
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      View Source
+                    </DropdownMenuItem>
+                  </>
                 )}
-
-                {/* Industry Impact */}
-                {industryImpact && (
-                  <div className="space-y-1">
-                    <span className="text-xs font-medium text-muted-foreground">Industry Impact:</span>
-                    <p className="text-xs text-foreground">{industryImpact}</p>
-                  </div>
-                )}
-
-                {/* Story Angles */}
-                {storyAngles.length > 0 && (
-                  <div className="space-y-1">
-                    <span className="text-xs font-medium text-muted-foreground">Story Angles:</span>
-                    <ul className="text-xs text-foreground space-y-0.5 pl-4">
-                      {(storyAngles as string[]).slice(0, 2).map((angle, i) => (
-                        <li key={i} className="list-disc">{angle}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Extracted Entities */}
-                {signal.entities && typeof signal.entities === 'object' && (
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {(signal.entities as any).companies?.map((c: any, i: number) => {
-                      const name = typeof c === 'string' ? c : c.name;
-                      return (
-                        <Badge
-                          key={i}
-                          variant="secondary"
-                          className="text-xs h-5 px-1.5 gap-1 cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onEntitySelect?.(name);
-                          }}
-                          data-testid={`entity-company-${i}`}
-                        >
-                          <Building2 className="w-2.5 h-2.5" />
-                          {name}
-                        </Badge>
-                      );
-                    })}
-                    {(signal.entities as any).organizations?.map((org: any, i: number) => {
-                      const name = typeof org === 'string' ? org : org.name;
-                      return (
-                        <Badge
-                          key={`org-${i}`}
-                          variant="secondary"
-                          className="text-xs h-5 px-1.5 gap-1 cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onEntitySelect?.(name);
-                          }}
-                          data-testid={`entity-org-${i}`}
-                        >
-                          <Building2 className="w-2.5 h-2.5" />
-                          {name}
-                        </Badge>
-                      );
-                    })}
-                    {(signal.entities as any).people?.map((person: any, i: number) => {
-                      const name = typeof person === 'string' ? person : person.name;
-                      return (
-                        <Badge
-                          key={`person-${i}`}
-                          variant="outline"
-                          className="text-xs h-5 px-1.5 gap-1 cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onEntitySelect?.(name);
-                          }}
-                          data-testid={`entity-person-${i}`}
-                        >
-                          <Users className="w-2.5 h-2.5" />
-                          {name}
-                        </Badge>
-                      );
-                    })}
-                    {(signal.entities as any).locations?.slice(0, 3).map((loc: any, i: number) => {
-                      const name = typeof loc === 'string' ? loc : loc.name;
-                      return (
-                        <Badge
-                          key={`loc-${i}`}
-                          variant="outline"
-                          className="text-xs h-5 px-1.5 gap-1 cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onEntitySelect?.(name);
-                          }}
-                          data-testid={`entity-loc-${i}`}
-                        >
-                          <MapPin className="w-2.5 h-2.5" />
-                          {name}
-                        </Badge>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(signal.title + "\n\n" + (signal.summary || ""));
+                  }}
+                >
+                  Copy Content
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
+
+        <p className="text-sm text-muted-foreground mt-1" data-testid={`signal-meta-${signal.id}`}>
+          {metaLine}
+        </p>
+
+        {signal.summary && (
+          <p
+            className={`text-sm mt-2 ${mode === "compact" ? "line-clamp-2" : ""}`}
+            data-testid={`signal-summary-${signal.id}`}
+          >
+            {signal.summary}
+          </p>
+        )}
+
+        <div className="flex flex-wrap gap-1.5 mt-3" data-testid={`signal-badges-${signal.id}`}>
+          {renderBadges(signal)}
+        </div>
+
+        {entityChips.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2" data-testid={`signal-entities-${signal.id}`}>
+            {entityChips.map((chip, i) => (
+              <Badge key={i} variant="outline" className="gap-1">
+                {chip.type === "company" && <Building2 className="w-3 h-3" />}
+                {chip.type === "location" && <MapPin className="w-3 h-3" />}
+                {chip.type === "related" && <Building2 className="w-3 h-3" />}
+                {chip.label}
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        {mode === "editorial" && (
+          <>
+            {(keyTakeaways.length > 0 || aiAnalysis?.industryImpact || aiAnalysis?.storyAngles?.length || suggestedFollowUp.length > 0) && (
+              <Card className="mt-4 bg-muted/40 border-0">
+                <CardContent className="p-4 space-y-4">
+                  <h4 className="text-sm font-medium">AI Analysis</h4>
+                  
+                  {keyTakeaways.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Key Takeaways
+                      </p>
+                      <ul className="space-y-1">
+                        {keyTakeaways.map((point, i) => (
+                          <li key={i} className="text-sm flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                            {point}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {aiAnalysis?.industryImpact && (
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Industry Impact
+                      </p>
+                      <p className="text-sm">{aiAnalysis.industryImpact}</p>
+                    </div>
+                  )}
+                  
+                  {aiAnalysis?.storyAngles && aiAnalysis.storyAngles.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Story Angles
+                      </p>
+                      <ul className="space-y-1">
+                        {aiAnalysis.storyAngles.map((angle, i) => (
+                          <li key={i} className="text-sm flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-secondary-foreground/50 mt-1.5 flex-shrink-0" />
+                            {angle}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {suggestedFollowUp.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Suggested Follow-Up
+                      </p>
+                      <ul className="space-y-1">
+                        {suggestedFollowUp.map((item, i) => (
+                          <li key={i} className="text-sm flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 flex-shrink-0" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            <p className="text-xs text-muted-foreground mt-3">
+              {relatedCount > 0
+                ? `Connected to ${relatedCount} related signal${relatedCount === 1 ? "" : "s"}`
+                : "Connections appear as more coverage accumulates"}
+            </p>
+
+            <div className="flex flex-wrap gap-2 mt-4">
+              <Button
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onGenerateArticle) onGenerateArticle();
+                }}
+                disabled={isGeneratingArticle}
+                data-testid={`button-create-article-${signal.id}`}
+              >
+                {isGeneratingArticle ? (
+                  <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                ) : (
+                  <FileEdit className="w-4 h-4 mr-1.5" />
+                )}
+                Create Article
+              </Button>
+            </div>
+          </>
+        )}
+      </CardContent>
     </Card>
   );
 }
+
+// Legacy export for backward compatibility with existing code
+export type { SignalCardProps };

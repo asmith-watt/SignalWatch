@@ -1,0 +1,149 @@
+You are a senior front end engineer working on SignalWatch (React + TypeScript) using Shadcn/UI + Tailwind CSS. Implement ONE reusable SignalCard component with TWO modes: "compact" and "editorial". Do NOT create separate card components. Use a single component with props.
+
+DECISIONS (MUST FOLLOW)
+1) Clicking a compact card should open the existing center detail panel (keep list visible). Do NOT navigate to a new route.
+2) Entity chips are non-clickable labels for now (no filtering, no navigation).
+
+DESIGN SYSTEM
+- Use Shadcn/UI components from client/src/components/ui (Card, Badge, Button, DropdownMenu if available).
+- Use theme-safe variants only (default, secondary, outline, destructive). No hard-coded colors.
+- Use hover-elevate and active-elevate-2 utility classes for card interaction states.
+- Use Lucide icons for actions (bookmark, more-horizontal, etc).
+
+FILES
+- Create/refactor: client/src/components/signal-card.tsx
+- Detail view is: client/src/components/signal-detail-panel.tsx
+- Update list views that show signals (All Signals, Signal Graph list, Industry Map list) to use SignalCard in compact mode.
+
+DATA
+Signal includes:
+- title, summary
+- company name
+- sourceName and/or sourceUrl domain
+- publishedAt (source date), gatheredAt (gathered date)
+- type
+- priority (high/medium/low)
+- sentiment (positive/neutral/negative)
+- contentStatus (new/reviewed/published/rejected)
+- aiAnalysis JSON which may include:
+  - relevanceScore (0–100)
+  - keyTakeaways, industryImpact, storyAngles, suggestedFollowUp
+  - priorityScore (0–100), noveltyScore (0–100), recommendedFormat (ignore|brief|news|analysis)
+
+------------------------------------------------------------
+1) Build SignalCard component
+------------------------------------------------------------
+Component API:
+
+<SignalCard
+  signal={signal}
+  mode="compact" | "editorial"
+  onOpen?={() => void}        // list views will provide this to open center detail panel
+  relatedCount?={number}      // optional (future-ready)
+  onToggleBookmark?={() => void} // optional if existing pattern uses callbacks
+  onOpenMenu?={() => void}       // optional if needed
+/>
+
+Implement shared helpers inside signal-card.tsx:
+- formatMetaLine(company, source, publishedAt, gatheredAt)
+- renderBadges(signal)
+- deriveEntityChips(signal) (see rules below)
+
+------------------------------------------------------------
+2) Compact mode spec (triage card)
+------------------------------------------------------------
+Purpose: skimmable in 3–5 seconds, no long analysis.
+
+Use:
+<Card className="hover-elevate active-elevate-2 cursor-pointer">
+
+Layout:
+A) Header row
+- Left: Title (single line, truncate)
+- Right: bookmark icon button + overflow menu icon button
+IMPORTANT: icon button clicks MUST NOT trigger onOpen (stopPropagation).
+
+B) Metadata line (text-sm text-muted-foreground)
+Format:
+"{company} • {sourceDomainOrName} • Source: {publishedAt} • Gathered: {gatheredAt}"
+
+C) Summary
+- text-sm
+- line-clamp-2
+
+D) Badge row (max 5 badges, keep consistent order)
+1) Type: <Badge variant="secondary">
+2) Priority:
+   - high => <Badge variant="default">
+   - medium => <Badge variant="secondary">
+   - low => <Badge variant="outline">
+3) Sentiment: ONLY show if negative => <Badge variant="destructive">
+4) contentStatus: <Badge variant="outline">
+5) recommendedFormat if present:
+   - ignore => outline
+   - brief/news/analysis => secondary
+Optional: if aiAnalysis.priorityScore exists and there is room, show “Score: XX” as outline.
+
+E) Entity chips row (2–4 chips max)
+- Use <Badge variant="outline" className="gap-1">
+- Chips are NON-CLICKABLE labels.
+Derive chips in this priority order:
+1) subject company name (always)
+2) up to 2 locations (from signal.entities.locations if present)
+3) one extra company from signal.entities.companies that is not the subject (investor/competitor/partner)
+Do NOT show dates or financials as chips.
+
+F) Click behavior
+- Clicking anywhere on the card (except action buttons) calls onOpen().
+- onOpen should open the center detail panel (existing app behavior). Do not route.
+
+------------------------------------------------------------
+3) Editorial mode spec (expanded / detail card)
+------------------------------------------------------------
+Purpose: deep context, article development.
+
+Editorial mode includes everything from compact mode PLUS:
+
+A) AI Analysis block
+- Use <Card className="mt-3 bg-muted/40"> (token-safe)
+- Header: “AI Analysis”
+- Render in this order if present:
+  - Key Takeaways (bullets)
+  - Industry Impact (paragraph)
+  - Story Angles (bullets)
+  - Suggested Follow-Up (bullets)
+
+B) Graph hint line (small)
+- text-xs text-muted-foreground
+- If relatedCount > 0: “Connected to {relatedCount} related signals”
+- Else: “Connections appear as more coverage accumulates”
+
+C) Primary actions row (only in editorial mode)
+- Buttons (Shadcn Button):
+  - Create Article
+  - Assign (if feature exists)
+  - Status change (if feature exists)
+Wire to existing handlers if present. Do not invent backend endpoints.
+
+------------------------------------------------------------
+4) Wire it into the app
+------------------------------------------------------------
+A) List views:
+Replace existing signal list item rendering with:
+<SignalCard mode="compact" signal={signal} onOpen={() => openSignalDetail(signal.id)} />
+
+Use the app’s existing function that opens the center detail panel (do not create a new routing pattern).
+
+B) Detail panel:
+In client/src/components/signal-detail-panel.tsx render:
+<SignalCard mode="editorial" signal={signal} relatedCount={relatedSignals?.length ?? 0} />
+
+Keep the existing right-side Related Signals panel unchanged.
+
+------------------------------------------------------------
+5) Acceptance criteria
+- Compact cards are concise and do not show AI Analysis.
+- Editorial mode shows AI Analysis and actions.
+- Bookmark/menu buttons work and do not open the detail panel accidentally.
+- Visual styling matches design_guidelines.md and uses variants/tokens only.
+- No duplicate logic for badges or metadata formatting across the app.

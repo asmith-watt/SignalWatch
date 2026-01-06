@@ -248,14 +248,13 @@ export function AllSignalsPage() {
                       <SignalCard
                         key={signal.id}
                         signal={signal}
-                        companyName={company?.name}
-                        showCompany
-                        onBookmark={handleBookmark}
+                        company={company}
+                        mode="compact"
+                        onOpen={() => handleSignalClick(signal)}
+                        onToggleBookmark={handleBookmark}
                         onMarkRead={handleMarkRead}
                         onPublishWordPress={(id) => setWpPublishSignalId(id)}
                         onPublishMediaSite={(id) => setMediaSitePublishSignalId(id)}
-                        onEntitySelect={handleEntitySelect}
-                        onClick={() => handleSignalClick(signal)}
                       />
                     );
                   })}
