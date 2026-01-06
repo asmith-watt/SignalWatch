@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,11 +10,13 @@ import {
   Search, 
   Building2, 
   Calendar,
-  ExternalLink,
   Network,
   ArrowRight,
 } from "lucide-react";
 import { format } from "date-fns";
+import { SignalDetailPanel } from "@/components/signal-detail-panel";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { Signal, Company } from "@shared/schema";
 
 interface RelatedSignalResult {
@@ -26,6 +27,7 @@ interface RelatedSignalResult {
 }
 
 export function SignalGraphPage() {
+  const { toast } = useToast();
   const [selectedSignalId, setSelectedSignalId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -33,10 +35,54 @@ export function SignalGraphPage() {
     queryKey: ["/api/signals"],
   });
 
+  const { data: companies = [] } = useQuery<Company[]>({
+    queryKey: ["/api/companies"],
+  });
+
   const { data: relatedSignals = [], isLoading: relatedLoading } = useQuery<RelatedSignalResult[]>({
     queryKey: ["/api/signals", selectedSignalId, "related"],
     enabled: !!selectedSignalId,
   });
+
+  const bookmarkMutation = useMutation({
+    mutationFn: async ({ id, bookmarked }: { id: number; bookmarked: boolean }) => {
+      return apiRequest("PATCH", `/api/signals/${id}`, { isBookmarked: bookmarked });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+    },
+  });
+
+  const statusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      return apiRequest("PATCH", `/api/signals/${id}`, { contentStatus: status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+    },
+  });
+
+  const notesMutation = useMutation({
+    mutationFn: async ({ id, notes }: { id: number; notes: string }) => {
+      return apiRequest("PATCH", `/api/signals/${id}`, { notes });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      toast({ title: "Notes saved" });
+    },
+  });
+
+  const handleBookmark = (id: number, bookmarked: boolean) => {
+    bookmarkMutation.mutate({ id, bookmarked });
+  };
+
+  const handleUpdateStatus = (id: number, status: string) => {
+    statusMutation.mutate({ id, status });
+  };
+
+  const handleUpdateNotes = (id: number, notes: string) => {
+    notesMutation.mutate({ id, notes });
+  };
 
   const filteredSignals = signals.filter((signal) =>
     signal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -50,6 +96,7 @@ export function SignalGraphPage() {
   };
 
   const selectedSignal = signals.find((s) => s.id === selectedSignalId);
+  const selectedCompany = selectedSignal ? companies.find((c) => c.id === selectedSignal.companyId) : undefined;
 
   return (
     <div className="flex h-full">
@@ -215,27 +262,20 @@ export function SignalGraphPage() {
           )}
         </ScrollArea>
 
-        {selectedSignal && (
-          <div className="p-4 border-t bg-background">
-            <div className="text-xs text-muted-foreground mb-2">Selected Signal</div>
-            <h3 className="text-sm font-medium line-clamp-2 mb-2">
-              {selectedSignal.title}
-            </h3>
-            {selectedSignal.sourceUrl && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full"
-                onClick={() => window.open(selectedSignal.sourceUrl!, "_blank")}
-                data-testid="button-view-source"
-              >
-                <ExternalLink className="h-3 w-3 mr-2" />
-                View Original
-              </Button>
-            )}
-          </div>
-        )}
       </div>
+
+      {selectedSignal && (
+        <div className="w-[400px] flex-shrink-0 border-l">
+          <SignalDetailPanel
+            signal={selectedSignal}
+            company={selectedCompany}
+            onClose={() => setSelectedSignalId(null)}
+            onBookmark={handleBookmark}
+            onUpdateStatus={handleUpdateStatus}
+            onUpdateNotes={handleUpdateNotes}
+          />
+        </div>
+      )}
     </div>
   );
 }
