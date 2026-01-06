@@ -45,6 +45,15 @@ SignalWatch is a B2B business intelligence platform designed for editorial teams
 - Industry and relationship type filters
 - Deterministic sorting by relationship degree then signal count
 
+### Idempotent Publishing System (January 2026)
+- **Duplicate prevention**: Unique constraint on `(signalId, publishedTo, style)` in articles table
+- **Idempotent publish logic**: Re-publishing same signal+style reuses existing content by default
+- **Force regeneration**: Optional toggle to regenerate fresh content with new AI image
+- **CMS idempotency key**: `clientReferenceId` field (`signalwatch:{signalId}:{style}`) sent to CMS
+- **SEO support**: `canonicalUrl` field sent to CMS for previously published articles
+- **UI improvements**: Toggle switch in publish dialog to control regeneration
+- **Storage methods added**: `getArticleBySignalAndStyle()`, `updateArticle()` for article management
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

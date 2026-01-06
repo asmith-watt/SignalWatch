@@ -19,7 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, ExternalLink, Sparkles } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Loader2, ExternalLink, Sparkles, RefreshCw } from "lucide-react";
 
 interface MediaSitePublishDialogProps {
   signalId: number | null;
@@ -36,26 +37,29 @@ export function MediaSitePublishDialog({
 }: MediaSitePublishDialogProps) {
   const { toast } = useToast();
   const [style, setStyle] = useState<"news" | "analysis" | "brief">("news");
+  const [forceRegenerate, setForceRegenerate] = useState(false);
 
   const publishMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest(
         "POST",
         `/api/signals/${signalId}/publish-to-media`,
-        { style }
+        { style, forceRegenerate }
       );
       return response.json();
     },
     onSuccess: (data) => {
       if (data.success) {
+        const action = data.reusedExisting ? "republished" : "generated and published";
         toast({
           title: "Published to BakingMilling",
           description: data.articleUrl
-            ? `Article published successfully. View at: ${data.articleUrl}`
-            : "Article published successfully.",
+            ? `Article ${action}. View at: ${data.articleUrl}`
+            : `Article ${action} successfully.`,
         });
         queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
         onOpenChange(false);
+        setForceRegenerate(false);
       } else {
         toast({
           title: "Publishing Failed",
@@ -106,16 +110,46 @@ export function MediaSitePublishDialog({
             </Select>
           </div>
 
+          <div className="flex items-center justify-between gap-4 py-2">
+            <div className="space-y-0.5">
+              <Label htmlFor="force-regenerate" className="cursor-pointer">Regenerate content</Label>
+              <p className="text-xs text-muted-foreground">
+                Create fresh article and image (uses AI credits)
+              </p>
+            </div>
+            <Switch
+              id="force-regenerate"
+              checked={forceRegenerate}
+              onCheckedChange={setForceRegenerate}
+              data-testid="switch-force-regenerate"
+            />
+          </div>
+
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Sparkles className="w-4 h-4" />
-            <span>AI-generated image with proper licensing (OpenAI DALL-E)</span>
+            {forceRegenerate ? (
+              <>
+                <RefreshCw className="w-4 h-4" />
+                <span>Will generate new AI article and image</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4" />
+                <span>Will reuse existing content if previously published</span>
+              </>
+            )}
           </div>
 
           <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md" data-testid="media-site-info-box">
             <p className="font-medium mb-1">What happens when you publish:</p>
             <ul className="list-disc list-inside space-y-1">
-              <li data-testid="text-info-generate">AI generates an article from the signal</li>
-              <li data-testid="text-info-image">AI creates a custom image with proper licensing</li>
+              {forceRegenerate ? (
+                <>
+                  <li data-testid="text-info-generate">AI generates a fresh article from the signal</li>
+                  <li data-testid="text-info-image">AI creates a new custom image</li>
+                </>
+              ) : (
+                <li data-testid="text-info-reuse">Reuses existing article if available, otherwise generates new</li>
+              )}
               <li data-testid="text-info-send">The article is sent to your media site</li>
             </ul>
           </div>

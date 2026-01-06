@@ -82,7 +82,9 @@ export interface IStorage {
   getArticle(id: number): Promise<Article | undefined>;
   getArticlesBySignal(signalId: number): Promise<Article[]>;
   getArticlesByCompany(companyId: number): Promise<Article[]>;
+  getArticleBySignalAndStyle(signalId: number, publishedTo: string, style: string): Promise<Article | undefined>;
   createArticle(article: InsertArticle): Promise<Article>;
+  updateArticle(id: number, updates: Partial<InsertArticle>): Promise<Article | undefined>;
 
   // Monitor Runs
   createMonitorRun(run: InsertMonitorRun): Promise<MonitorRun>;
@@ -359,9 +361,30 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(articles.createdAt));
   }
 
+  async getArticleBySignalAndStyle(signalId: number, publishedTo: string, style: string): Promise<Article | undefined> {
+    const [article] = await db
+      .select()
+      .from(articles)
+      .where(and(
+        eq(articles.signalId, signalId),
+        eq(articles.publishedTo, publishedTo),
+        eq(articles.style, style)
+      ));
+    return article || undefined;
+  }
+
   async createArticle(article: InsertArticle): Promise<Article> {
     const [created] = await db.insert(articles).values(article).returning();
     return created;
+  }
+
+  async updateArticle(id: number, updates: Partial<InsertArticle>): Promise<Article | undefined> {
+    const [updated] = await db
+      .update(articles)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(articles.id, id))
+      .returning();
+    return updated || undefined;
   }
 
   // Monitor Runs

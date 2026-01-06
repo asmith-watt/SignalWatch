@@ -19,7 +19,7 @@ import { importBakingMillingCompanies } from "./import-baking-milling-companies"
 import { importBakingMillingSignals } from "./import-signals-by-company-name";
 import { generateRssFeed, generateAllSignalsRssFeed, getAvailableFeeds } from "./rss-feeds";
 import { publishToWordPress, testWordPressConnection } from "./wordpress-publisher";
-import { selectStockImage, buildMediaSitePayload, publishToMediaSite, generateAIImage } from "./media-site-publisher";
+import { selectStockImage, buildMediaSitePayload, buildPayloadFromExistingArticle, publishToMediaSite, generateAIImage } from "./media-site-publisher";
 import { verifySignalDates, fixSignalDates, verifySourceUrl, verifySourceUrls } from "./date-verifier";
 import { objectStorageClient } from "./replit_integrations/object_storage";
 import express from "express";
@@ -942,11 +942,11 @@ export async function registerRoutes(
     }
   });
 
-  // Media Site Publishing - Push to external media site
+  // Media Site Publishing - Push to external media site (IDEMPOTENT)
   app.post("/api/signals/:id/publish-to-media", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const { style = "news" } = req.body;
+      const { style = "news", forceRegenerate = false } = req.body;
 
       const signal = await storage.getSignal(id);
       if (!signal) {
@@ -954,24 +954,63 @@ export async function registerRoutes(
       }
 
       const company = await storage.getCompany(signal.companyId) || null;
-      const article = await generateArticleFromSignal(signal, company, style);
-
-      // Use production URL if available (set during deployment), otherwise fall back to current domain
+      
+      // Check if article already exists for this signal+style
+      const existingArticle = await storage.getArticleBySignalAndStyle(id, "media_site", style);
+      
+      // Use production URL if available, otherwise fall back to current domain
       const productionAppUrl = process.env.PRODUCTION_APP_URL;
       const replitDomain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS;
       const protocol = req.headers["x-forwarded-proto"] || req.protocol || "http";
       const host = req.headers.host || "localhost:5000";
       const baseUrl = productionAppUrl || (replitDomain ? `https://${replitDomain}` : `${protocol}://${host}`);
+
+      let payload;
+      let article;
+      let imageUrl: string;
+      let regenerated = false;
       
-      // Always use AI-generated images for proper licensing
-      const aiImage = await generateAIImage(signal, company, baseUrl);
-      if (!aiImage) {
-        return res.status(500).json({ error: "Failed to generate AI image" });
+      if (existingArticle && !forceRegenerate) {
+        // REUSE existing article content - no regeneration
+        // If existing article has no image, generate one now
+        if (!existingArticle.imageUrl) {
+          const aiImage = await generateAIImage(signal, company, baseUrl);
+          if (!aiImage) {
+            return res.status(500).json({ error: "Failed to generate AI image" });
+          }
+          imageUrl = aiImage.imageUrl;
+        } else {
+          imageUrl = existingArticle.imageUrl;
+        }
+        
+        payload = buildPayloadFromExistingArticle(existingArticle, signal, company, style);
+        payload.imageUrl = imageUrl; // Ensure payload has valid image
+        
+        article = {
+          headline: existingArticle.headline,
+          subheadline: existingArticle.subheadline || "",
+          body: existingArticle.body,
+          keyTakeaways: (existingArticle.keyTakeaways as string[]) || [],
+          seoDescription: existingArticle.seoDescription || "",
+          suggestedTags: (existingArticle.tags as string[]) || [],
+        };
+        console.log(`Reusing existing article for signal ${id} style ${style}`);
+      } else {
+        // GENERATE new article content
+        regenerated = true;
+        article = await generateArticleFromSignal(signal, company, style);
+        
+        // Generate AI image
+        const aiImage = await generateAIImage(signal, company, baseUrl);
+        if (!aiImage) {
+          return res.status(500).json({ error: "Failed to generate AI image" });
+        }
+        imageUrl = aiImage.imageUrl;
+        const imageCredit = aiImage.credit;
+        
+        payload = buildMediaSitePayload(article, signal, company, imageUrl, style, imageCredit);
+        console.log(`Generated new article for signal ${id} style ${style}${forceRegenerate ? " (forced)" : ""}`);
       }
-      const imageUrl = aiImage.imageUrl;
-      const imageCredit = aiImage.credit;
-      
-      const payload = buildMediaSitePayload(article, signal, company, imageUrl, imageCredit);
 
       const result = await publishToMediaSite(payload);
 
@@ -987,7 +1026,7 @@ export async function registerRoutes(
             : `${mediaSiteUrl}${result.articleUrl.startsWith("/") ? "" : "/"}${result.articleUrl}`;
         }
         
-        await storage.createArticle({
+        const articleData = {
           signalId: signal.id,
           companyId: signal.companyId,
           headline: article.headline,
@@ -998,11 +1037,24 @@ export async function registerRoutes(
           externalUrl: fullExternalUrl,
           externalId: result.articleId || null,
           imageUrl: imageUrl,
-        });
+          keyTakeaways: article.keyTakeaways || [],
+          seoDescription: article.seoDescription || "",
+          tags: article.suggestedTags || [],
+        };
+        
+        if (existingArticle) {
+          // UPDATE existing article row
+          await storage.updateArticle(existingArticle.id, articleData);
+        } else {
+          // INSERT new article row
+          await storage.createArticle(articleData);
+        }
       }
 
       res.json({
         ...result,
+        regenerated,
+        reusedExisting: !regenerated,
         payload: result.success ? payload : undefined,
         article: result.success ? article : undefined,
       });

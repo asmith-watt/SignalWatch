@@ -1,0 +1,101 @@
+You are a senior full-stack engineer working on SignalWatch (Express + TypeScript + Drizzle + Neon). We already publish live content to the Baking & Milling Next.js CMS. We need to tighten the system so we can safely publish sample content without duplicates, silent regeneration, or SEO gaps.
+
+IMPORTANT CONSTRAINTS
+- No draft mode. Publishing is live.
+- Publishing must be idempotent (re-publishing updates, never duplicates).
+- SEO should be “good enough” for sample content, not over-engineered.
+- Do NOT redesign UI flows beyond minimal toggles.
+
+CURRENT CONTEXT
+- Publish route: POST /api/signals/:id/publish-to-media
+- Publisher: server/media-site-publisher.ts
+- CMS endpoint: POST {MEDIA_SITE_URL}/api/articles/receive
+- Articles are currently regenerated on every publish.
+- Duplicate prevention is NOT implemented.
+- CMS response returns { id, url }.
+- articles table stores externalId and externalUrl.
+
+GOALS
+1) Prevent duplicate articles for the same signal + style.
+2) Make publish deterministic (reuse existing content by default).
+3) Allow explicit regeneration when desired.
+4) Add minimal SEO guardrails (canonical + tag hygiene).
+
+------------------------------------------------------------
+A) DATABASE SAFETY — add uniqueness
+------------------------------------------------------------
+In the Drizzle schema for articles, add a unique constraint:
+
+UNIQUE(signal_id, published_to, style)
+
+Constraint name:
+articles_signal_published_style_unique
+
+Create and apply a migration.
+
+This ensures SignalWatch can never insert duplicates accidentally.
+
+------------------------------------------------------------
+B) IDEMPOTENT PUBLISH LOGIC (CORE FIX)
+------------------------------------------------------------
+Modify POST /api/signals/:id/publish-to-media in server/routes.ts.
+
+Key = (signalId, publishedTo="media_site", style)
+
+Behavior:
+1) Query articles table for an existing row with this key.
+2) If an article EXISTS:
+   - By default, DO NOT regenerate content.
+   - Reuse existing article fields:
+     - headline
+     - subheadline
+     - body
+     - tags
+     - seoDescription
+     - imageUrl
+   - Build CMS payload from the stored article.
+   - Publish to CMS.
+   - UPDATE the same articles row with:
+     - externalId
+     - externalUrl
+     - imageUrl (if changed)
+     - updatedAt
+3) If NO article exists:
+   - Generate article from signal (existing logic).
+   - Generate AI image (existing logic).
+   - Publish to CMS.
+   - INSERT a new row into articles (existing behavior).
+
+------------------------------------------------------------
+C) EXPLICIT REGENERATION (OPT-IN ONLY)
+------------------------------------------------------------
+Allow regeneration ONLY when explicitly requested.
+
+- Accept optional body param:
+  { style, forceRegenerate?: boolean }
+
+If forceRegenerate === true:
+- Generate a NEW article.
+- Overwrite the existing row via UPDATE (not INSERT).
+- Publish updated content to CMS.
+
+This keeps “Publish” deterministic by default.
+
+------------------------------------------------------------
+D) CMS IDEMPOTENCY KEY (IMPORTANT)
+------------------------------------------------------------
+Extend MediaSitePayload to include:
+
+clientReferenceId: string
+
+Value:
+"signalwatch:{signalId}:{style}"
+
+Send this field in the root payload to the CMS.
+
+Even if the CMS doesn’t use it yet, this guarantees future upsert safety.
+
+------------------------------------------------------------
+E) SEO POLISH (MINIMAL, REQUIRED)
+------------------------------------------------------------
+Extend MediaSitePayload to i

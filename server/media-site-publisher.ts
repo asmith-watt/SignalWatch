@@ -1,4 +1,4 @@
-import type { Signal, Company } from "@shared/schema";
+import type { Signal, Company, Article } from "@shared/schema";
 import type { GeneratedArticle } from "./article-generator";
 import { generateImageBuffer } from "./replit_integrations/image/client";
 import { openai } from "./replit_integrations/image/client";
@@ -14,6 +14,8 @@ export interface MediaSitePayload {
   author: string;
   imageUrl: string;
   imageCredit?: string;
+  clientReferenceId: string;
+  canonicalUrl?: string;
   signal: {
     id: number;
     type: string;
@@ -135,12 +137,53 @@ export async function generateAIImage(
   }
 }
 
+export function buildPayloadFromExistingArticle(
+  existingArticle: Article,
+  signal: Signal,
+  company: Company | null,
+  style: string
+): MediaSitePayload {
+  const aiAnalysis = signal.aiAnalysis as { relevanceScore?: number } | null;
+  const relevanceScore = aiAnalysis?.relevanceScore || 50;
+
+  return {
+    headline: existingArticle.headline,
+    subheadline: existingArticle.subheadline || "",
+    body: existingArticle.body,
+    keyTakeaways: (existingArticle.keyTakeaways as string[]) || [],
+    seoDescription: existingArticle.seoDescription || "",
+    tags: (existingArticle.tags as string[]) || [],
+    author: process.env.MEDIA_SITE_AUTHOR || "Your Publication Staff",
+    imageUrl: existingArticle.imageUrl || "",
+    imageCredit: "AI-generated image via OpenAI DALL-E",
+    clientReferenceId: `signalwatch:${signal.id}:${style}`,
+    canonicalUrl: existingArticle.externalUrl || undefined,
+    signal: {
+      id: signal.id,
+      type: signal.type,
+      relevanceScore: typeof relevanceScore === "number" ? relevanceScore : 50,
+      sourceName: signal.sourceName,
+      sourceUrl: signal.sourceUrl,
+    },
+    company: company
+      ? {
+          id: company.id,
+          name: company.name,
+          industry: company.industry,
+        }
+      : null,
+    generatedAt: new Date().toISOString(),
+  };
+}
+
 export function buildMediaSitePayload(
   article: GeneratedArticle,
   signal: Signal,
   company: Company | null,
   imageUrl: string,
-  imageCredit?: string
+  style: string,
+  imageCredit?: string,
+  canonicalUrl?: string
 ): MediaSitePayload {
   const aiAnalysis = signal.aiAnalysis as { relevanceScore?: number } | null;
   const relevanceScore = aiAnalysis?.relevanceScore || 50;
@@ -155,6 +198,8 @@ export function buildMediaSitePayload(
     author: process.env.MEDIA_SITE_AUTHOR || "Your Publication Staff",
     imageUrl,
     imageCredit,
+    clientReferenceId: `signalwatch:${signal.id}:${style}`,
+    canonicalUrl,
     signal: {
       id: signal.id,
       type: signal.type,

@@ -1,5 +1,5 @@
 import { sql, relations } from "drizzle-orm";
-import { pgTable, text, varchar, serial, integer, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, serial, integer, timestamp, boolean, jsonb, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -251,8 +251,14 @@ export const articles = pgTable("articles", {
   externalUrl: text("external_url"),
   externalId: text("external_id"),
   imageUrl: text("image_url"),
+  keyTakeaways: jsonb("key_takeaways"),
+  seoDescription: text("seo_description"),
+  tags: jsonb("tags"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
-});
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+  uniqueIndex("articles_signal_published_style_unique").on(table.signalId, table.publishedTo, table.style),
+]);
 
 export const articlesRelations = relations(articles, ({ one }) => ({
   signal: one(signals, {
