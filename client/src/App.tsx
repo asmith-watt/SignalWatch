@@ -15,6 +15,7 @@ import { Dashboard } from "@/pages/dashboard";
 import { AllSignalsPage } from "@/pages/all-signals";
 import { AlertsPage } from "@/pages/alerts";
 import { IndustryMapPage } from "@/pages/industry-map";
+import { SignalGraphPage } from "@/pages/signal-graph";
 import WordPressSettings from "@/pages/wordpress-settings";
 import DataManagementPage from "@/pages/data-management";
 import NotFound from "@/pages/not-found";
@@ -110,6 +111,9 @@ function MainLayout() {
               </Route>
               <Route path="/signals">
                 <AllSignalsPage />
+              </Route>
+              <Route path="/signal-graph">
+                <SignalGraphPage />
               </Route>
               <Route path="/alerts">
                 <AlertsPage />
