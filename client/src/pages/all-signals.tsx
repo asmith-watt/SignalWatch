@@ -1,10 +1,10 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Radio } from "lucide-react";
 import { SignalCard } from "@/components/signal-card";
 import { SignalTimeline } from "@/components/signal-timeline";
 import { SignalFiltersBar, type SignalFilters } from "@/components/signal-filters";
-import { SignalDetailPanel } from "@/components/signal-detail-panel";
 import { SignalFeedSkeleton } from "@/components/loading-skeleton";
 import { EmptySignals, EmptyFilteredSignals } from "@/components/empty-states";
 import { WordPressPublishDialog } from "@/components/wordpress-publish-dialog";
@@ -50,8 +50,8 @@ function extractEntityNames(entities: unknown): string[] {
 }
 
 export function AllSignalsPage() {
+  const [, navigate] = useLocation();
   const [filters, setFilters] = useState<SignalFilters>(defaultFilters);
-  const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "timeline">("list");
   const [wpPublishSignalId, setWpPublishSignalId] = useState<number | null>(null);
   const [mediaSitePublishSignalId, setMediaSitePublishSignalId] = useState<number | null>(null);
@@ -154,34 +154,17 @@ export function AllSignalsPage() {
 
   const handleBookmark = (id: number, bookmarked: boolean) => {
     updateSignalMutation.mutate({ id, updates: { isBookmarked: bookmarked } });
-    if (selectedSignal?.id === id) {
-      setSelectedSignal({ ...selectedSignal, isBookmarked: bookmarked });
-    }
   };
 
   const handleMarkRead = (id: number, read: boolean) => {
     updateSignalMutation.mutate({ id, updates: { isRead: read } });
   };
 
-  const handleUpdateStatus = (id: number, status: string) => {
-    updateSignalMutation.mutate({ id, updates: { contentStatus: status } });
-    if (selectedSignal?.id === id) {
-      setSelectedSignal({ ...selectedSignal, contentStatus: status });
-    }
-  };
-
-  const handleUpdateNotes = (id: number, notes: string) => {
-    updateSignalMutation.mutate({ id, updates: { notes } });
-    if (selectedSignal?.id === id) {
-      setSelectedSignal({ ...selectedSignal, notes });
-    }
-  };
-
   const handleSignalClick = (signal: Signal) => {
-    setSelectedSignal(signal);
     if (!signal.isRead) {
       handleMarkRead(signal.id, true);
     }
+    navigate(`/signals/${signal.id}`);
   };
 
   const handleEntitySelect = (entityName: string) => {
@@ -203,9 +186,7 @@ export function AllSignalsPage() {
 
   return (
     <div className="flex h-full">
-      <div
-        className={`flex-1 flex flex-col ${selectedSignal ? "w-[calc(100%-400px)]" : ""}`}
-      >
+      <div className="flex-1 flex flex-col">
         <div className="p-6 space-y-6 overflow-auto">
           <div>
             <h1 className="text-2xl font-semibold flex items-center gap-2">
@@ -285,20 +266,6 @@ export function AllSignalsPage() {
           </Tabs>
         </div>
       </div>
-
-      {selectedSignal && (
-        <div className="w-[400px] flex-shrink-0 border-l">
-          <SignalDetailPanel
-            signal={selectedSignal}
-            company={companies.find((c) => c.id === selectedSignal.companyId)}
-            onClose={() => setSelectedSignal(null)}
-            onBookmark={handleBookmark}
-            onUpdateStatus={handleUpdateStatus}
-            onUpdateNotes={handleUpdateNotes}
-            onEntitySelect={handleEntitySelect}
-          />
-        </div>
-      )}
 
       <WordPressPublishDialog
         signalId={wpPublishSignalId}

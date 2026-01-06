@@ -13,6 +13,7 @@ import { GlobalSearch } from "@/components/global-search";
 import { AddCompanyDialog } from "@/components/add-company-dialog";
 import { Dashboard } from "@/pages/dashboard";
 import { AllSignalsPage } from "@/pages/all-signals";
+import { SignalDetailPage } from "@/pages/signal-detail";
 import { AlertsPage } from "@/pages/alerts";
 import { IndustryMapPage } from "@/pages/industry-map";
 import { SignalGraphPage } from "@/pages/signal-graph";
@@ -111,6 +112,9 @@ function MainLayout() {
               </Route>
               <Route path="/signals">
                 <AllSignalsPage />
+              </Route>
+              <Route path="/signals/:id">
+                <SignalDetailPage />
               </Route>
               <Route path="/signal-graph">
                 <SignalGraphPage />
