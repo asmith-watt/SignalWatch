@@ -414,10 +414,11 @@ export function Dashboard({
                         <SignalCard
                           key={signal.id}
                           signal={signal}
-                          onBookmark={handleBookmark}
+                          company={selectedCompany}
+                          mode="compact"
+                          onOpen={() => handleSignalClick(signal)}
+                          onToggleBookmark={handleBookmark}
                           onMarkRead={handleMarkRead}
-                          onEntitySelect={handleEntitySelect}
-                          onClick={() => handleSignalClick(signal)}
                         />
                       ))}
                     </div>

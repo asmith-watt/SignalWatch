@@ -148,14 +148,13 @@ export function SignalTimeline({
                         <div className="absolute -left-[22px] top-4 w-2 h-2 rounded-full bg-muted-foreground/30" />
                         <SignalCard
                           signal={signal}
-                          companyName={company?.name}
-                          showCompany
-                          onBookmark={onBookmark}
+                          company={company}
+                          mode="compact"
+                          onOpen={() => onSignalClick?.(signal)}
+                          onToggleBookmark={onBookmark}
                           onMarkRead={onMarkRead}
                           onAssign={onAssign}
                           onCreateContent={onCreateContent}
-                          onEntitySelect={onEntitySelect}
-                          onClick={() => onSignalClick?.(signal)}
                         />
                       </div>
                     );
