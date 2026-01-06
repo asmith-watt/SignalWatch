@@ -477,20 +477,23 @@ export class DatabaseStorage implements IStorage {
     
     const results: RelatedSignalResult[] = [];
     
-    for (const signal of relatedSignals.slice(0, limit)) {
+    for (const signal of relatedSignals.slice(0, limit * 2)) {
+      if (results.length >= limit) break;
+      
       const sharedEntityIds = signalEntityCounts.get(signal.id);
       if (!sharedEntityIds) continue;
       
       // Filter out subject entities from the shared set  
       const nonSubjectEntityIds = Array.from(sharedEntityIds).filter(id => !subjectEntityIds.has(id));
       
-      const sharedEntities = nonSubjectEntityIds.length > 0 
-        ? await db
-            .select({ name: entities.name })
-            .from(entities)
-            .where(inArray(entities.id, nonSubjectEntityIds))
-            .limit(10)
-        : [];
+      // Skip signals that only share subject entities
+      if (nonSubjectEntityIds.length === 0) continue;
+      
+      const sharedEntities = await db
+        .select({ name: entities.name })
+        .from(entities)
+        .where(inArray(entities.id, nonSubjectEntityIds))
+        .limit(10);
       
       const company = await this.getCompany(signal.companyId);
       
@@ -509,7 +512,7 @@ export class DatabaseStorage implements IStorage {
       results.push({
         signal,
         company: company || null,
-        sharedEntityCount: sharedEntityIds.size,
+        sharedEntityCount: nonSubjectEntityIds.length,
         sharedEntitiesPreview: filteredPreview,
       });
     }
