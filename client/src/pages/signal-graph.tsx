@@ -208,10 +208,10 @@ export function SignalGraphPage() {
             <div className="p-6 text-center">
               <GitBranch className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
               <p className="text-sm text-muted-foreground">
-                No related signals found
+                No related signals yet
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                This signal may not share entities with other signals yet
+                Connections appear as more coverage accumulates
               </p>
             </div>
           ) : (
