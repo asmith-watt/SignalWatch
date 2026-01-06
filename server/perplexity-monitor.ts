@@ -8,6 +8,7 @@ import {
   computeNoveltyScore 
 } from "./dedupe";
 import { computePriorityScore, getRecommendedFormat } from "./priority-scoring";
+import { linkSignalToEntities } from "./graph";
 
 const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
 
@@ -358,6 +359,14 @@ export async function monitorCompany(company: Company): Promise<MonitorResult> {
         priority: priorityResult.label,
       });
       console.log(`  Enriched signal (priority: ${priorityResult.label}/${priorityResult.score}, format: ${formatRec.format})`);
+      
+      // Link signal to graph entities
+      try {
+        const linkResult = await linkSignalToEntities(createdSignal.id, company, enrichment.entities);
+        console.log(`  Linked signal to ${linkResult.linked} entities`);
+      } catch (linkError) {
+        console.error(`  Failed to link signal to entities:`, linkError);
+      }
     } catch (enrichError) {
       console.error(`  Failed to enrich signal:`, enrichError);
       
@@ -388,6 +397,14 @@ export async function monitorCompany(company: Company): Promise<MonitorResult> {
         },
         priority: priorityResult.label,
       });
+      
+      // Still link signal to graph even without enrichment (uses subject company only)
+      try {
+        const linkResult = await linkSignalToEntities(createdSignal.id, company, null);
+        console.log(`  Linked signal to ${linkResult.linked} entities (no enrichment)`);
+      } catch (linkError) {
+        console.error(`  Failed to link signal to entities:`, linkError);
+      }
     }
     
     createdCount++;

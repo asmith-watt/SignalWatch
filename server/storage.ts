@@ -15,6 +15,7 @@ import {
   type InsertArticle,
   type MonitorRun,
   type InsertMonitorRun,
+  type Entity,
   users,
   companies,
   signals,
@@ -23,9 +24,12 @@ import {
   companyRelationships,
   articles,
   monitorRuns,
+  signalEntities,
+  entities,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, or, ilike, sql } from "drizzle-orm";
+import { eq, desc, and, or, ilike, sql, gt, inArray } from "drizzle-orm";
+import { linkSignalToEntities, hasSignalEntityLinks } from "./graph";
 
 export interface IStorage {
   // Users
@@ -86,6 +90,26 @@ export interface IStorage {
   getMonitorRun(id: number): Promise<MonitorRun | undefined>;
   getMonitorRuns(limit?: number): Promise<MonitorRun[]>;
   getActiveMonitorRun(): Promise<MonitorRun | undefined>;
+
+  // Signal Graph
+  getRelatedSignals(signalId: number, limit?: number, days?: number): Promise<RelatedSignalResult[]>;
+  backfillSignalEntities(startAfterId: number, limit: number): Promise<BackfillResult>;
+}
+
+export interface RelatedSignalResult {
+  signal: Signal;
+  company: Company | null;
+  sharedEntityCount: number;
+  sharedEntitiesPreview: string[];
+}
+
+export interface BackfillResult {
+  scanned: number;
+  linkedSignals: number;
+  linksCreated: number;
+  skipped: number;
+  errors: number;
+  lastId: number;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -376,6 +400,139 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(monitorRuns.startedAt))
       .limit(1);
     return run || undefined;
+  }
+
+  // Signal Graph
+  async getRelatedSignals(signalId: number, limit: number = 10, days: number = 30): Promise<RelatedSignalResult[]> {
+    const signalEntityLinks = await db
+      .select()
+      .from(signalEntities)
+      .where(eq(signalEntities.signalId, signalId));
+    
+    if (signalEntityLinks.length === 0) {
+      return [];
+    }
+    
+    const entityIds = signalEntityLinks.map(se => se.entityId);
+    
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    
+    const relatedLinks = await db
+      .select({
+        signalId: signalEntities.signalId,
+        entityId: signalEntities.entityId,
+      })
+      .from(signalEntities)
+      .where(
+        and(
+          inArray(signalEntities.entityId, entityIds),
+          sql`${signalEntities.signalId} != ${signalId}`
+        )
+      );
+    
+    if (relatedLinks.length === 0) {
+      return [];
+    }
+    
+    const signalEntityCounts = new Map<number, Set<number>>();
+    for (const link of relatedLinks) {
+      if (!signalEntityCounts.has(link.signalId)) {
+        signalEntityCounts.set(link.signalId, new Set());
+      }
+      signalEntityCounts.get(link.signalId)!.add(link.entityId);
+    }
+    
+    const sortedSignalIds = Array.from(signalEntityCounts.entries())
+      .sort((a, b) => b[1].size - a[1].size)
+      .slice(0, limit * 2)
+      .map(([id]) => id);
+    
+    if (sortedSignalIds.length === 0) {
+      return [];
+    }
+    
+    const relatedSignals = await db
+      .select()
+      .from(signals)
+      .where(
+        and(
+          inArray(signals.id, sortedSignalIds),
+          sql`COALESCE(${signals.publishedAt}, ${signals.gatheredAt}) >= ${cutoffDate}`
+        )
+      )
+      .orderBy(desc(signals.publishedAt));
+    
+    const results: RelatedSignalResult[] = [];
+    
+    for (const signal of relatedSignals.slice(0, limit)) {
+      const sharedEntityIds = signalEntityCounts.get(signal.id);
+      if (!sharedEntityIds) continue;
+      
+      const sharedEntities = await db
+        .select({ name: entities.name })
+        .from(entities)
+        .where(inArray(entities.id, Array.from(sharedEntityIds)))
+        .limit(5);
+      
+      const company = await this.getCompany(signal.companyId);
+      
+      results.push({
+        signal,
+        company: company || null,
+        sharedEntityCount: sharedEntityIds.size,
+        sharedEntitiesPreview: sharedEntities.map(e => e.name),
+      });
+    }
+    
+    return results.sort((a, b) => b.sharedEntityCount - a.sharedEntityCount);
+  }
+
+  async backfillSignalEntities(startAfterId: number, limit: number): Promise<BackfillResult> {
+    const result: BackfillResult = {
+      scanned: 0,
+      linkedSignals: 0,
+      linksCreated: 0,
+      skipped: 0,
+      errors: 0,
+      lastId: startAfterId,
+    };
+    
+    const signalBatch = await db
+      .select()
+      .from(signals)
+      .where(gt(signals.id, startAfterId))
+      .orderBy(signals.id)
+      .limit(limit);
+    
+    for (const signal of signalBatch) {
+      result.scanned++;
+      result.lastId = signal.id;
+      
+      try {
+        const hasLinks = await hasSignalEntityLinks(signal.id);
+        if (hasLinks) {
+          result.skipped++;
+          continue;
+        }
+        
+        const company = await this.getCompany(signal.companyId);
+        if (!company) {
+          result.errors++;
+          continue;
+        }
+        
+        const linkResult = await linkSignalToEntities(signal.id, company, signal.entities);
+        result.linkedSignals++;
+        result.linksCreated += linkResult.linked;
+        result.errors += linkResult.errors;
+      } catch (error) {
+        console.error(`Backfill error for signal ${signal.id}:`, error);
+        result.errors++;
+      }
+    }
+    
+    return result;
   }
 }
 

@@ -1151,6 +1151,44 @@ export async function registerRoutes(
     }
   });
 
+  // Signal Graph endpoints
+  app.get("/api/signals/:id/related", async (req: Request, res: Response) => {
+    try {
+      const signalId = parseInt(req.params.id);
+      const limit = parseInt(req.query.limit as string) || 10;
+      const days = parseInt(req.query.days as string) || 30;
+      
+      const signal = await storage.getSignal(signalId);
+      if (!signal) {
+        return res.status(404).json({ error: "Signal not found" });
+      }
+      
+      const relatedSignals = await storage.getRelatedSignals(signalId, limit, days);
+      res.json(relatedSignals);
+    } catch (error) {
+      console.error("Error fetching related signals:", error);
+      res.status(500).json({ error: "Failed to fetch related signals" });
+    }
+  });
+
+  app.post("/api/admin/graph/backfill", async (req: Request, res: Response) => {
+    try {
+      const adminToken = req.headers["x-admin-token"];
+      if (!process.env.ADMIN_TOKEN || adminToken !== process.env.ADMIN_TOKEN) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      
+      const startAfterId = parseInt(req.query.startAfterId as string) || 0;
+      const limit = parseInt(req.query.limit as string) || 200;
+      
+      const result = await storage.backfillSignalEntities(startAfterId, limit);
+      res.json(result);
+    } catch (error) {
+      console.error("Error backfilling signal entities:", error);
+      res.status(500).json({ error: "Failed to backfill signal entities" });
+    }
+  });
+
   app.post("/api/monitor/company/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
