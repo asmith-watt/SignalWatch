@@ -80,6 +80,7 @@ export interface IStorage {
 
   // Articles
   getArticle(id: number): Promise<Article | undefined>;
+  getAllArticles(limit?: number): Promise<Article[]>;
   getArticlesBySignal(signalId: number): Promise<Article[]>;
   getArticlesByCompany(companyId: number): Promise<Article[]>;
   getArticleBySignalAndStyle(signalId: number, publishedTo: string, style: string): Promise<Article | undefined>;
@@ -343,6 +344,14 @@ export class DatabaseStorage implements IStorage {
   async getArticle(id: number): Promise<Article | undefined> {
     const [article] = await db.select().from(articles).where(eq(articles.id, id));
     return article || undefined;
+  }
+
+  async getAllArticles(limit: number = 100): Promise<Article[]> {
+    return db
+      .select()
+      .from(articles)
+      .orderBy(desc(articles.createdAt))
+      .limit(limit);
   }
 
   async getArticlesBySignal(signalId: number): Promise<Article[]> {

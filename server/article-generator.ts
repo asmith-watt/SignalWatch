@@ -79,7 +79,7 @@ OUTPUT (STRICT JSON):
 {
   "headline": "60-90 characters, include company name when relevant, use specific verbs (acquires, launches, expands, appoints, reports)",
   "subheadline": "1-2 sentences: what changed, why it matters now, who is affected first",
-  "body": "4-10 short paragraphs. Start with strong lead. Include key facts (who, what, when, where, numbers). Include one natural source reference like 'According to [Source]...' Keep paragraphs short (1-3 lines).",
+  "body": "4-10 short paragraphs separated by double newlines (\\n\\n). Start with strong lead. Include key facts (who, what, when, where, numbers). Include one natural source reference like 'According to [Source]...' Keep paragraphs short (1-3 lines). Use \\n\\n between each paragraph for clear separation.",
   "keyTakeaways": ["3-5 concrete facts or implications, not vague restatements"],
   "seoDescription": "150-160 character meta description",
   "suggestedTags": ["5-10 industry-appropriate tags, company name, signal type"],
@@ -145,7 +145,7 @@ OUTPUT STRUCTURE (STRICT JSON):
   "headline": "Clear and factual, prefer 'Company + action', avoid vague verbs",
   "subheadline": "1-2 sentences: what changed, why it matters now, who is affected first",
   "whyItMatters": "2-3 sentences explaining business significance for baking/milling. Mention segment affected (baking or milling) explicitly. Make impact concrete (capacity, cost, supply chain, competition, regulation, operations).",
-  "body": "Factual description of the signal: who, what, when, where. Short paragraphs. Include one natural reference to the source in the body text.",
+  "body": "Factual description of the signal: who, what, when, where. Use 3-6 short paragraphs separated by double newlines (\\n\\n). Include one natural reference to the source in the body text. Use \\n\\n between each paragraph.",
   "keyDetails": ["3-8 confirmed details only: location, facility/product name, investment amount, capacity/volume, timeline, partners. Omit if unknown."],
   "whatsNext": "2-3 sentences with conservative, clearly framed next steps or implications. If speculative, label as 'what stakeholders will watch next'.",
   "keyTakeaways": ["3-5 bullets summarizing most important facts and implications for industry reader"],

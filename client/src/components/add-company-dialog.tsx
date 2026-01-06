@@ -56,6 +56,12 @@ interface AddCompanyDialogProps {
 }
 
 const industryOptions = [
+  "Poultry",
+  "Feed",
+  "Pet Food",
+  "Baking & Milling",
+  "IPPE Exhibitors",
+  "Feed & Grain",
   "Technology",
   "SaaS",
   "AI/ML",

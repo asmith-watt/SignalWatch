@@ -11,7 +11,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle, Sparkles, Calendar, AlertTriangle, Check, RefreshCw, Link2, Brain, Info } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScanHistory } from "@/components/scan-history";
-import type { Company, Signal } from "@shared/schema";
+import type { Company, Signal, Article } from "@shared/schema";
+import { format } from "date-fns";
+import { FileText, ExternalLink } from "lucide-react";
 
 interface DateVerificationResult {
   signalId: number;
@@ -66,6 +68,10 @@ export function DataManagementPage() {
 
   const { data: signals = [] } = useQuery<Signal[]>({
     queryKey: ["/api/signals"],
+  });
+
+  const { data: articles = [], isLoading: isLoadingArticles } = useQuery<Article[]>({
+    queryKey: ["/api/articles"],
   });
 
   const importCompaniesMutation = useMutation({
@@ -728,6 +734,82 @@ export function DataManagementPage() {
                     </table>
                   </div>
                 )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-muted-foreground" />
+              <CardTitle>Published Articles</CardTitle>
+            </div>
+            <CardDescription>
+              Articles generated and published from signals
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoadingArticles ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : articles.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                No articles published yet. Generate and publish articles from the signal detail panel.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-2 font-medium">Headline</th>
+                      <th className="text-left p-2 font-medium">Style</th>
+                      <th className="text-left p-2 font-medium">Published To</th>
+                      <th className="text-left p-2 font-medium">Created</th>
+                      <th className="text-left p-2 font-medium">Link</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {articles.map((article) => (
+                      <tr key={article.id} className="border-b hover-elevate" data-testid={`row-article-${article.id}`}>
+                        <td className="p-2">
+                          <div className="max-w-md truncate" title={article.headline}>
+                            {article.headline}
+                          </div>
+                        </td>
+                        <td className="p-2">
+                          <Badge variant="outline" className="capitalize">
+                            {article.style}
+                          </Badge>
+                        </td>
+                        <td className="p-2">
+                          <Badge variant="secondary">
+                            {article.publishedTo}
+                          </Badge>
+                        </td>
+                        <td className="p-2 text-muted-foreground whitespace-nowrap">
+                          {article.createdAt ? format(new Date(article.createdAt), "MMM d, yyyy") : "N/A"}
+                        </td>
+                        <td className="p-2">
+                          {article.externalUrl ? (
+                            <a 
+                              href={article.externalUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline inline-flex items-center gap-1"
+                              data-testid={`link-article-${article.id}`}
+                            >
+                              View <ExternalLink className="h-3 w-3" />
+                            </a>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </CardContent>

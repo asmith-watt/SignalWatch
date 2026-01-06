@@ -82,7 +82,7 @@ OUTPUT (STRICT JSON - output ONLY the JSON, no markdown):
 {
   "headline": "60-90 characters, include company name when relevant, use specific verbs (acquires, launches, expands, appoints, reports)",
   "subheadline": "1-2 sentences: what changed, why it matters now, who is affected first",
-  "body": "4-10 short paragraphs. Start with strong lead. Include key facts (who, what, when, where, numbers). Include one natural source reference like 'According to [Source]...' Keep paragraphs short (1-3 lines).",
+  "body": "4-10 short paragraphs separated by double newlines (\\n\\n). Start with strong lead. Include key facts (who, what, when, where, numbers). Include one natural source reference like 'According to [Source]...' Keep paragraphs short (1-3 lines). Use \\n\\n between each paragraph for clear separation.",
   "keyTakeaways": ["3-5 concrete facts or implications, not vague restatements"],
   "seoDescription": "150-160 character meta description",
   "suggestedTags": ["5-10 industry-appropriate tags, company name, signal type"],
@@ -166,7 +166,7 @@ OUTPUT (STRICT JSON - output ONLY the JSON, no markdown):
 {
   "headline": "Headline here",
   "subheadline": "Subheadline here",
-  "body": "Article body with paragraphs separated by newlines",
+  "body": "Article body with paragraphs separated by double newlines (\\n\\n). Use 3-6 short paragraphs with \\n\\n between each.",
   "keyTakeaways": ["Takeaway 1", "Takeaway 2", "Takeaway 3"],
   "seoDescription": "150-160 character meta description",
   "suggestedTags": ["tag1", "tag2", "tag3"],

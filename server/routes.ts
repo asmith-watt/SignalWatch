@@ -1090,6 +1090,17 @@ export async function registerRoutes(
   });
 
   // Article history endpoints
+  app.get("/api/articles", async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 100;
+      const articles = await storage.getAllArticles(limit);
+      res.json(articles);
+    } catch (error) {
+      console.error("Error getting all articles:", error);
+      res.status(500).json({ error: "Failed to get articles" });
+    }
+  });
+
   app.get("/api/signals/:id/articles", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);

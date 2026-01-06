@@ -76,7 +76,9 @@ const industryGroups: Record<string, string[]> = {
   Poultry: ["Poultry", "Chicken", "Turkey", "Egg", "Duck", "Broiler", "Layer", "Hatchery"],
   Feed: ["Feed", "Nutrition", "Premix", "Compound"],
   "Pet Food": ["Pet Food", "Pet", "Dog Food", "Cat Food"],
-  "Baking & Milling": ["Baking & Milling", "Baking", "Milling", "Flour", "Grain", "Mill"],
+  "Baking & Milling": ["Baking & Milling", "Baking", "Milling", "Flour", "Mill"],
+  "IPPE Exhibitors": ["IPPE Exhibitors", "IPPE"],
+  "Feed & Grain": ["Feed & Grain"],
 };
 
 function getIndustryGroup(industry: string | null): string {
@@ -106,6 +108,8 @@ const defaultExpandedGroups: Record<string, boolean> = {
   Feed: true,
   "Pet Food": true,
   "Baking & Milling": true,
+  "IPPE Exhibitors": true,
+  "Feed & Grain": true,
   Other: true,
 };
 

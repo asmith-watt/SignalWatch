@@ -93,11 +93,13 @@ export function SignalDetailPanel({
     matchScore?: number;
   }>({ status: "idle" });
 
-  // Reset verification states when signal changes
+  // Reset verification states and generated content when signal changes
   useEffect(() => {
     setDateVerification({ status: "idle" });
     setSourceVerification({ status: "idle" });
-  }, [signal.id, signal.sourceUrl]);
+    setGeneratedArticle(null);
+    setNotes(signal.notes || "");
+  }, [signal.id]);
   const [generatedArticle, setGeneratedArticle] = useState<{
     headline: string;
     subheadline: string;
