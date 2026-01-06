@@ -1,0 +1,135 @@
+I need a small set of specifics so I don’t guess wrong on schema, stack, and where logic belongs.
+
+1) Repo and stack basics
+
+Backend framework: Express, Fastify, Next API routes, something else?
+
+Language: TypeScript or JavaScript?
+
+ORM: Drizzle, Prisma, Sequelize, raw SQL?
+
+DB hosting: Neon, Supabase, local Postgres?
+
+Where env vars live and how they’re set in Replit
+
+2) Database details (most important)
+
+Current signals table schema (paste the create table or ORM model)
+
+Any related tables:
+
+companies
+
+markets
+
+signal_entities or tags table
+
+Current fields you already have for:
+
+URL
+
+title
+
+summary
+
+published date
+
+relevance score
+
+priority
+
+status/state
+
+Whether a hash column exists now, and its exact name/type
+
+3) Monitoring pipeline details
+
+The exact endpoints used today:
+
+/api/monitor/perplexity-all
+
+per-company endpoint name
+
+What the monitor returns from Perplexity:
+
+Is it a list of links?
+
+Does it include title, snippet, publish date, source name?
+
+Where you do extraction today:
+
+server side only
+
+or client calls API then saves
+
+4) Perplexity constraints
+
+Rate limits you’ve observed
+
+Whether you use Perplexity “sonar” style responses with citations/URLs
+
+Whether you can reliably get a canonical URL (sometimes Perplexity returns tracking links)
+
+5) UI workflow + states
+
+Current statuses and editor actions:
+
+is it new/staged/approved/rejected/published?
+
+something else?
+
+Whether the UI already supports:
+
+filtering
+
+sorting
+
+grouping
+
+a “toggle” control
+
+6) Scheduling environment
+
+Is the backend process always on in Replit?
+
+If it sleeps, do you have Replit “Always On” or an external uptime pinger?
+
+Preferred schedule:
+
+6:00 AM UTC is fine, but confirm if you want a local editorial time (America/Chicago)
+
+7) Embeddings availability (decides similarity approach)
+
+Do you already generate embeddings anywhere?
+
+Do you have an embeddings store:
+
+pgvector
+
+Mongo Atlas Vector Search
+
+Pinecone
+
+none
+
+If none, are you OK with a “good enough” similarity fallback first (token/Jaccard), then embeddings later?
+
+8) “Trusted sources” list
+
+Do you have a curated list of trusted domains already?
+
+If not, do you want:
+
+a simple table trusted_sources(domain, weight)
+
+or a hardcoded config file
+
+The minimum you can paste for me to revise the prompt perfectly
+
+If you only paste three things, I can do 90% of it accurately:
+
+The signals schema/model
+
+The monitor endpoint code that saves signals (the file or main function)
+
+The set of status values used in the UI
