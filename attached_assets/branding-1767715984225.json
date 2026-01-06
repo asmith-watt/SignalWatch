@@ -1,0 +1,97 @@
+{
+  "colorScheme": "light",
+  "fonts": [
+    {
+      "family": "sans-serif",
+      "count": 104
+    },
+    {
+      "family": "Nunito",
+      "count": 95
+    },
+    {
+      "family": "Work Sans",
+      "count": 1
+    }
+  ],
+  "colors": {
+    "primary": "#FF33D4",
+    "accent": "#153CBA",
+    "background": "#F2F2F2",
+    "textPrimary": "#153CBA",
+    "link": "#153CBA"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "Nunito",
+      "heading": "Nunito"
+    },
+    "fontStacks": {
+      "body": [
+        "Nunito",
+        "sans-serif"
+      ],
+      "heading": [
+        "Nunito",
+        "sans-serif"
+      ],
+      "paragraph": [
+        "Work Sans",
+        "sans-serif"
+      ]
+    },
+    "fontSizes": {
+      "h1": "48px",
+      "h2": "48px",
+      "body": "20px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "24px"
+  },
+  "components": {
+    "input": {
+      "background": "transparent",
+      "textColor": "#000000",
+      "borderColor": "#153CBA",
+      "borderRadius": "32px",
+      "borderRadiusCorners": {
+        "topLeft": "32px",
+        "topRight": "32px",
+        "bottomRight": "32px",
+        "bottomLeft": "32px"
+      },
+      "shadow": "none"
+    }
+  },
+  "images": {
+    "logo": "File saved at: attached_assets/logo.svg",
+    "favicon": "https://www.vortex-intl.com/wp-content/themes/vortex/dist/images/favicons/apple-touch-icon_cd72593f.png",
+    "ogImage": "https://www.vortex-intl.com/wp-content/uploads/2023/12/inserted/schema-organization-logo400x400.jpg"
+  },
+  "__framework_hints": [],
+  "__llm_logo_reasoning": {
+    "selectedIndex": 0,
+    "reasoning": "Strong indicators: header logo linking to homepage, header location, visible, top-left position, highest logo on page, src contains logo, class contains logo, src contains brand name \"VORTEX\", reasonable size, SVG format. Score: 131 (clear winner by 64 points)",
+    "confidence": 0.9
+  },
+  "__llm_button_reasoning": {
+    "primary": {
+      "index": -1,
+      "text": "N/A",
+      "reasoning": "LLM failed"
+    },
+    "secondary": {
+      "index": -1,
+      "text": "N/A",
+      "reasoning": "LLM failed"
+    },
+    "confidence": 0
+  },
+  "confidence": {
+    "buttons": 0,
+    "colors": 0,
+    "overall": 0
+  }
+}
