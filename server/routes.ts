@@ -1524,6 +1524,141 @@ export async function registerRoutes(
     }
   });
 
+  // Export ALL data as JSON for production sync
+  app.get("/api/export/all-data", async (req: Request, res: Response) => {
+    try {
+      const allCompanies = await storage.getAllCompanies();
+      const allSignals = await storage.getAllSignals();
+      const allAlerts = await storage.getAllAlerts();
+      
+      const exportData = {
+        exportedAt: new Date().toISOString(),
+        companies: allCompanies,
+        signals: allSignals,
+        alerts: allAlerts,
+      };
+      
+      res.setHeader("Content-Type", "application/json");
+      res.json(exportData);
+    } catch (error) {
+      console.error("Error exporting all data:", error);
+      res.status(500).json({ error: "Failed to export data" });
+    }
+  });
+
+  // Import ALL data from JSON export (for production sync)
+  app.post("/api/import/all-data", async (req: Request, res: Response) => {
+    try {
+      const { companies, signals } = req.body;
+      
+      console.log(`[Import All] Received ${companies?.length || 0} companies and ${signals?.length || 0} signals`);
+      
+      if (!Array.isArray(companies) || !Array.isArray(signals)) {
+        return res.status(400).json({ error: "Invalid import data format" });
+      }
+      
+      const idMapping = new Map<number, number>();
+      let companiesImported = 0;
+      let companiesUpdated = 0;
+      let signalsImported = 0;
+      let signalsUpdated = 0;
+      const errors: string[] = [];
+      
+      // Import/update companies
+      for (const company of companies) {
+        try {
+          const existing = await storage.getCompanyByName(company.name);
+          
+          if (existing) {
+            idMapping.set(company.id, existing.id);
+            // Update existing company with new data
+            await storage.updateCompany(existing.id, {
+              website: company.website,
+              industry: company.industry,
+              description: company.description,
+              region: company.region,
+              country: company.country,
+              tags: company.tags,
+              productTypes: company.productTypes,
+            });
+            companiesUpdated++;
+          } else {
+            const { id, createdAt, updatedAt, ...companyData } = company;
+            const created = await storage.createCompany(companyData);
+            idMapping.set(company.id, created.id);
+            companiesImported++;
+          }
+        } catch (e: any) {
+          errors.push(`Company ${company.name}: ${e.message}`);
+        }
+      }
+      
+      // Import/update signals
+      for (const signal of signals) {
+        try {
+          const newCompanyId = idMapping.get(signal.companyId);
+          if (!newCompanyId) {
+            errors.push(`No company mapping for signal ${signal.id}`);
+            continue;
+          }
+          
+          // Check if signal exists by hash
+          const existingSignal = signal.hash ? await storage.getSignalByHash(signal.hash) : null;
+          
+          if (existingSignal) {
+            // Update existing signal with corrected dates
+            await storage.updateSignal(existingSignal.id, {
+              publishedAt: signal.publishedAt ? new Date(signal.publishedAt) : null,
+              gatheredAt: signal.gatheredAt ? new Date(signal.gatheredAt) : null,
+            });
+            signalsUpdated++;
+          } else {
+            await storage.createSignal({
+              companyId: newCompanyId,
+              type: signal.type,
+              title: signal.title,
+              content: signal.content || null,
+              summary: signal.summary || null,
+              sourceUrl: signal.sourceUrl || null,
+              sourceName: signal.sourceName || null,
+              citations: signal.citations || [],
+              publishedAt: signal.publishedAt ? new Date(signal.publishedAt) : null,
+              gatheredAt: signal.gatheredAt ? new Date(signal.gatheredAt) : new Date(),
+              sentiment: signal.sentiment || null,
+              entities: signal.entities || null,
+              priority: signal.priority || "medium",
+              isRead: signal.isRead || false,
+              isBookmarked: signal.isBookmarked || false,
+              assignedTo: signal.assignedTo || null,
+              contentStatus: signal.contentStatus || "new",
+              notes: signal.notes || null,
+              aiAnalysis: signal.aiAnalysis || null,
+              hash: signal.hash || null,
+            });
+            signalsImported++;
+          }
+        } catch (e: any) {
+          errors.push(`Signal ${signal.id}: ${e.message}`);
+        }
+      }
+      
+      console.log(`[Import All] Companies: ${companiesImported} new, ${companiesUpdated} updated`);
+      console.log(`[Import All] Signals: ${signalsImported} new, ${signalsUpdated} updated`);
+      
+      res.json({ 
+        success: true, 
+        companiesImported,
+        companiesUpdated,
+        signalsImported,
+        signalsUpdated,
+        errors: errors.slice(0, 20),
+      });
+    } catch (error) {
+      console.error("Error importing all data:", error);
+      res.status(500).json({ error: "Failed to import data" });
+    }
+  });
+
   // Export Baking & Milling data as JSON for production import
   app.get("/api/export/baking-milling", async (req: Request, res: Response) => {
     try {
