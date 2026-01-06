@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "./lib/queryClient";
@@ -23,10 +23,23 @@ import NotFound from "@/pages/not-found";
 import { useToast } from "@/hooks/use-toast";
 import type { Company, Signal, InsertCompany } from "@shared/schema";
 
+const SELECTED_COMPANY_KEY = "signalwatch-selected-company";
+
 function MainLayout() {
   const { toast } = useToast();
-  const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(() => {
+    const saved = localStorage.getItem(SELECTED_COMPANY_KEY);
+    return saved ? parseInt(saved, 10) : null;
+  });
   const [showAddCompanyDialog, setShowAddCompanyDialog] = useState(false);
+
+  useEffect(() => {
+    if (selectedCompanyId !== null) {
+      localStorage.setItem(SELECTED_COMPANY_KEY, String(selectedCompanyId));
+    } else {
+      localStorage.removeItem(SELECTED_COMPANY_KEY);
+    }
+  }, [selectedCompanyId]);
 
   const { data: companies = [], isLoading: companiesLoading } = useQuery<Company[]>({
     queryKey: ["/api/companies"],

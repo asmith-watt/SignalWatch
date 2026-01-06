@@ -98,6 +98,17 @@ function getCompanyInitials(name: string): string {
     .toUpperCase();
 }
 
+const EXPANDED_GROUPS_KEY = "signalwatch-expanded-groups";
+const SCROLL_POSITION_KEY = "signalwatch-sidebar-scroll";
+
+const defaultExpandedGroups: Record<string, boolean> = {
+  Poultry: true,
+  Feed: true,
+  "Pet Food": true,
+  "Baking & Milling": true,
+  Other: true,
+};
+
 export function AppSidebar({
   companies,
   selectedCompanyId,
@@ -108,17 +119,25 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const [location, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
-    Poultry: true,
-    Feed: true,
-    "Pet Food": true,
-    "Baking & Milling": true,
-    Other: true,
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(() => {
+    const saved = localStorage.getItem(EXPANDED_GROUPS_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return defaultExpandedGroups;
+      }
+    }
+    return defaultExpandedGroups;
   });
   const [updatingGroup, setUpdatingGroup] = useState<string | null>(null);
   const [updatingCompany, setUpdatingCompany] = useState<number | null>(null);
   const [isMonitoring, setIsMonitoring] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    localStorage.setItem(EXPANDED_GROUPS_KEY, JSON.stringify(expandedGroups));
+  }, [expandedGroups]);
 
   const { data: progress } = useQuery<MonitorProgress>({
     queryKey: ["/api/monitor/progress"],
