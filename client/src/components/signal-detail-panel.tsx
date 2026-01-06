@@ -23,6 +23,10 @@ import {
   AlertTriangle,
   Link2,
   Network,
+  ChevronDown,
+  ChevronRight,
+  Building2,
+  MapPin,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -32,6 +36,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Select,
   SelectContent,
@@ -325,9 +330,49 @@ export function SignalDetailPanel({
 
   const aiAnalysis = signal.aiAnalysis as {
     keyPoints?: string[];
+    keyTakeaways?: string[];
     suggestedActions?: string[];
+    suggestedFollowUp?: string[];
     relatedTopics?: string[];
+    industryImpact?: string;
+    storyAngles?: string[];
+    recommendedFormat?: string;
+    relevanceScore?: number;
+    priorityScore?: number;
+    noveltyScore?: number;
+    competitorImplications?: string[];
   } | null;
+
+  // Derive entity chips for the detail panel (up to 6)
+  const entityChips: Array<{ label: string; type: "company" | "location" | "related" }> = [];
+  if (company?.name) {
+    entityChips.push({ label: company.name, type: "company" });
+  }
+  if (entities?.locations && entities.locations.length > 0) {
+    for (const loc of entities.locations.slice(0, 2)) {
+      const locName = typeof loc === 'string' ? loc : loc.name;
+      if (entityChips.length < 6) {
+        entityChips.push({ label: locName, type: "location" });
+      }
+    }
+  }
+  if (entities?.organizations && entities.organizations.length > 0) {
+    for (const org of entities.organizations.slice(0, 3)) {
+      const orgName = typeof org === 'string' ? org : org.name;
+      if (orgName !== company?.name && entityChips.length < 6) {
+        entityChips.push({ label: orgName, type: "related" });
+      }
+    }
+  }
+
+  const [editorialInsightsOpen, setEditorialInsightsOpen] = useState(true);
+  
+  // Get all the AI analysis fields, with fallbacks
+  const keyTakeaways = aiAnalysis?.keyTakeaways || aiAnalysis?.keyPoints || [];
+  const industryImpact = aiAnalysis?.industryImpact;
+  const storyAngles = aiAnalysis?.storyAngles || [];
+  const suggestedFollowUp = aiAnalysis?.suggestedFollowUp || aiAnalysis?.suggestedActions || [];
+  const hasEditorialInsights = keyTakeaways.length > 0 || industryImpact || storyAngles.length > 0 || suggestedFollowUp.length > 0;
 
   return (
     <div className="h-full flex flex-col border-l bg-background">
@@ -532,48 +577,104 @@ export function SignalDetailPanel({
             </div>
           </div>
 
-          {aiAnalysis && (
+          {hasEditorialInsights && (
             <>
               <Separator />
-              <div className="space-y-4">
-                <h4 className="text-sm font-medium flex items-center gap-2">
-                  <Brain className="w-4 h-4" />
-                  AI Analysis
-                </h4>
-
-                {aiAnalysis.keyPoints && aiAnalysis.keyPoints.length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      Key Points
-                    </p>
-                    <ul className="space-y-1.5">
-                      {aiAnalysis.keyPoints.map((point, i) => (
-                        <li key={i} className="text-sm flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                          {point}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {aiAnalysis.suggestedActions &&
-                  aiAnalysis.suggestedActions.length > 0 && (
+              <Collapsible open={editorialInsightsOpen} onOpenChange={setEditorialInsightsOpen}>
+                <CollapsibleTrigger className="flex items-center justify-between w-full group" data-testid="collapsible-editorial-insights">
+                  <h4 className="text-sm font-medium flex items-center gap-2">
+                    <Brain className="w-4 h-4" />
+                    Editorial Insights
+                  </h4>
+                  {editorialInsightsOpen ? (
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-4 mt-4">
+                  {keyTakeaways.length > 0 && (
                     <div className="space-y-2">
                       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                        Suggested Actions
+                        Key Takeaways
                       </p>
                       <ul className="space-y-1.5">
-                        {aiAnalysis.suggestedActions.map((action, i) => (
+                        {keyTakeaways.map((point, i) => (
                           <li key={i} className="text-sm flex items-start gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 flex-shrink-0" />
-                            {action}
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                            {point}
                           </li>
                         ))}
                       </ul>
                     </div>
                   )}
-              </div>
+
+                  {industryImpact && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Industry Impact
+                      </p>
+                      <p className="text-sm">{industryImpact}</p>
+                    </div>
+                  )}
+
+                  {storyAngles.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Story Angles
+                      </p>
+                      <ul className="space-y-1.5">
+                        {storyAngles.map((angle, i) => (
+                          <li key={i} className="text-sm flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-secondary-foreground/50 mt-1.5 flex-shrink-0" />
+                            {angle}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {suggestedFollowUp.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Suggested Follow-Up
+                      </p>
+                      <ul className="space-y-1.5">
+                        {suggestedFollowUp.map((item, i) => (
+                          <li key={i} className="text-sm flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 flex-shrink-0" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {entityChips.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Key Entities
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {entityChips.map((chip, i) => (
+                          <Badge 
+                            key={i} 
+                            variant="outline" 
+                            className="gap-1 cursor-pointer"
+                            onClick={() => onEntitySelect?.(chip.label)}
+                            data-testid={`editorial-entity-${i}`}
+                          >
+                            {chip.type === "company" && <Building2 className="w-3 h-3" />}
+                            {chip.type === "location" && <MapPin className="w-3 h-3" />}
+                            {chip.type === "related" && <Building2 className="w-3 h-3" />}
+                            {chip.label}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CollapsibleContent>
+              </Collapsible>
             </>
           )}
 

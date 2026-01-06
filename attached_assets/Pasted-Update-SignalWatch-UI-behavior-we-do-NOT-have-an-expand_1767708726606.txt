@@ -1,0 +1,47 @@
+Update SignalWatch UI behavior: we do NOT have an expanded card view in lists. Instead, the right-side “Signal Details” panel is the editorial view. Implement the two-mode design as:
+- Compact mode in list cards only
+- Editorial mode content inside the Signal Details panel
+
+1) List card updates (compact mode)
+In the signal list cards (Signal Graph list and any other lists):
+- Keep the current compact card layout.
+- Add these elements if missing:
+  A) Badge row (max 5):
+    - type (secondary)
+    - priority (default for high, secondary for medium, outline for low)
+    - sentiment ONLY if negative (destructive)
+    - contentStatus (outline)
+    - aiAnalysis.recommendedFormat if present (secondary; ignore as outline)
+  B) Entity chips row (2–4 max) below badges:
+    - always include subject company
+    - then up to 2 locations from signals.entities.locations
+    - then one extra company from signals.entities.companies that is not the subject
+
+Do NOT attempt “expand” in the list card.
+
+2) Signal Details panel becomes the editorial view
+In the right-side panel (Signal Details):
+- Add a new collapsible section titled “Editorial Insights” (collapsed by default is OK, or expanded if you prefer).
+- Render from aiAnalysis if present:
+  - Key Takeaways (bullets)
+  - Industry Impact (paragraph)
+  - Story Angles (bullets)
+  - Suggested Follow-up (bullets)
+- Show entity chips here too (same chips as list, but can show up to 6 in details).
+
+3) Related Signals panel empty state copy
+Replace:
+- “No related signals found”
+With:
+- “No related signals yet. Connections appear as more coverage accumulates.”
+
+4) Related Signals item rendering (when present)
+For each related signal returned by /api/signals/:id/related:
+- Show title, company, date
+- Add “Related via: X, Y” using sharedEntitiesPreview if the API provides it.
+
+Acceptance criteria
+- List cards remain compact and skimmable.
+- Editorial Insights appears in Signal Details panel.
+- No attempt to expand cards in the list.
+- UI uses Shadcn components and variants, no hard-coded colors.
