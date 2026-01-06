@@ -946,7 +946,7 @@ export async function registerRoutes(
   app.post("/api/signals/:id/publish-to-media", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const { style = "news", imageType = "stock" } = req.body;
+      const { style = "news" } = req.body;
 
       const signal = await storage.getSignal(id);
       if (!signal) {
@@ -963,21 +963,13 @@ export async function registerRoutes(
       const host = req.headers.host || "localhost:5000";
       const baseUrl = productionAppUrl || (replitDomain ? `https://${replitDomain}` : `${protocol}://${host}`);
       
-      let imageUrl: string;
-      let imageCredit: string | undefined;
-      
-      if (imageType === "ai") {
-        const aiImage = await generateAIImage(signal, company, baseUrl);
-        if (aiImage) {
-          imageUrl = aiImage.imageUrl;
-          imageCredit = aiImage.credit;
-        } else {
-          imageUrl = selectStockImage(signal, company, baseUrl);
-          imageCredit = undefined;
-        }
-      } else {
-        imageUrl = selectStockImage(signal, company, baseUrl);
+      // Always use AI-generated images for proper licensing
+      const aiImage = await generateAIImage(signal, company, baseUrl);
+      if (!aiImage) {
+        return res.status(500).json({ error: "Failed to generate AI image" });
       }
+      const imageUrl = aiImage.imageUrl;
+      const imageCredit = aiImage.credit;
       
       const payload = buildMediaSitePayload(article, signal, company, imageUrl, imageCredit);
 

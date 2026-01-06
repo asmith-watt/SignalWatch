@@ -76,7 +76,6 @@ export function SignalDetailPanel({
   const [articleStyle, setArticleStyle] = useState<"news" | "brief" | "analysis" | "signal">("signal");
   const [aiProvider, setAiProvider] = useState<"openai" | "claude">("openai");
   const [claudeModel, setClaudeModel] = useState<"claude-sonnet-4-5" | "claude-opus-4-5" | "claude-haiku-4-5">("claude-sonnet-4-5");
-  const [imageType, setImageType] = useState<"stock" | "ai">("stock");
   const [dateVerification, setDateVerification] = useState<{
     status: "idle" | "checking" | "mismatch" | "match" | "error";
     extractedDate?: string | null;
@@ -226,8 +225,8 @@ export function SignalDetailPanel({
   });
 
   const mediaSitePublishMutation = useMutation({
-    mutationFn: async ({ signalId, imageType }: { signalId: number; imageType: "stock" | "ai" }) => {
-      const res = await apiRequest("POST", `/api/signals/${signalId}/publish-to-media`, { imageType });
+    mutationFn: async ({ signalId }: { signalId: number }) => {
+      const res = await apiRequest("POST", `/api/signals/${signalId}/publish-to-media`, {});
       return res.json();
     },
     onSuccess: (data) => {
@@ -822,41 +821,12 @@ export function SignalDetailPanel({
                     </Button>
                   </div>
                   <div className="pt-2 border-t">
-                    <p className="text-xs text-muted-foreground mb-2">Publish to Media Site:</p>
-                    <div className="flex items-center gap-3 mb-2">
-                      <label className="flex items-center gap-1.5 text-sm cursor-pointer">
-                        <input
-                          type="radio"
-                          name="imageType"
-                          value="stock"
-                          checked={imageType === "stock"}
-                          onChange={() => setImageType("stock")}
-                          className="w-4 h-4"
-                          data-testid="radio-image-stock"
-                        />
-                        Stock Image
-                      </label>
-                      <label className="flex items-center gap-1.5 text-sm cursor-pointer">
-                        <input
-                          type="radio"
-                          name="imageType"
-                          value="ai"
-                          checked={imageType === "ai"}
-                          onChange={() => setImageType("ai")}
-                          className="w-4 h-4"
-                          data-testid="radio-image-ai"
-                        />
-                        AI Generated
-                      </label>
-                    </div>
+                    <p className="text-xs text-muted-foreground mb-2">Publish to Media Site (AI-generated image with proper licensing):</p>
                     <Button
                       variant="default"
                       size="sm"
                       onClick={() => {
-                        mediaSitePublishMutation.mutate({ 
-                          signalId: signal.id, 
-                          imageType 
-                        });
+                        mediaSitePublishMutation.mutate({ signalId: signal.id });
                       }}
                       disabled={mediaSitePublishMutation.isPending}
                       data-testid="button-send-to-media-site"
