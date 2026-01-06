@@ -939,7 +939,7 @@ export function SignalDetailPanel({
                     </Button>
                   </div>
                   <div className="pt-2 border-t">
-                    <p className="text-xs text-muted-foreground mb-2">Publish to Media Site (AI-generated image with proper licensing):</p>
+                    <p className="text-xs text-muted-foreground mb-2">Publish to Baking Milling site (AI-generated image with proper licensing):</p>
                     <Button
                       variant="default"
                       size="sm"
@@ -954,7 +954,7 @@ export function SignalDetailPanel({
                       ) : (
                         <Send className="w-3.5 h-3.5 mr-1.5" />
                       )}
-                      {mediaSitePublishMutation.isPending ? "Publishing..." : "Send to Media Site"}
+                      {mediaSitePublishMutation.isPending ? "Publishing..." : "Send to Baking Milling site"}
                     </Button>
                   </div>
                 </div>

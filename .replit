@@ -48,4 +48,4 @@ NODE_ENV = "production"
 PRODUCTION_APP_URL = "https://media-horizon--andrewniu.replit.app"
 
 [userenv.shared]
-MEDIA_SITE_URL = "https://baking-and-milling-industry-news--andrewniu.replit.app"
+MEDIA_SITE_URL = "https://baking-mill-news--andrewniu.replit.app"
