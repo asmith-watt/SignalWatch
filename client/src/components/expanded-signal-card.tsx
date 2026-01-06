@@ -125,8 +125,9 @@ export function ExpandedSignalCard({
     return (
       <div className="space-y-3">
         {sections.map(({ key, label, icon: Icon }) => {
-          const items = entities[key] as Array<string | { name: string; role?: string; amount?: string }> | undefined;
-          if (!items || items.length === 0) return null;
+          const rawItems = entities[key];
+          if (!rawItems || !Array.isArray(rawItems) || rawItems.length === 0) return null;
+          const items = rawItems as Array<string | { name: string; role?: string; amount?: string }>;
           
           return (
             <div key={key}>
