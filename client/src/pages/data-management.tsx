@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle, Sparkles, Calendar, AlertTriangle, Check, RefreshCw, Link2 } from "lucide-react";
+import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle, Sparkles, Calendar, AlertTriangle, Check, RefreshCw, Link2, Brain, Info } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScanHistory } from "@/components/scan-history";
 import type { Company, Signal } from "@shared/schema";
@@ -113,6 +113,22 @@ export function DataManagementPage() {
     },
   });
 
+  const analyzeAllSignalsMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/signals/analyze-all", {});
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      toast({ 
+        title: "Analysis Complete", 
+        description: `Analyzed ${data.analyzed} signals (${data.failed} failed)` 
+      });
+    },
+    onError: () => {
+      toast({ title: "Failed to analyze signals", variant: "destructive" });
+    },
+  });
+
   const verifyDatesMutation = useMutation({
     mutationFn: async (limit: number) => {
       const response = await fetch(`/api/signals/verify-dates?limit=${limit}&onlyMismatches=true`);
@@ -191,7 +207,7 @@ export function DataManagementPage() {
           <p className="text-muted-foreground mt-1">Export and import your company and signal data</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
@@ -279,7 +295,97 @@ export function DataManagementPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Brain className="h-5 w-5 text-muted-foreground" />
+                <CardTitle className="text-lg">AI Analysis</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-3">
+                <p className="text-xs text-muted-foreground">
+                  {signals.filter(s => !s.aiAnalysis).length} signals pending analysis
+                </p>
+                <Button
+                  size="sm"
+                  onClick={() => analyzeAllSignalsMutation.mutate()}
+                  disabled={analyzeAllSignalsMutation.isPending}
+                  data-testid="button-analyze-signals"
+                >
+                  {analyzeAllSignalsMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Brain className="h-4 w-4 mr-2" />
+                  )}
+                  Analyze All Signals
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Info className="h-5 w-5 text-muted-foreground" />
+              <CardTitle>AI Features Overview</CardTitle>
+            </div>
+            <CardDescription>
+              Understanding how AI enrichment and analysis work in SignalWatch
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <h4 className="font-medium">AI Company Enrichment</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Uses Perplexity AI to research and fill in missing company data. This includes:
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                  <li>Company descriptions and overviews</li>
+                  <li>Official website URLs</li>
+                  <li>LinkedIn and Twitter profiles</li>
+                  <li>Founding year and company size</li>
+                </ul>
+                <div className="pt-2 border-t">
+                  <p className="text-xs text-muted-foreground">
+                    <strong>When to run:</strong> After importing new companies or when you notice missing profile data.
+                    Run manually as needed - not scheduled.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Brain className="h-4 w-4 text-primary" />
+                  <h4 className="font-medium">AI Signal Analysis</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Uses OpenAI (GPT-4o) to analyze signals and extract editorial insights. This includes:
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                  <li>Key takeaways and story angles</li>
+                  <li>Industry impact assessment</li>
+                  <li>Competitor implications</li>
+                  <li>Entity extraction (people, companies, financials)</li>
+                  <li>Relevance and priority scoring</li>
+                </ul>
+                <div className="pt-2 border-t">
+                  <p className="text-xs text-muted-foreground">
+                    <strong>When to run:</strong> Click "Analyze All" to batch-process all unanalyzed signals. 
+                    Signals already analyzed are skipped. Individual signals can also be analyzed from their detail page.
+                    Processing time varies based on the number of signals and API response times.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
