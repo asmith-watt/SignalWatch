@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import { Radio } from "lucide-react";
 import { SignalCard } from "@/components/signal-card";
 import { SignalTimeline } from "@/components/signal-timeline";
@@ -9,6 +8,7 @@ import { SignalFeedSkeleton } from "@/components/loading-skeleton";
 import { EmptySignals, EmptyFilteredSignals } from "@/components/empty-states";
 import { WordPressPublishDialog } from "@/components/wordpress-publish-dialog";
 import { MediaSitePublishDialog } from "@/components/media-site-publish-dialog";
+import { ExpandedSignalCard } from "@/components/expanded-signal-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { Company, Signal } from "@shared/schema";
@@ -50,9 +50,9 @@ function extractEntityNames(entities: unknown): string[] {
 }
 
 export function AllSignalsPage() {
-  const [, navigate] = useLocation();
   const [filters, setFilters] = useState<SignalFilters>(defaultFilters);
   const [viewMode, setViewMode] = useState<"list" | "timeline">("list");
+  const [expandedSignalId, setExpandedSignalId] = useState<number | null>(null);
   const [wpPublishSignalId, setWpPublishSignalId] = useState<number | null>(null);
   const [mediaSitePublishSignalId, setMediaSitePublishSignalId] = useState<number | null>(null);
 
@@ -164,7 +164,15 @@ export function AllSignalsPage() {
     if (!signal.isRead) {
       handleMarkRead(signal.id, true);
     }
-    navigate(`/signals/${signal.id}`);
+    setExpandedSignalId(expandedSignalId === signal.id ? null : signal.id);
+  };
+
+  const handleUpdateStatus = (id: number, status: string) => {
+    updateSignalMutation.mutate({ id, updates: { contentStatus: status } });
+  };
+
+  const handleUpdateNotes = (id: number, notes: string) => {
+    updateSignalMutation.mutate({ id, updates: { notes } });
   };
 
   const handleEntitySelect = (entityName: string) => {
@@ -225,6 +233,25 @@ export function AllSignalsPage() {
                     const company = companies.find(
                       (c) => c.id === signal.companyId
                     );
+                    const isExpanded = expandedSignalId === signal.id;
+                    
+                    if (isExpanded) {
+                      return (
+                        <ExpandedSignalCard
+                          key={signal.id}
+                          signal={signal}
+                          company={company}
+                          onCollapse={() => setExpandedSignalId(null)}
+                          onBookmark={handleBookmark}
+                          onUpdateStatus={handleUpdateStatus}
+                          onUpdateNotes={handleUpdateNotes}
+                          onEntitySelect={handleEntitySelect}
+                          onPublishWordPress={(id) => setWpPublishSignalId(id)}
+                          onPublishMediaSite={(id) => setMediaSitePublishSignalId(id)}
+                        />
+                      );
+                    }
+                    
                     return (
                       <SignalCard
                         key={signal.id}
