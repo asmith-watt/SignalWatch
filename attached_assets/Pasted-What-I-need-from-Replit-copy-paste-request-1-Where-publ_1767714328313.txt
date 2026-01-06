@@ -1,0 +1,112 @@
+What I need from Replit (copy/paste request)
+1️⃣ Where publishing is implemented (files + functions)
+
+Ask Replit:
+
+“List the exact files and functions that handle publishing to the Baking & Milling Next.js CMS. Include route handlers and helper modules.”
+
+I’m looking for:
+
+The backend route name (example: /api/publish/baking-milling)
+
+The function that actually does the fetch() / HTTP call
+
+Any shared publisher/adapters
+
+This tells us whether you already have a single, clean publish adapter or multiple ad-hoc ones.
+
+2️⃣ The exact payload sent to the CMS (this is critical)
+
+Ask Replit to paste:
+
+“The exact JSON payload we POST to the Next.js CMS when publishing, with field names.”
+
+I need to see:
+
+externalId (or equivalent)
+
+title
+
+body format (HTML vs Markdown)
+
+tags/categories
+
+source attribution
+
+any metadata
+
+This answers:
+
+Are we idempotent?
+
+Are we sending fields the CMS ignores?
+
+Are we missing SEO or attribution fields?
+
+3️⃣ The CMS response we store
+
+Ask Replit:
+
+“What does the CMS return on publish, and which fields do we persist in the articles table?”
+
+Specifically:
+
+Do we store externalUrl?
+
+Do we store a CMS post ID?
+
+Do we overwrite on re-publish or create a new row?
+
+This tells us if you’ll be able to:
+
+link back to live articles
+
+update instead of duplicate
+
+audit what was published
+
+4️⃣ How duplicates are prevented today
+
+Ask Replit:
+
+“Explain how we prevent publishing the same signal twice to Baking & Milling.”
+
+Possible answers:
+
+externalId upsert
+
+manual UI check
+
+articles table constraint
+
+or nothing (this is common)
+
+If the answer is “nothing,” that’s the one thing you still need.
+
+5️⃣ Where the publish button is wired in the UI
+
+Ask Replit:
+
+“Show where the Baking & Milling publish button calls the backend and what data it sends.”
+
+I need to confirm:
+
+Does it send signalId?
+
+Does it send articleId?
+
+Does it regenerate content on publish (bad) or reuse generated content (good)?
+
+6️⃣ One real example (this seals it)
+
+Ask Replit for one real publish example:
+
+“Paste one example of:
+
+the SignalWatch publish request payload
+
+the CMS response
+
+the resulting row in the articles table”
+
+Redact secrets. One example answers 90% of questions instantly.
