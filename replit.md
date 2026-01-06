@@ -6,6 +6,13 @@ SignalWatch is a B2B business intelligence platform designed for editorial teams
 
 ## Recent Changes
 
+### Object Storage for Persistent Images (January 2026)
+- Migrated AI-generated images from ephemeral filesystem to Replit Object Storage
+- Images now persist across deployments and production restarts
+- New endpoint `/api/storage/images/:filename` serves images from Object Storage
+- Bucket configured with `DEFAULT_OBJECT_STORAGE_BUCKET_ID` environment variable
+- Public images stored in `public/generated-images/` directory within the bucket
+
 ### Claude Integration for Article Generation (January 2026)
 - Added Anthropic Claude as alternative AI provider for article generation
 - Supports Claude Sonnet 4.5, Opus 4.5, and Haiku 4.5 models

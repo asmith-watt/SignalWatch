@@ -2,8 +2,7 @@ import type { Signal, Company } from "@shared/schema";
 import type { GeneratedArticle } from "./article-generator";
 import { generateImageBuffer } from "./replit_integrations/image/client";
 import { openai } from "./replit_integrations/image/client";
-import fs from "fs";
-import path from "path";
+import { objectStorageClient } from "./replit_integrations/object_storage";
 
 export interface MediaSitePayload {
   headline: string;
@@ -100,16 +99,31 @@ export async function generateAIImage(
       "1024x1024"
     );
 
-    const imagesDir = path.resolve(process.cwd(), "public/generated-images");
-    if (!fs.existsSync(imagesDir)) {
-      fs.mkdirSync(imagesDir, { recursive: true });
+    const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+    if (!bucketId) {
+      console.error("Object storage bucket not configured");
+      return null;
     }
 
     const filename = `ai-image-${signal.id}-${Date.now()}.png`;
-    const filePath = path.join(imagesDir, filename);
-    fs.writeFileSync(filePath, imageBuffer);
+    const objectPath = `public/generated-images/${filename}`;
+    
+    const bucket = objectStorageClient.bucket(bucketId);
+    const file = bucket.file(objectPath);
+    
+    await file.save(imageBuffer, {
+      contentType: "image/png",
+      metadata: {
+        "custom:aclPolicy": JSON.stringify({
+          owner: "system",
+          visibility: "public",
+        }),
+      },
+    });
 
-    const imageUrl = `${baseUrl}/generated-images/${filename}`;
+    console.log(`AI image uploaded to Object Storage: ${objectPath}`);
+
+    const imageUrl = `${baseUrl}/api/storage/images/${filename}`;
 
     return {
       imageUrl,

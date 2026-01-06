@@ -21,6 +21,7 @@ import { generateRssFeed, generateAllSignalsRssFeed, getAvailableFeeds } from ".
 import { publishToWordPress, testWordPressConnection } from "./wordpress-publisher";
 import { selectStockImage, buildMediaSitePayload, publishToMediaSite, generateAIImage } from "./media-site-publisher";
 import { verifySignalDates, fixSignalDates, verifySourceUrl, verifySourceUrls } from "./date-verifier";
+import { objectStorageClient } from "./replit_integrations/object_storage";
 import express from "express";
 import path from "path";
 
@@ -31,8 +32,46 @@ export async function registerRoutes(
   // Serve stock images from public/stock-images
   app.use("/stock-images", express.static(path.resolve(process.cwd(), "public/stock-images")));
   
-  // Serve AI-generated images from public/generated-images
+  // Serve AI-generated images from public/generated-images (legacy local storage)
   app.use("/generated-images", express.static(path.resolve(process.cwd(), "public/generated-images")));
+
+  // Serve AI-generated images from Object Storage (persistent storage)
+  app.get("/api/storage/images/:filename", async (req: Request, res: Response) => {
+    try {
+      const { filename } = req.params;
+      const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+      
+      if (!bucketId) {
+        return res.status(500).json({ error: "Object storage not configured" });
+      }
+
+      const bucket = objectStorageClient.bucket(bucketId);
+      const file = bucket.file(`public/generated-images/${filename}`);
+      
+      const [exists] = await file.exists();
+      if (!exists) {
+        return res.status(404).json({ error: "Image not found" });
+      }
+
+      const [metadata] = await file.getMetadata();
+      res.set({
+        "Content-Type": metadata.contentType || "image/png",
+        "Cache-Control": "public, max-age=31536000",
+      });
+
+      const stream = file.createReadStream();
+      stream.on("error", (err) => {
+        console.error("Stream error:", err);
+        if (!res.headersSent) {
+          res.status(500).json({ error: "Error streaming image" });
+        }
+      });
+      stream.pipe(res);
+    } catch (error) {
+      console.error("Error serving image from storage:", error);
+      res.status(500).json({ error: "Failed to serve image" });
+    }
+  });
 
   // Companies CRUD
   app.get("/api/companies", async (req: Request, res: Response) => {
