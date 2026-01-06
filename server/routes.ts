@@ -1125,6 +1125,32 @@ export async function registerRoutes(
     }
   });
 
+  // Monitor Runs endpoints - track scheduled monitoring runs
+  app.get("/api/monitor/runs", async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const runs = await storage.getMonitorRuns(limit);
+      res.json(runs);
+    } catch (error) {
+      console.error("Error fetching monitor runs:", error);
+      res.status(500).json({ error: "Failed to fetch monitor runs" });
+    }
+  });
+
+  app.get("/api/monitor/runs/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const run = await storage.getMonitorRun(id);
+      if (!run) {
+        return res.status(404).json({ error: "Monitor run not found" });
+      }
+      res.json(run);
+    } catch (error) {
+      console.error("Error fetching monitor run:", error);
+      res.status(500).json({ error: "Failed to fetch monitor run" });
+    }
+  });
+
   app.post("/api/monitor/company/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);

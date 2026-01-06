@@ -6,6 +6,23 @@ SignalWatch is a B2B business intelligence platform designed for editorial teams
 
 ## Recent Changes
 
+### Advanced Monitoring & Deduplication (January 2026)
+- **Deduplication system** (`server/dedupe.ts`):
+  - SHA256-based stable hash generation with URL canonicalization
+  - Jaccard similarity for near-duplicate detection (85% threshold, 75% for same domain)
+  - Novelty scoring (0-100) based on 14-day lookback window
+- **Auto-prioritization** (`server/priority-scoring.ts`):
+  - Deterministic priority scoring (0-100) based on signal type, sentiment, relevance
+  - Weight factors: regulatory (+20), acquisitions (+20), earnings (+15), funding (+10)
+  - Recommended editorial format: ignore, brief, news, or analysis
+- **Scheduler improvements** (`server/scheduler.ts`):
+  - Enable with `ENABLE_SCHEDULER=true` environment variable
+  - Configurable cron via `MONITOR_CRON` (default: `0 6 * * *` = 6:00 AM UTC)
+  - Tracks runs in `monitor_runs` table with full statistics
+- **New endpoints**:
+  - `GET /api/monitor/runs` - List recent monitoring runs
+  - `GET /api/monitor/runs/:id` - Get specific run details
+
 ### Object Storage for Persistent Images (January 2026)
 - Migrated AI-generated images from ephemeral filesystem to Replit Object Storage
 - Images now persist across deployments and production restarts

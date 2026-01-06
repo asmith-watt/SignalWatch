@@ -1,0 +1,253 @@
+You are a senior full-stack engineer working on SignalWatch (Express.js + TypeScript + Drizzle ORM + Neon Postgres + React dashboard). Implement the next improvements in this exact priority order, using the existing schema unless explicitly stated. Keep behavior consistent: exact duplicates should SKIP INSERT (one canonical row only).
+
+CONTEXT
+- Signals schema includes: signals.hash (text nullable), signals.aiAnalysis (jsonb), signals.priority (high/medium/low), signals.contentStatus (new/reviewed/published/rejected), signals.type, signals.sentiment, signals.citations (text[]), signals.sourceUrl/sourceName, publishedAt, gatheredAt.
+- Monitoring endpoints exist:
+  POST /api/monitor/all
+  POST /api/monitor/company/:id
+  POST /api/monitor/industry/:industry
+  POST /api/monitor/country/:country
+  GET  /api/monitor/progress
+  POST /api/monitor/stop
+- Perplexity returns ExtractedSignal with title/summary/type/citations/sourceUrl/sourceName/sentiment/priority/publishedAt (YYYY-MM-DD).
+- Current dedupe: hash = generateHash(signal.title + company.name); getSignalByHash(hash); if existing => skip insert.
+
+GOALS
+1) Reduce noise with exact + near-duplicate detection (near-dupes should be detected and SKIPPED, same as exact dupes).
+2) Auto-prioritize consistently using deterministic scoring (no LLM required).
+3) Turn on scheduled monitoring at 6:00 AM UTC with safe concurrency and logging.
+4) Add recommended editorial action (brief/news/analysis/ignore) stored on the signal (prefer aiAnalysis JSONB to avoid migration).
+
+------------------------------------------------------------
+PRIORITY 1 — De-duplication + Near-Dupe Similarity (skip insert)
+------------------------------------------------------------
+
+A) Replace the current hash with a stable sha256 fingerprint
+Implement a new hash function (keep column name signals.hash):
+- Prefer URL-based fingerprint if we have any URL:
+  - Use signal.sourceUrl if present else first citation URL if present else "".
+  - Canonicalize URL:
+    - lowercase
+    - trim
+    - ensure https:// if missing
+    - remove protocol and leading www.
+    - remove trailing slash
+    - strip query params known for tracking: utm_*, gclid, fbclid, mc_cid, mc_eid
+- If no URL, fall back to title-based fingerprint:
+  - normalize title:
+    - lowercase, trim
+    - collapse whitespace
+    - remove punctuation except hyphens inside words
+- Include company scope to reduce collisions:
+  - fingerprint_base = `${companyId}|${canonical_url_or_title}|${published_day}`
+  - published_day = YYYY-MM-DD from publishedAt if present else derived from gatheredAt
+- Compute hash = sha256(fingerprint_base) hex string.
+
+Update generateHash() accordingly. Keep the function name if used elsewhere, but change implementation to sha256 and the normalization rules above.
+
+B) Keep exact dedupe behavior: skip insert
+- Before insert, call storage.getSignalByHash(hash).
+- If exists => duplicatesSkipped++ and continue.
+- This preserves one canonical row.
+
+C) Add near-duplicate detection (no embeddings)
+Implement similarity dedupe before insert. This should ALSO skip insert when matched.
+
+1) Fetch candidate recent signals for the same company:
+- new storage method: getRecentSignalsForCompany(companyId, lookbackDays=14, limit=200)
+- return id, title, summary, sourceUrl, publishedAt, gatheredAt, hash, aiAnalysis, citations, type, sentiment, priority
+
+2) Implement text similarity:
+- Create a normalized title string for both new signal and candidate:
+  - lowercase, trim, collapse whitespace, remove punctuation, remove common boilerplate tokens:
+    ["inc", "llc", "ltd", "co", "corp", "corporation", "company", "reports", "announces", "launches"]
+- Tokenize by whitespace, remove stopwords (a small static set is fine: the, a, an, and, or, of, to, in, for, on, with, from, by, at, as, is, are).
+- Compute Jaccard similarity = |intersection| / |union|.
+
+3) Matching rules:
+- If Jaccard(titleTokens) >= 0.85 => treat as near-duplicate
+- OR if normalized titles are identical => near-duplicate
+- OR if (new.sourceUrl canonical host matches candidate host AND Jaccard >= 0.75) => near-duplicate
+
+4) When near-duplicate detected:
+- Do NOT insert the new row (skip insert).
+- Increment duplicatesSkipped.
+- Optionally log: "Skipping near-duplicate (jaccard=0.xx): <title> matches signal #<id>"
+
+D) Store novelty metadata on canonical rows (no migration)
+Since we skip duplicates, we still want novelty info for the one row we keep.
+On the created canonical signal, add to aiAnalysis JSONB:
+- aiAnalysis.noveltyScore: number (0–100) where 100 = highly novel
+- aiAnalysis.dedupe: { method: "exact_hash"|"near_jaccard"|"none", comparedLookbackDays: 14 }
+Implementation:
+- If exact hash matched we never create row; no need to store.
+- If near-dupe would have matched, we also skip insert.
+- For canonical inserts, compute noveltyScore by checking max Jaccard similarity vs recent titles:
+  - maxSim = max jaccard across candidates
+  - noveltyScore = round((1 - maxSim) * 100)
+  - clamp 0..100
+  - If there are no candidates, noveltyScore = 100
+
+E) API reporting
+Return extra monitoring metrics:
+- { signalsCreated, signalsFound, duplicatesSkipped, nearDuplicatesSkipped }
+Ensure existing callers don’t break: keep old fields and add new.
+
+Acceptance criteria Priority 1:
+- Exact dupes are still skipped.
+- Near-dup headlines are skipped with Jaccard >= 0.85.
+- Newly created signals have signals.hash populated with sha256-based stable hash.
+- Monitoring report includes nearDuplicatesSkipped.
+- React list “feels cleaner” because repeated articles don’t accumulate.
+
+------------------------------------------------------------
+PRIORITY 2 — Auto-Prioritization (deterministic score)
+------------------------------------------------------------
+
+Goal: Stop defaulting everything to medium. Compute a score and set signals.priority accordingly. Also store numeric score inside aiAnalysis for sorting.
+
+A) Create computePriorityScore(signal, company) => { score0to100, label }
+Use only deterministic logic. No LLM calls.
+
+Inputs available:
+- signal.type
+- signal.sentiment
+- signal.citations length
+- signal.sourceUrl/sourceName
+- aiAnalysis.relevanceScore if present (assume 0..1). If missing, treat as 0.5.
+- aiAnalysis.noveltyScore from Priority 1 if present (0..100). If missing, treat as 50.
+
+Scoring (start at 50):
+- Type weights:
+  regulatory +20
+  earnings +15
+  legal (if you have it; else map "regulatory" or "news") +15
+  acquisition +20
+  funding +10
+  executive_change +10
+  product_launch +5
+  partnership +5
+  press_release +5
+  news +0
+  other +0
+- Sentiment:
+  negative +10
+  neutral +0
+  positive +2
+- Relevance:
+  + round(relevanceScore * 20)  // 0..20
+- Novelty penalty/boost:
+  If noveltyScore <= 20 => -25
+  Else if noveltyScore <= 40 => -10
+  Else if noveltyScore >= 80 => +5
+- Citations:
+  If citations >= 3 => +5
+  If citations == 0 => -5
+
+Clamp 0..100
+
+Label mapping:
+- 0..39 => "low"
+- 40..69 => "medium"
+- 70..100 => "high"
+
+B) Apply priority on create
+When creating a signal, compute score/label and:
+- set signalData.priority = label
+- set aiAnalysis.priorityScore = score
+- set aiAnalysis.priorityReason = short string listing the main factors (type, sentiment, novelty, relevance)
+
+C) UI sorting (light touch)
+React already supports sorting. Add an option:
+- Sort by aiAnalysis.priorityScore desc (fallback to priority + gatheredAt)
+If this is too much UI work now, ensure API returns the score so the UI can use it later.
+
+Acceptance criteria Priority 2:
+- New signals no longer default to medium in most cases.
+- Regulatory + negative + high relevance typically lands high.
+- Low novelty signals are pushed to low or medium.
+
+------------------------------------------------------------
+PRIORITY 3 — Scheduled Monitoring at 6:00 AM UTC
+------------------------------------------------------------
+
+Goal: Enable daily monitoring without manual clicks.
+
+A) Implement node-cron scheduler (server-side)
+- Controlled by env var ENABLE_SCHEDULER=true/false
+- Cron env var MONITOR_CRON default "0 6 * * *" (6:00 UTC)
+- Ensure only one run at a time (global in-memory lock is fine).
+- Scheduler should call the same internal function used by POST /api/monitor/all (do not loop through HTTP to localhost).
+
+B) Rate limiting and concurrency
+- Keep current 1 second delay between companies.
+- Also add max concurrency = 1 for Perplexity calls unless you already have a safe limiter.
+- Add retries: up to 2 retries with exponential backoff (500ms, 1500ms) for transient errors.
+
+C) Run logging table (small migration is OK here)
+Create a table monitor_runs:
+- id serial pk
+- scope text not null  // "all" | "industry:<x>" | "company:<id>" etc
+- started_at timestamptz not null default now()
+- finished_at timestamptz
+- signals_found int default 0
+- signals_created int default 0
+- duplicates_skipped int default 0
+- near_duplicates_skipped int default 0
+- status text default "running" // running, success, error, stopped
+- error text
+
+Expose:
+- GET /api/monitor/runs?limit=20
+- GET /api/monitor/runs/:id
+
+Acceptance criteria Priority 3:
+- With ENABLE_SCHEDULER=true, a run triggers daily at 06:00 UTC.
+- monitor_runs records are created and updated with counts.
+- If a run is in progress, new runs do not start.
+
+------------------------------------------------------------
+PRIORITY 4 — Recommended Editorial Action
+------------------------------------------------------------
+
+Goal: Add "what should an editor do" without migrations by storing in aiAnalysis.
+
+A) Determine recommendedFormat: "ignore"|"brief"|"news"|"analysis"
+Rules:
+- If aiAnalysis.noveltyScore <= 20 => "ignore"
+- Else if priority == "high" AND type in ["regulatory","earnings","acquisition","executive_change"] => "news"
+- Else if priority == "high" AND sentiment == "negative" => "analysis"
+- Else if priority == "medium" AND aiAnalysis.relevanceScore >= 0.75 => "brief"
+- Else => "brief"
+
+Store in aiAnalysis:
+- aiAnalysis.recommendedFormat
+- aiAnalysis.recommendedReason (1 sentence)
+
+B) UI
+Add a small pill/badge on each signal row for recommendedFormat.
+Allow editors to override manually by writing into signals.notes or a new field only if you already have an edit UI (do not add complex editing now).
+
+Acceptance criteria Priority 4:
+- Every created signal has aiAnalysis.recommendedFormat.
+- UI shows the recommended format.
+
+------------------------------------------------------------
+DELIVERABLES
+1) Implement in order: Priority 1, then 2, then 3, then 4 with separate commits.
+2) Add unit tests (Vitest/Jest depending on repo) for:
+- URL canonicalization and sha256 hash generation
+- Jaccard similarity function
+- priority scoring
+3) Update README:
+- env vars: ENABLE_SCHEDULER, MONITOR_CRON
+- dedupe rules
+- priority scoring rules
+
+IMPORTANT CONSTRAINTS
+- Do not break existing API response shapes. Add fields rather than removing.
+- Keep exact-dup behavior: skip insert.
+- Avoid large migrations; prefer aiAnalysis JSONB for new metadata.
+- Keep monitoring stoppable via /api/monitor/stop.
+
+Start by implementing Priority 1 only. After tests pass, proceed to Priority 2, then 3, then 4.

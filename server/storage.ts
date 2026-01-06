@@ -13,6 +13,8 @@ import {
   type InsertCompanyRelationship,
   type Article,
   type InsertArticle,
+  type MonitorRun,
+  type InsertMonitorRun,
   users,
   companies,
   signals,
@@ -20,6 +22,7 @@ import {
   activityLog,
   companyRelationships,
   articles,
+  monitorRuns,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike, sql } from "drizzle-orm";
@@ -44,6 +47,7 @@ export interface IStorage {
   getSignal(id: number): Promise<Signal | undefined>;
   getAllSignals(): Promise<Signal[]>;
   getSignalsByCompany(companyId: number): Promise<Signal[]>;
+  getRecentSignalsForCompany(companyId: number, lookbackDays?: number, limit?: number): Promise<Signal[]>;
   createSignal(signal: InsertSignal): Promise<Signal>;
   updateSignal(id: number, signal: Partial<InsertSignal>): Promise<Signal | undefined>;
   deleteSignal(id: number): Promise<void>;
@@ -75,6 +79,13 @@ export interface IStorage {
   getArticlesBySignal(signalId: number): Promise<Article[]>;
   getArticlesByCompany(companyId: number): Promise<Article[]>;
   createArticle(article: InsertArticle): Promise<Article>;
+
+  // Monitor Runs
+  createMonitorRun(run: InsertMonitorRun): Promise<MonitorRun>;
+  updateMonitorRun(id: number, updates: Partial<InsertMonitorRun>): Promise<MonitorRun | undefined>;
+  getMonitorRun(id: number): Promise<MonitorRun | undefined>;
+  getMonitorRuns(limit?: number): Promise<MonitorRun[]>;
+  getActiveMonitorRun(): Promise<MonitorRun | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -163,6 +174,23 @@ export class DatabaseStorage implements IStorage {
       .from(signals)
       .where(eq(signals.companyId, companyId))
       .orderBy(desc(signals.createdAt));
+  }
+
+  async getRecentSignalsForCompany(companyId: number, lookbackDays: number = 14, limit: number = 200): Promise<Signal[]> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - lookbackDays);
+    
+    return db
+      .select()
+      .from(signals)
+      .where(
+        and(
+          eq(signals.companyId, companyId),
+          sql`${signals.gatheredAt} >= ${cutoffDate}`
+        )
+      )
+      .orderBy(desc(signals.gatheredAt))
+      .limit(limit);
   }
 
   async createSignal(signal: InsertSignal): Promise<Signal> {
@@ -310,6 +338,44 @@ export class DatabaseStorage implements IStorage {
   async createArticle(article: InsertArticle): Promise<Article> {
     const [created] = await db.insert(articles).values(article).returning();
     return created;
+  }
+
+  // Monitor Runs
+  async createMonitorRun(run: InsertMonitorRun): Promise<MonitorRun> {
+    const [created] = await db.insert(monitorRuns).values(run).returning();
+    return created;
+  }
+
+  async updateMonitorRun(id: number, updates: Partial<InsertMonitorRun>): Promise<MonitorRun | undefined> {
+    const [updated] = await db
+      .update(monitorRuns)
+      .set(updates)
+      .where(eq(monitorRuns.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async getMonitorRun(id: number): Promise<MonitorRun | undefined> {
+    const [run] = await db.select().from(monitorRuns).where(eq(monitorRuns.id, id));
+    return run || undefined;
+  }
+
+  async getMonitorRuns(limit: number = 20): Promise<MonitorRun[]> {
+    return db
+      .select()
+      .from(monitorRuns)
+      .orderBy(desc(monitorRuns.startedAt))
+      .limit(limit);
+  }
+
+  async getActiveMonitorRun(): Promise<MonitorRun | undefined> {
+    const [run] = await db
+      .select()
+      .from(monitorRuns)
+      .where(eq(monitorRuns.status, "running"))
+      .orderBy(desc(monitorRuns.startedAt))
+      .limit(1);
+    return run || undefined;
   }
 }
 

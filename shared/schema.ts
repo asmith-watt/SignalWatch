@@ -292,5 +292,27 @@ export const insertActivityLogSchema = createInsertSchema(activityLog).omit({
 export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
 export type ActivityLog = typeof activityLog.$inferSelect;
 
+// Monitor runs table - tracks monitoring job history
+export const monitorRuns = pgTable("monitor_runs", {
+  id: serial("id").primaryKey(),
+  scope: text("scope").notNull(),
+  startedAt: timestamp("started_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  finishedAt: timestamp("finished_at"),
+  signalsFound: integer("signals_found").default(0),
+  signalsCreated: integer("signals_created").default(0),
+  duplicatesSkipped: integer("duplicates_skipped").default(0),
+  nearDuplicatesSkipped: integer("near_duplicates_skipped").default(0),
+  status: text("status").default("running"),
+  error: text("error"),
+});
+
+export const insertMonitorRunSchema = createInsertSchema(monitorRuns).omit({
+  id: true,
+  startedAt: true,
+});
+
+export type InsertMonitorRun = z.infer<typeof insertMonitorRunSchema>;
+export type MonitorRun = typeof monitorRuns.$inferSelect;
+
 // Re-export chat models for OpenAI integration
 export * from "./models/chat";

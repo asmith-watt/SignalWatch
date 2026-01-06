@@ -2,6 +2,12 @@ import type { Company, InsertSignal } from "@shared/schema";
 import { storage } from "./storage";
 import { enrichSignal } from "./ai-analysis";
 import { startMonitoring, updateProgress, finishMonitoring, shouldStop } from "./monitor-progress";
+import { 
+  generateStableHash, 
+  checkNearDuplicate, 
+  computeNoveltyScore 
+} from "./dedupe";
+import { computePriorityScore, getRecommendedFormat } from "./priority-scoring";
 
 const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
 
@@ -43,7 +49,8 @@ function getMaxSignalAgeDays(): number {
   return DEFAULT_MAX_SIGNAL_AGE_DAYS;
 }
 
-function generateHash(content: string): string {
+// Legacy hash function - kept for reference, replaced by generateStableHash from dedupe.ts
+function generateLegacyHash(content: string): string {
   let hash = 0;
   for (let i = 0; i < content.length; i++) {
     const char = content.charCodeAt(i);
@@ -218,6 +225,11 @@ export interface MonitorResult {
   signalsCreated: number;
   signalsFound: number;
   duplicatesSkipped: number;
+  nearDuplicatesSkipped: number;
+}
+
+export interface CompanyMonitorResult extends MonitorResult {
+  company: string;
 }
 
 export async function monitorCompany(company: Company): Promise<MonitorResult> {
@@ -226,16 +238,53 @@ export async function monitorCompany(company: Company): Promise<MonitorResult> {
   
   let createdCount = 0;
   let duplicatesSkipped = 0;
+  let nearDuplicatesSkipped = 0;
+  
+  // Fetch recent signals for near-duplicate detection
+  const recentSignals = await storage.getRecentSignalsForCompany(company.id, 14, 200);
+  const candidatesForNearDupe = recentSignals.map(s => ({
+    id: s.id,
+    title: s.title,
+    sourceUrl: s.sourceUrl,
+  }));
   
   for (const signal of signals) {
-    const hash = generateHash(signal.title + company.name);
+    const gatheredAt = new Date();
+    const publishedAt = signal.publishedAt ? new Date(signal.publishedAt) : null;
     
+    // Generate new sha256-based stable hash
+    const hash = generateStableHash(
+      company.id,
+      signal.sourceUrl,
+      signal.citations,
+      signal.title,
+      publishedAt,
+      gatheredAt
+    );
+    
+    // Check for exact duplicate by hash
     const existing = await storage.getSignalByHash(hash);
     if (existing) {
-      console.log(`  Skipping duplicate: ${signal.title}`);
+      console.log(`  Skipping exact duplicate: ${signal.title}`);
       duplicatesSkipped++;
       continue;
     }
+
+    // Check for near-duplicate using Jaccard similarity
+    const nearDupeCheck = checkNearDuplicate(
+      signal.title,
+      signal.sourceUrl,
+      candidatesForNearDupe
+    );
+    
+    if (nearDupeCheck.isNearDuplicate) {
+      console.log(`  Skipping near-duplicate (jaccard=${nearDupeCheck.similarity?.toFixed(2)}): ${signal.title} matches signal #${nearDupeCheck.matchedSignalId}`);
+      nearDuplicatesSkipped++;
+      continue;
+    }
+
+    // Compute novelty score based on similarity to recent signals
+    const noveltyScore = computeNoveltyScore(signal.title, recentSignals.map(s => ({ title: s.title })));
 
     const signalData: InsertSignal = {
       companyId: company.id,
@@ -245,7 +294,7 @@ export async function monitorCompany(company: Company): Promise<MonitorResult> {
       sourceUrl: signal.sourceUrl,
       sourceName: signal.sourceName,
       citations: signal.citations || [],
-      publishedAt: signal.publishedAt ? new Date(signal.publishedAt) : null,
+      publishedAt: publishedAt,
       sentiment: signal.sentiment,
       priority: signal.priority,
       isRead: false,
@@ -255,7 +304,14 @@ export async function monitorCompany(company: Company): Promise<MonitorResult> {
     };
 
     const createdSignal = await storage.createSignal(signalData);
-    console.log(`  Created signal: ${signal.title}`);
+    console.log(`  Created signal: ${signal.title} (novelty: ${noveltyScore})`);
+    
+    // Add the new signal to candidates for subsequent near-dupe checks in this batch
+    candidatesForNearDupe.push({
+      id: createdSignal.id,
+      title: signal.title,
+      sourceUrl: signal.sourceUrl,
+    });
     
     // Auto-enrich new signals with AI analysis
     try {
@@ -267,13 +323,71 @@ export async function monitorCompany(company: Company): Promise<MonitorResult> {
         industry: company.industry || undefined,
       });
       
+      // Compute deterministic priority score
+      const priorityResult = computePriorityScore({
+        type: signal.type,
+        sentiment: signal.sentiment,
+        citationsCount: signal.citations?.length || 0,
+        relevanceScore: enrichment.aiAnalysis.relevanceScore,
+        noveltyScore,
+      });
+      
+      // Get recommended editorial format
+      const formatRec = getRecommendedFormat(
+        priorityResult.label,
+        signal.type,
+        signal.sentiment,
+        enrichment.aiAnalysis.relevanceScore,
+        noveltyScore
+      );
+      
+      // Add novelty, priority, and format metadata to aiAnalysis
+      const enrichedAiAnalysis = {
+        ...enrichment.aiAnalysis,
+        noveltyScore,
+        dedupe: { method: "none" as const, comparedLookbackDays: 14 },
+        priorityScore: priorityResult.score,
+        priorityReason: priorityResult.reason,
+        recommendedFormat: formatRec.format,
+        recommendedReason: formatRec.reason,
+      };
+      
       await storage.updateSignal(createdSignal.id, {
         entities: enrichment.entities,
-        aiAnalysis: enrichment.aiAnalysis,
+        aiAnalysis: enrichedAiAnalysis,
+        priority: priorityResult.label,
       });
-      console.log(`  Enriched signal with AI analysis (score: ${enrichment.aiAnalysis.relevanceScore})`);
+      console.log(`  Enriched signal (priority: ${priorityResult.label}/${priorityResult.score}, format: ${formatRec.format})`);
     } catch (enrichError) {
       console.error(`  Failed to enrich signal:`, enrichError);
+      
+      // Still compute priority without AI relevance score
+      const priorityResult = computePriorityScore({
+        type: signal.type,
+        sentiment: signal.sentiment,
+        citationsCount: signal.citations?.length || 0,
+        noveltyScore,
+      });
+      
+      const formatRec = getRecommendedFormat(
+        priorityResult.label,
+        signal.type,
+        signal.sentiment,
+        undefined,
+        noveltyScore
+      );
+      
+      await storage.updateSignal(createdSignal.id, {
+        aiAnalysis: { 
+          noveltyScore, 
+          dedupe: { method: "none", comparedLookbackDays: 14 },
+          priorityScore: priorityResult.score,
+          priorityReason: priorityResult.reason,
+          recommendedFormat: formatRec.format,
+          recommendedReason: formatRec.reason,
+        },
+        priority: priorityResult.label,
+      });
     }
     
     createdCount++;
@@ -283,6 +397,7 @@ export async function monitorCompany(company: Company): Promise<MonitorResult> {
     signalsCreated: createdCount,
     signalsFound: signals.length,
     duplicatesSkipped,
+    nearDuplicatesSkipped,
   };
 }
 
@@ -343,17 +458,17 @@ export async function monitorCompaniesByCountry(country: string): Promise<{ comp
   return results;
 }
 
-export async function monitorAllCompanies(): Promise<{ company: string; signalsCreated: number }[]> {
+export async function monitorAllCompanies(): Promise<CompanyMonitorResult[]> {
   const companies = await storage.getAllCompanies();
-  const targetIndustries = ["Poultry", "Feed", "Pet Food"];
+  const targetIndustries = ["Poultry", "Feed", "Pet Food", "Baking & Milling"];
   const targetCompanies = companies.filter(c => c.industry && targetIndustries.includes(c.industry));
 
-  console.log(`Monitoring all ${targetCompanies.length} companies across Poultry, Feed, and Pet Food industries...`);
+  console.log(`Monitoring all ${targetCompanies.length} companies across ${targetIndustries.join(", ")} industries...`);
   
   startMonitoring(targetCompanies.length, 'all');
   
-  const results: { company: string; signalsCreated: number }[] = [];
-  let totalSignalsFound = 0;
+  const results: CompanyMonitorResult[] = [];
+  let totalSignalsCreated = 0;
   
   try {
     for (const company of targetCompanies) {
@@ -362,10 +477,16 @@ export async function monitorAllCompanies(): Promise<{ company: string; signalsC
         break;
       }
       console.log(`[${results.length + 1}/${targetCompanies.length}] Monitoring ${company.name} (${company.industry})...`);
-      updateProgress(results.length + 1, company.name, totalSignalsFound);
+      updateProgress(results.length + 1, company.name, totalSignalsCreated);
       const result = await monitorCompany(company);
-      totalSignalsFound += result.signalsCreated;
-      results.push({ company: company.name, signalsCreated: result.signalsCreated });
+      totalSignalsCreated += result.signalsCreated;
+      results.push({ 
+        company: company.name, 
+        signalsCreated: result.signalsCreated,
+        signalsFound: result.signalsFound,
+        duplicatesSkipped: result.duplicatesSkipped,
+        nearDuplicatesSkipped: result.nearDuplicatesSkipped,
+      });
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   } finally {
