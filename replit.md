@@ -50,8 +50,15 @@ SignalWatch is a B2B business intelligence platform designed for editorial teams
 - **Idempotent publish logic**: Re-publishing same signal+style reuses existing content by default
 - **Force regeneration**: Optional toggle to regenerate fresh content with new AI image
 - **CMS idempotency key**: `clientReferenceId` field (`signalwatch:{signalId}:{style}`) sent to CMS
-- **SEO support**: `canonicalUrl` field sent to CMS for previously published articles
-- **UI improvements**: Toggle switch in publish dialog to control regeneration
+- **SEO support**: `canonicalUrl` field sent to CMS, updated from CMS response after each publish
+- **Tag hygiene** (`server/media-site-publisher.ts sanitizeTags()`):
+  - Strips company-name-only tags to ensure diversity
+  - Auto-adds topic tag based on signal.type (e.g., "Funding", "Partnership", "Fire")
+  - Ensures minimum 2 non-company tags with fallbacks ("Industry Update", "Market News")
+  - Covers all signal types with "Business Update" fallback for unknown types
+- **UI improvements**: 
+  - Toggle switch in publish dialog to control regeneration
+  - "Published to Baking & Milling" toast with clickable "View Article" link
 - **Storage methods added**: `getArticleBySignalAndStyle()`, `updateArticle()` for article management
 
 ## User Preferences

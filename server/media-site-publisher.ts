@@ -145,6 +145,13 @@ export function buildPayloadFromExistingArticle(
 ): MediaSitePayload {
   const aiAnalysis = signal.aiAnalysis as { relevanceScore?: number } | null;
   const relevanceScore = aiAnalysis?.relevanceScore || 50;
+  
+  // Apply tag hygiene validation even for existing articles
+  const sanitizedTags = sanitizeTags(
+    (existingArticle.tags as string[]) || [],
+    signal.type,
+    company?.name || null
+  );
 
   return {
     headline: existingArticle.headline,
@@ -152,7 +159,7 @@ export function buildPayloadFromExistingArticle(
     body: existingArticle.body,
     keyTakeaways: (existingArticle.keyTakeaways as string[]) || [],
     seoDescription: existingArticle.seoDescription || "",
-    tags: (existingArticle.tags as string[]) || [],
+    tags: sanitizedTags,
     author: process.env.MEDIA_SITE_AUTHOR || "Your Publication Staff",
     imageUrl: existingArticle.imageUrl || "",
     imageCredit: "AI-generated image via OpenAI DALL-E",
@@ -176,6 +183,78 @@ export function buildPayloadFromExistingArticle(
   };
 }
 
+// Map signal types to topic tags for SEO - covers all possible signal types
+const SIGNAL_TYPE_TAGS: Record<string, string> = {
+  news: "Industry News",
+  funding: "Funding",
+  partnership: "Partnership",
+  acquisition: "Acquisition",
+  product_launch: "Product Launch",
+  executive_change: "Executive Change",
+  earnings: "Earnings",
+  regulatory: "Regulation",
+  press_release: "Press Release",
+  fire: "Fire",
+  recall: "Recall",
+  expansion: "Expansion",
+  layoff: "Layoffs",
+  job_posting: "Hiring",
+  website_change: "Company Update",
+  social_media: "Social Media",
+  award: "Awards",
+  bankruptcy: "Business News",
+  merger: "Mergers",
+  ipo: "IPO",
+  lawsuit: "Legal",
+  sustainability: "Sustainability",
+  other: "Business Update",
+};
+
+/**
+ * Validates and sanitizes tags for SEO requirements:
+ * - Ensures at least 2 tags
+ * - At least one tag must NOT be the company name
+ * - Auto-adds topic tag based on signal type if needed
+ * - Strips company-name-only tags to ensure diversity
+ */
+export function sanitizeTags(
+  rawTags: string[],
+  signalType: string,
+  companyName: string | null
+): string[] {
+  const companyNameLower = companyName?.toLowerCase().trim() || "";
+  
+  // Start with non-company tags only (strip company name tags)
+  let tags = (rawTags || []).filter(t => 
+    t.toLowerCase().trim() !== companyNameLower
+  );
+  
+  // Add topic tag based on signal type if not already present
+  // Falls back to "Business Update" for any unknown signal types
+  const topicTag = SIGNAL_TYPE_TAGS[signalType] || "Business Update";
+  if (!tags.some(t => t.toLowerCase() === topicTag.toLowerCase())) {
+    tags.push(topicTag);
+  }
+  
+  // Ensure minimum 2 non-company tags
+  const defaultTags = ["Industry Update", "Market News", "Business Intelligence"];
+  for (const defaultTag of defaultTags) {
+    if (tags.length >= 2) break;
+    if (!tags.some(t => t.toLowerCase() === defaultTag.toLowerCase())) {
+      tags.push(defaultTag);
+    }
+  }
+  
+  // Remove duplicates (case-insensitive) and clean up
+  const seen = new Set<string>();
+  return tags.filter(tag => {
+    const lower = tag.toLowerCase().trim();
+    if (!lower || seen.has(lower)) return false;
+    seen.add(lower);
+    return true;
+  });
+}
+
 export function buildMediaSitePayload(
   article: GeneratedArticle,
   signal: Signal,
@@ -187,6 +266,13 @@ export function buildMediaSitePayload(
 ): MediaSitePayload {
   const aiAnalysis = signal.aiAnalysis as { relevanceScore?: number } | null;
   const relevanceScore = aiAnalysis?.relevanceScore || 50;
+  
+  // Apply tag hygiene validation
+  const sanitizedTags = sanitizeTags(
+    article.suggestedTags || [],
+    signal.type,
+    company?.name || null
+  );
 
   return {
     headline: article.headline,
@@ -194,7 +280,7 @@ export function buildMediaSitePayload(
     body: article.body + (article.sourceAttribution ? `\n\n${article.sourceAttribution}` : ""),
     keyTakeaways: article.keyTakeaways,
     seoDescription: article.seoDescription,
-    tags: article.suggestedTags || [],
+    tags: sanitizedTags,
     author: process.env.MEDIA_SITE_AUTHOR || "Your Publication Staff",
     imageUrl,
     imageCredit,

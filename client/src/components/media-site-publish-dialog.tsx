@@ -52,10 +52,21 @@ export function MediaSitePublishDialog({
       if (data.success) {
         const action = data.reusedExisting ? "republished" : "generated and published";
         toast({
-          title: "Published to BakingMilling",
+          title: "Published to Baking & Milling",
           description: data.articleUrl
-            ? `Article ${action}. View at: ${data.articleUrl}`
+            ? `Article ${action} successfully.`
             : `Article ${action} successfully.`,
+          action: data.articleUrl ? (
+            <a
+              href={data.articleUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary underline hover:no-underline text-sm whitespace-nowrap"
+              data-testid="link-published-article"
+            >
+              View Article
+            </a>
+          ) : undefined,
         });
         queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
         onOpenChange(false);
@@ -87,7 +98,7 @@ export function MediaSitePublishDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Publish to BakingMilling</DialogTitle>
+          <DialogTitle>Publish to Baking & Milling</DialogTitle>
           <DialogDescription>
             {signalTitle
               ? `Publish "${signalTitle}" to your external media site`

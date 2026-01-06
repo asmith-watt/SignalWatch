@@ -1026,6 +1026,7 @@ export async function registerRoutes(
             : `${mediaSiteUrl}${result.articleUrl.startsWith("/") ? "" : "/"}${result.articleUrl}`;
         }
         
+        // Use sanitized tags from payload (already processed by sanitizeTags)
         const articleData = {
           signalId: signal.id,
           companyId: signal.companyId,
@@ -1039,7 +1040,7 @@ export async function registerRoutes(
           imageUrl: imageUrl,
           keyTakeaways: article.keyTakeaways || [],
           seoDescription: article.seoDescription || "",
-          tags: article.suggestedTags || [],
+          tags: payload.tags, // Use sanitized tags from payload
         };
         
         if (existingArticle) {
