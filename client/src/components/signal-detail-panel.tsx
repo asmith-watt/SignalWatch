@@ -1059,60 +1059,6 @@ export function SignalDetailPanel({
             )}
           </div>
 
-          <Separator />
-
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium flex items-center gap-2">
-              <User className="w-4 h-4" />
-              Workflow
-            </h4>
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs text-muted-foreground">Content Status</label>
-                <Select
-                  value={signal.contentStatus || "new"}
-                  onValueChange={(value) => onUpdateStatus(signal.id, value)}
-                >
-                  <SelectTrigger className="mt-1" data-testid="select-content-status">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
-              Notes
-            </h4>
-            <Textarea
-              placeholder="Add notes about this signal..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={4}
-              className="resize-none"
-              data-testid="textarea-signal-notes"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSaveNotes}
-              disabled={isSaving || notes === (signal.notes || "")}
-              data-testid="button-save-notes"
-            >
-              {isSaving ? "Saving..." : "Save Notes"}
-            </Button>
-          </div>
         </div>
       </ScrollArea>
     </div>
