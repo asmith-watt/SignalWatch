@@ -49,3 +49,5 @@ PRODUCTION_APP_URL = "https://media-horizon--andrewniu.replit.app"
 
 [userenv.shared]
 MEDIA_SITE_URL = "https://baking-mill-news--andrewniu.replit.app"
+ENABLE_SCHEDULER = "true"
+MONITOR_CRON = "0 6 * * *"
