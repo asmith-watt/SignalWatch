@@ -22,6 +22,7 @@ import {
   CalendarCheck,
   AlertTriangle,
   Link2,
+  Network,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -110,6 +111,22 @@ export function SignalDetailPanel({
     queryFn: async () => {
       const res = await fetch(`/api/signals/${signal.id}/articles`);
       if (!res.ok) throw new Error("Failed to fetch articles");
+      return res.json();
+    },
+  });
+
+  interface RelatedSignalResult {
+    signal: Signal;
+    company: Company | null;
+    sharedEntityCount: number;
+    sharedEntitiesPreview: string[];
+  }
+
+  const { data: relatedSignals = [], isLoading: isLoadingRelated } = useQuery<RelatedSignalResult[]>({
+    queryKey: ["/api/signals", signal.id, "related"],
+    queryFn: async () => {
+      const res = await fetch(`/api/signals/${signal.id}/related?limit=5&days=30`);
+      if (!res.ok) throw new Error("Failed to fetch related signals");
       return res.json();
     },
   });
@@ -888,6 +905,58 @@ export function SignalDetailPanel({
               </div>
             </>
           )}
+
+          <Separator />
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium flex items-center gap-2">
+              <Network className="w-4 h-4" />
+              Related Signals
+            </h4>
+            {isLoadingRelated ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                Loading related signals...
+              </div>
+            ) : relatedSignals.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No related signals found</p>
+            ) : (
+              <div className="space-y-2">
+                {relatedSignals.map((result) => (
+                  <div
+                    key={result.signal.id}
+                    className="p-3 bg-muted/50 rounded-md space-y-1.5 hover-elevate cursor-pointer"
+                    data-testid={`related-signal-${result.signal.id}`}
+                    onClick={() => {
+                      window.location.hash = `signal-${result.signal.id}`;
+                    }}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-medium line-clamp-2">{result.signal.title}</p>
+                      <Badge variant="outline" className="shrink-0 text-xs capitalize">
+                        {result.signal.priority}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                      {result.company && <span>{result.company.name}</span>}
+                      {result.signal.publishedAt && (
+                        <span>{formatDistanceToNow(new Date(result.signal.publishedAt), { addSuffix: true })}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <Badge variant="secondary" className="text-xs">
+                        {result.sharedEntityCount} shared {result.sharedEntityCount === 1 ? 'entity' : 'entities'}
+                      </Badge>
+                      {result.sharedEntitiesPreview.slice(0, 3).map((name) => (
+                        <Badge key={name} variant="outline" className="text-xs">
+                          {name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           <Separator />
 

@@ -404,6 +404,11 @@ export class DatabaseStorage implements IStorage {
 
   // Signal Graph
   async getRelatedSignals(signalId: number, limit: number = 10, days: number = 30): Promise<RelatedSignalResult[]> {
+    const originalSignal = await this.getSignal(signalId);
+    if (!originalSignal) {
+      return [];
+    }
+    
     const signalEntityLinks = await db
       .select()
       .from(signalEntities)
@@ -414,6 +419,13 @@ export class DatabaseStorage implements IStorage {
     }
     
     const entityIds = signalEntityLinks.map(se => se.entityId);
+    
+    // Get subject entity IDs (role = 'subject') to filter from previews
+    const subjectEntityIds = new Set(
+      signalEntityLinks
+        .filter(se => se.role === "subject")
+        .map(se => se.entityId)
+    );
     
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
@@ -469,19 +481,36 @@ export class DatabaseStorage implements IStorage {
       const sharedEntityIds = signalEntityCounts.get(signal.id);
       if (!sharedEntityIds) continue;
       
-      const sharedEntities = await db
-        .select({ name: entities.name })
-        .from(entities)
-        .where(inArray(entities.id, Array.from(sharedEntityIds)))
-        .limit(5);
+      // Filter out subject entities from the shared set  
+      const nonSubjectEntityIds = Array.from(sharedEntityIds).filter(id => !subjectEntityIds.has(id));
+      
+      const sharedEntities = nonSubjectEntityIds.length > 0 
+        ? await db
+            .select({ name: entities.name })
+            .from(entities)
+            .where(inArray(entities.id, nonSubjectEntityIds))
+            .limit(10)
+        : [];
       
       const company = await this.getCompany(signal.companyId);
+      
+      // Deduplicate entity names for preview
+      const seenNames = new Set<string>();
+      const filteredPreview: string[] = [];
+      for (const e of sharedEntities) {
+        const lowerName = e.name.toLowerCase();
+        if (!seenNames.has(lowerName)) {
+          seenNames.add(lowerName);
+          filteredPreview.push(e.name);
+          if (filteredPreview.length >= 5) break;
+        }
+      }
       
       results.push({
         signal,
         company: company || null,
         sharedEntityCount: sharedEntityIds.size,
-        sharedEntitiesPreview: sharedEntities.map(e => e.name),
+        sharedEntitiesPreview: filteredPreview,
       });
     }
     
