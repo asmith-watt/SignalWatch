@@ -237,6 +237,27 @@ export function ExpandedSignalCard({
           </a>
         )}
 
+        {company?.description && (
+          <div className="bg-muted/50 rounded-md p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-medium flex items-center gap-2">
+                <Building2 className="w-4 h-4" />
+                About {company.name}
+              </h4>
+              <span className="text-xs text-muted-foreground">Powered by Perplexity</span>
+            </div>
+            <p className="text-sm text-muted-foreground">{company.description}</p>
+            {(company.industry || company.location) && (
+              <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                {company.industry && <span>Industry: {company.industry}</span>}
+                {company.location && <span>Location: {company.location}</span>}
+                {company.founded && <span>Founded: {company.founded}</span>}
+                {company.size && <span>Size: {company.size}</span>}
+              </div>
+            )}
+          </div>
+        )}
+
         <Separator />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
