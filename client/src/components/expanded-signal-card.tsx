@@ -6,29 +6,23 @@ import {
   BookmarkCheck,
   Building2,
   Clock,
-  Tag,
   Sparkles,
-  Loader2,
-  Send,
-  User,
+  Globe,
   MapPin,
-  DollarSign,
-  Calendar,
+  MoreHorizontal,
+  FileText,
 } from "lucide-react";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Signal, Company } from "@shared/schema";
@@ -45,30 +39,36 @@ interface ExpandedSignalCardProps {
   onPublishMediaSite?: (id: number) => void;
 }
 
-const statusOptions = [
-  { value: "new", label: "New" },
-  { value: "reviewing", label: "Reviewing" },
-  { value: "writing", label: "Writing" },
-  { value: "published", label: "Published" },
-];
-
 const typeColors: Record<string, string> = {
-  funding: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  acquisition: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
-  partnership: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-  executive: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  product: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
-  earnings: "bg-green-500/10 text-green-600 dark:text-green-400",
-  regulatory: "bg-red-500/10 text-red-600 dark:text-red-400",
-  expansion: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
-  restructuring: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-  news: "bg-slate-500/10 text-slate-600 dark:text-slate-400",
+  funding: "border-emerald-500 text-emerald-600 dark:text-emerald-400",
+  acquisition: "border-purple-500 text-purple-600 dark:text-purple-400",
+  partnership: "border-blue-500 text-blue-600 dark:text-blue-400",
+  executive: "border-amber-500 text-amber-600 dark:text-amber-400",
+  product: "border-cyan-500 text-cyan-600 dark:text-cyan-400",
+  earnings: "border-green-500 text-green-600 dark:text-green-400",
+  regulatory: "border-red-500 text-red-600 dark:text-red-400",
+  expansion: "border-indigo-500 text-indigo-600 dark:text-indigo-400",
+  restructuring: "border-orange-500 text-orange-600 dark:text-orange-400",
+  news: "border-blue-500 text-blue-600 dark:text-blue-400",
 };
 
 const priorityColors: Record<string, string> = {
-  high: "bg-red-500/10 text-red-600 dark:text-red-400",
-  medium: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  low: "bg-green-500/10 text-green-600 dark:text-green-400",
+  high: "border-red-500 text-red-600 dark:text-red-400",
+  medium: "border-amber-500 text-amber-600 dark:text-amber-400",
+  low: "border-green-500 text-green-600 dark:text-green-400",
+};
+
+const sentimentColors: Record<string, string> = {
+  positive: "border-green-500 text-green-600 dark:text-green-400",
+  negative: "border-red-500 text-red-600 dark:text-red-400",
+  neutral: "border-gray-500 text-gray-600 dark:text-gray-400",
+};
+
+const statusColors: Record<string, string> = {
+  new: "border-blue-500 text-blue-600 dark:text-blue-400",
+  reviewing: "border-amber-500 text-amber-600 dark:text-amber-400",
+  writing: "border-purple-500 text-purple-600 dark:text-purple-400",
+  published: "border-green-500 text-green-600 dark:text-green-400",
 };
 
 export function ExpandedSignalCard({
@@ -76,15 +76,11 @@ export function ExpandedSignalCard({
   company,
   onCollapse,
   onBookmark,
-  onUpdateStatus,
-  onUpdateNotes,
   onEntitySelect,
   onPublishWordPress,
   onPublishMediaSite,
 }: ExpandedSignalCardProps) {
   const { toast } = useToast();
-  const [notes, setNotes] = useState(signal.notes || "");
-  const [isSaving, setIsSaving] = useState(false);
 
   const analyzeSignalMutation = useMutation({
     mutationFn: async (signalId: number) => {
@@ -99,303 +95,252 @@ export function ExpandedSignalCard({
     },
   });
 
-  const handleSaveNotes = async () => {
-    setIsSaving(true);
-    onUpdateNotes(signal.id, notes);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setIsSaving(false);
-    toast({ title: "Notes saved" });
-  };
-
-  const publishedAt = signal.publishedAt ? new Date(signal.publishedAt) : new Date(signal.createdAt);
-  const analysis = signal.aiAnalysis as Record<string, unknown> | null;
+  const publishedAt = signal.publishedAt ? new Date(signal.publishedAt) : null;
+  const gatheredAt = new Date(signal.createdAt);
+  const analysis = signal.aiAnalysis as {
+    keyTakeaways?: string[];
+    keyPoints?: string[];
+    industryImpact?: string;
+    storyAngles?: string[];
+    relevanceScore?: number;
+    priorityScore?: number;
+  } | null;
   const entities = signal.entities as Record<string, unknown> | null;
 
-  const renderEntities = () => {
-    if (!entities) return null;
-    
-    const sections = [
-      { key: "people", label: "People", icon: User },
-      { key: "organizations", label: "Organizations", icon: Building2 },
-      { key: "locations", label: "Locations", icon: MapPin },
-      { key: "financials", label: "Financials", icon: DollarSign },
-      { key: "dates", label: "Dates", icon: Calendar },
-    ];
+  const keyTakeaways = analysis?.keyTakeaways || analysis?.keyPoints || [];
+  const industryImpact = analysis?.industryImpact;
+  const storyAngles = analysis?.storyAngles || [];
+  const relevanceScore = analysis?.relevanceScore || analysis?.priorityScore;
 
-    return (
-      <div className="space-y-3">
-        {sections.map(({ key, label, icon: Icon }) => {
-          const rawItems = entities[key];
-          if (!rawItems || !Array.isArray(rawItems) || rawItems.length === 0) return null;
-          const items = rawItems as Array<string | { name: string; role?: string; amount?: string }>;
-          
-          return (
-            <div key={key}>
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
-                <Icon className="w-4 h-4" />
-                {label}
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {items.map((item, i) => {
-                  const name = typeof item === "string" ? item : item.name;
-                  const detail = typeof item === "object" ? (item.role || item.amount) : undefined;
-                  return (
-                    <Badge
-                      key={i}
-                      variant="secondary"
-                      className="cursor-pointer"
-                      onClick={() => onEntitySelect?.(name)}
-                      data-testid={`entity-${key}-${i}`}
-                    >
-                      {name}
-                      {detail && <span className="ml-1 opacity-70">({detail})</span>}
-                    </Badge>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
+  const entityChips: Array<{ label: string; type: "company" | "location" | "org" }> = [];
+  if (company?.name) {
+    entityChips.push({ label: company.name, type: "company" });
+  }
+  if (entities?.locations && Array.isArray(entities.locations)) {
+    for (const loc of entities.locations.slice(0, 3)) {
+      const locName = typeof loc === 'string' ? loc : (loc as { name: string }).name;
+      if (entityChips.length < 6) {
+        entityChips.push({ label: locName, type: "location" });
+      }
+    }
+  }
+  if (entities?.organizations && Array.isArray(entities.organizations)) {
+    for (const org of entities.organizations.slice(0, 2)) {
+      const orgName = typeof org === 'string' ? org : (org as { name: string }).name;
+      if (orgName !== company?.name && entityChips.length < 6) {
+        entityChips.push({ label: orgName, type: "org" });
+      }
+    }
+  }
+
+  const hasAnalysis = keyTakeaways.length > 0 || industryImpact || storyAngles.length > 0;
 
   return (
-    <Card className="border-primary/20" data-testid={`expanded-signal-${signal.id}`}>
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-2">
-              <Badge className={typeColors[signal.type] || typeColors.news}>
-                {signal.type}
-              </Badge>
-              <Badge className={priorityColors[signal.priority || "medium"]}>
-                {signal.priority || "medium"} priority
-              </Badge>
-              {company && (
-                <Badge variant="outline">
-                  <Building2 className="w-3 h-3 mr-1" />
-                  {company.name}
-                </Badge>
-              )}
-            </div>
-            <h3 className="text-lg font-semibold leading-tight">{signal.title}</h3>
-            <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" />
-                {formatDistanceToNow(publishedAt, { addSuffix: true })}
-              </span>
-              <span>{format(publishedAt, "MMM d, yyyy")}</span>
-            </div>
+    <Card data-testid={`expanded-signal-${signal.id}`}>
+      <CardContent className="p-4 space-y-4">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
+            <FileText className="w-5 h-5 text-muted-foreground" />
           </div>
           
-          <div className="flex items-center gap-1">
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => onBookmark(signal.id, !signal.isBookmarked)}
-              data-testid="button-bookmark"
-            >
-              {signal.isBookmarked ? (
-                <BookmarkCheck className="w-4 h-4 text-primary" />
-              ) : (
-                <Bookmark className="w-4 h-4" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <h3 className="text-base font-semibold leading-tight">{signal.title}</h3>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => onBookmark(signal.id, !signal.isBookmarked)}
+                  data-testid="button-bookmark"
+                >
+                  {signal.isBookmarked ? (
+                    <BookmarkCheck className="w-4 h-4 text-primary" />
+                  ) : (
+                    <Bookmark className="w-4 h-4" />
+                  )}
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="icon" variant="ghost" data-testid="button-menu">
+                      <MoreHorizontal className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {!analysis && (
+                      <DropdownMenuItem 
+                        onClick={() => analyzeSignalMutation.mutate(signal.id)}
+                        disabled={analyzeSignalMutation.isPending}
+                      >
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        {analyzeSignalMutation.isPending ? "Analyzing..." : "AI Analyze"}
+                      </DropdownMenuItem>
+                    )}
+                    {onPublishWordPress && (
+                      <DropdownMenuItem onClick={() => onPublishWordPress(signal.id)}>
+                        WordPress
+                      </DropdownMenuItem>
+                    )}
+                    {onPublishMediaSite && (
+                      <DropdownMenuItem onClick={() => onPublishMediaSite(signal.id)}>
+                        Baking Milling Site
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem onClick={onCollapse}>
+                      <ChevronUp className="w-4 h-4 mr-2" />
+                      Collapse
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 text-sm text-muted-foreground">
+              {company && <span className="font-medium">{company.name}</span>}
+              {company && <span>-</span>}
+              {signal.sourceName && (
+                <>
+                  <span className="flex items-center gap-1">
+                    <Globe className="w-3 h-3" />
+                    {signal.sourceName}
+                  </span>
+                  <span>-</span>
+                </>
               )}
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={onCollapse}
-              data-testid="button-collapse"
-            >
-              <ChevronUp className="w-4 h-4" />
-            </Button>
+              {publishedAt && (
+                <>
+                  <span>Source: {format(publishedAt, "M/d/yyyy")}</span>
+                  <span>-</span>
+                </>
+              )}
+              <span>Gathered: {format(gatheredAt, "M/d/yyyy")}</span>
+            </div>
+
+            {(signal.content || signal.summary) && (
+              <p className="mt-2 text-sm text-muted-foreground line-clamp-3">
+                {signal.content || signal.summary}
+              </p>
+            )}
+
+            <div className="flex flex-wrap items-center gap-2 mt-3">
+              <Badge variant="outline" className={typeColors[signal.type] || typeColors.news}>
+                {signal.type.replace("_", " ")}
+              </Badge>
+              <Badge variant="outline" className={priorityColors[signal.priority || "medium"]}>
+                {(signal.priority || "medium").charAt(0).toUpperCase() + (signal.priority || "medium").slice(1)} Priority
+              </Badge>
+              {signal.sentiment && signal.sentiment !== "neutral" && (
+                <Badge variant="outline" className={sentimentColors[signal.sentiment]}>
+                  {signal.sentiment.charAt(0).toUpperCase() + signal.sentiment.slice(1)}
+                </Badge>
+              )}
+              {signal.contentStatus && (
+                <Badge variant="outline" className={statusColors[signal.contentStatus] || ""}>
+                  {signal.contentStatus.charAt(0).toUpperCase() + signal.contentStatus.slice(1)}
+                </Badge>
+              )}
+              {relevanceScore && (
+                <Badge variant="outline" className="border-purple-500 text-purple-600 dark:text-purple-400 gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  Score: {relevanceScore}
+                </Badge>
+              )}
+              {signal.sourceUrl && (
+                <a
+                  href={signal.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline ml-auto"
+                  data-testid="link-source"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  View Source
+                </a>
+              )}
+            </div>
           </div>
         </div>
-      </CardHeader>
 
-      <CardContent className="space-y-4">
-        {signal.summary && (
-          <p className="text-muted-foreground">{signal.summary}</p>
-        )}
-
-        {signal.content && (
-          <div className="text-sm">
-            <p className="whitespace-pre-wrap">{signal.content}</p>
-          </div>
-        )}
-
-        {signal.sourceUrl && (
-          <a
-            href={signal.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-            data-testid="link-source"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            View Source
-          </a>
-        )}
-
-        {company?.description && (
-          <div className="bg-muted/50 rounded-md p-3 space-y-2">
+        {hasAnalysis && (
+          <div className="bg-muted/50 rounded-lg p-4 space-y-4">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium flex items-center gap-2">
-                <Building2 className="w-4 h-4" />
-                About {company.name}
+              <h4 className="text-sm font-medium flex items-center gap-2 text-primary">
+                <Sparkles className="w-4 h-4" />
+                AI Analysis
               </h4>
               <span className="text-xs text-muted-foreground">Powered by Perplexity</span>
             </div>
-            <p className="text-sm text-muted-foreground">{company.description}</p>
-            {(company.industry || company.location) && (
-              <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                {company.industry && <span>Industry: {company.industry}</span>}
-                {company.location && <span>Location: {company.location}</span>}
-                {company.founded && <span>Founded: {company.founded}</span>}
-                {company.size && <span>Size: {company.size}</span>}
+
+            {keyTakeaways.length > 0 && (
+              <div>
+                <p className="text-sm font-medium mb-2">Key Takeaways:</p>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  {keyTakeaways.map((point, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-foreground/60 mt-2 flex-shrink-0" />
+                      {String(point)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {industryImpact && (
+              <div>
+                <p className="text-sm font-medium mb-1">Industry Impact:</p>
+                <p className="text-sm text-muted-foreground">{String(industryImpact)}</p>
+              </div>
+            )}
+
+            {storyAngles.length > 0 && (
+              <div>
+                <p className="text-sm font-medium mb-2">Story Angles:</p>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  {storyAngles.map((angle, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-foreground/60 mt-2 flex-shrink-0" />
+                      {String(angle)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {entityChips.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-2 border-t border-border/50">
+                {entityChips.map((chip, i) => (
+                  <Badge
+                    key={i}
+                    variant="secondary"
+                    className="gap-1.5 cursor-pointer"
+                    onClick={() => onEntitySelect?.(chip.label)}
+                    data-testid={`entity-chip-${i}`}
+                  >
+                    {chip.type === "company" && <Building2 className="w-3 h-3" />}
+                    {chip.type === "location" && <MapPin className="w-3 h-3" />}
+                    {chip.type === "org" && <Building2 className="w-3 h-3" />}
+                    {chip.label}
+                  </Badge>
+                ))}
               </div>
             )}
           </div>
         )}
 
-        <Separator />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div>
-              <h4 className="font-medium mb-2 flex items-center gap-2">
-                <Tag className="w-4 h-4" />
-                Status & Actions
-              </h4>
-              <div className="space-y-3">
-                <Select
-                  value={signal.contentStatus || "new"}
-                  onValueChange={(value) => onUpdateStatus(signal.id, value)}
-                >
-                  <SelectTrigger data-testid="select-status">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <div className="flex flex-wrap gap-2">
-                  {!analysis && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => analyzeSignalMutation.mutate(signal.id)}
-                      disabled={analyzeSignalMutation.isPending}
-                      data-testid="button-analyze"
-                    >
-                      {analyzeSignalMutation.isPending ? (
-                        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                      ) : (
-                        <Sparkles className="w-4 h-4 mr-1" />
-                      )}
-                      Analyze
-                    </Button>
-                  )}
-                  {onPublishWordPress && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => onPublishWordPress(signal.id)}
-                      data-testid="button-publish-wp"
-                    >
-                      <Send className="w-4 h-4 mr-1" />
-                      WordPress
-                    </Button>
-                  )}
-                  {onPublishMediaSite && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => onPublishMediaSite(signal.id)}
-                      data-testid="button-publish-media"
-                    >
-                      <Send className="w-4 h-4 mr-1" />
-                      Baking Milling
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-medium mb-2">Notes</h4>
-              <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add editorial notes..."
-                className="min-h-[80px]"
-                data-testid="textarea-notes"
-              />
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={handleSaveNotes}
-                disabled={isSaving || notes === (signal.notes || "")}
-                className="mt-2"
-                data-testid="button-save-notes"
-              >
-                {isSaving ? "Saving..." : "Save Notes"}
-              </Button>
-            </div>
+        {!hasAnalysis && (
+          <div className="bg-muted/30 rounded-lg p-4 text-center">
+            <p className="text-sm text-muted-foreground mb-2">No AI analysis available yet</p>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => analyzeSignalMutation.mutate(signal.id)}
+              disabled={analyzeSignalMutation.isPending}
+              data-testid="button-analyze"
+            >
+              <Sparkles className="w-4 h-4 mr-1" />
+              {analyzeSignalMutation.isPending ? "Analyzing..." : "Analyze with AI"}
+            </Button>
           </div>
-
-          <div className="space-y-4">
-            {analysis && (
-              <div>
-                <h4 className="font-medium mb-2 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" />
-                  AI Analysis
-                </h4>
-                <div className="space-y-3 text-sm">
-                  {Array.isArray(analysis.keyTakeaways) && analysis.keyTakeaways.length > 0 ? (
-                    <div>
-                      <span className="font-medium text-muted-foreground">Key Takeaways:</span>
-                      <ul className="list-disc list-inside mt-1 space-y-1">
-                        {(analysis.keyTakeaways as string[]).map((t, i) => (
-                          <li key={i}>{String(t)}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-                  {typeof analysis.industryImpact === "string" ? (
-                    <div>
-                      <span className="font-medium text-muted-foreground">Industry Impact:</span>
-                      <p className="mt-1">{analysis.industryImpact}</p>
-                    </div>
-                  ) : null}
-                  {Array.isArray(analysis.storyAngles) && analysis.storyAngles.length > 0 ? (
-                    <div>
-                      <span className="font-medium text-muted-foreground">Story Angles:</span>
-                      <ul className="list-disc list-inside mt-1 space-y-1">
-                        {(analysis.storyAngles as string[]).map((a, i) => (
-                          <li key={i}>{String(a)}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            )}
-
-            {entities && Object.keys(entities).length > 0 && (
-              <div>
-                <h4 className="font-medium mb-2">Extracted Entities</h4>
-                {renderEntities()}
-              </div>
-            )}
-          </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
