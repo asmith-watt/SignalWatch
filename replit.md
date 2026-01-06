@@ -45,6 +45,15 @@ SignalWatch is a B2B business intelligence platform designed for editorial teams
 - Industry and relationship type filters
 - Deterministic sorting by relationship degree then signal count
 
+### Media Site CMS Integration (January 2026)
+- **Endpoint**: `POST /api/articles` on external media site (configured via `MEDIA_SITE_URL` env var)
+- **Payload mapping**: SignalWatch fields mapped to media site schema:
+  - `headline` → `title`, `body` → `content`, `seoDescription` → `excerpt`
+  - `sourceSignalId` sent as string (required by media site API)
+  - Auto-generated `slug` from headline + timestamp
+- **Response handling**: Constructs article URL from `slug` if not returned directly
+- **Article URL format**: `{MEDIA_SITE_URL}/article/{slug}`
+
 ### Idempotent Publishing System (January 2026)
 - **Duplicate prevention**: Unique constraint on `(signalId, publishedTo, style)` in articles table
 - **Idempotent publish logic**: Re-publishing same signal+style reuses existing content by default

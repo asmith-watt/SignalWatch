@@ -317,7 +317,7 @@ export async function publishToMediaSite(
     };
   }
 
-  const apiUrl = `${mediaSiteUrl.replace(/\/$/, "")}/api/articles/receive`;
+  const apiUrl = `${mediaSiteUrl.replace(/\/$/, "")}/api/articles`;
 
   try {
     const headers: Record<string, string> = {
@@ -329,10 +329,40 @@ export async function publishToMediaSite(
       headers["X-API-Key"] = mediaSiteApiKey;
     }
 
+    // Generate slug from headline
+    const slug = payload.headline
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .substring(0, 80) + "-" + Date.now();
+
+    // Map SignalWatch payload to media site schema
+    // Note: sourceSignalId must be a string for the media site API
+    const mediaSitePayload = {
+      title: payload.headline,
+      slug,
+      content: payload.body,
+      excerpt: payload.seoDescription || payload.subheadline,
+      author: payload.author,
+      tags: payload.tags,
+      imageUrl: payload.imageUrl || null,
+      imageCredit: payload.imageCredit || null,
+      status: "published",
+      sourceSignalId: String(payload.signal.id),
+      signalType: payload.signal.type,
+      sourceName: payload.signal.sourceName,
+      sourceUrl: payload.signal.sourceUrl,
+      companyName: payload.company?.name || null,
+      industry: payload.company?.industry || "Baking & Milling",
+      whyItMatters: payload.keyTakeaways?.length > 0 
+        ? payload.keyTakeaways.join(" | ") 
+        : null,
+    };
+
     const response = await fetch(apiUrl, {
       method: "POST",
       headers,
-      body: JSON.stringify(payload),
+      body: JSON.stringify(mediaSitePayload),
     });
 
     if (!response.ok) {
@@ -350,7 +380,9 @@ export async function publishToMediaSite(
     const result = await response.json();
     
     const articleId = result.id?.toString() || result.articleId?.toString();
-    const articleUrl = result.url || result.articleUrl;
+    // Construct article URL from media site URL and slug
+    const articleUrl = result.url || result.articleUrl || 
+      (result.slug ? `${mediaSiteUrl.replace(/\/$/, "")}/article/${result.slug}` : undefined);
     
     if (!articleId && !articleUrl) {
       console.warn("Media site returned success but no article ID or URL - article may not have been saved");
