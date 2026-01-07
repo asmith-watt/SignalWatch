@@ -184,6 +184,16 @@ export function buildPayloadFromExistingArticle(
 }
 
 /**
+ * Format signal type for display (e.g., "product_launch" -> "Product Launch")
+ */
+function formatSignalType(type: string): string {
+  return type
+    .split("_")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+/**
  * Format the body content with a clickable source link at the end
  */
 function formatBodyWithSourceLink(
@@ -384,6 +394,17 @@ export async function publishToMediaSite(
       whyItMatters: payload.keyTakeaways?.length > 0 
         ? payload.keyTakeaways.join("\n\n") 
         : null,
+      keyTakeaways: payload.keyTakeaways || [],
+      // Signal Details for structured display
+      signalDetails: {
+        company: payload.company?.name || null,
+        companyId: payload.company?.id || null,
+        category: payload.company?.industry || "Baking & Milling",
+        signalType: formatSignalType(payload.signal.type),
+        signalDate: payload.generatedAt,
+        sourceName: payload.signal.sourceName,
+        sourceUrl: payload.signal.sourceUrl,
+      },
     };
 
     const response = await fetch(apiUrl, {
