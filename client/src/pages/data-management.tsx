@@ -74,6 +74,10 @@ export function DataManagementPage() {
   const [syncProgress, setSyncProgress] = useState<number>(0);
   const [syncLogs, setSyncLogs] = useState<string[]>([]);
   const [isExporting, setIsExporting] = useState(false);
+  const [isPushingToProd, setIsPushingToProd] = useState(false);
+  const [productionUrl, setProductionUrl] = useState(() => {
+    return localStorage.getItem("signalwatch_production_url") || "";
+  });
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
@@ -322,6 +326,81 @@ export function DataManagementPage() {
     e.target.value = "";
   };
 
+  const handleProductionUrlChange = (url: string) => {
+    setProductionUrl(url);
+    localStorage.setItem("signalwatch_production_url", url);
+  };
+
+  const handlePushToProduction = async () => {
+    if (!productionUrl.trim()) {
+      toast({ title: "Please enter production URL", variant: "destructive" });
+      return;
+    }
+
+    setIsPushingToProd(true);
+    setSyncLogs([`Starting push to production...`]);
+    setSyncResult(null);
+    setSyncProgress(0);
+
+    try {
+      // Step 1: Export from dev
+      setSyncLogs(prev => [...prev, `Fetching data from development...`]);
+      setSyncProgress(20);
+
+      const exportResponse = await fetch("/api/export/all-data");
+      if (!exportResponse.ok) throw new Error(`Export failed with status ${exportResponse.status}`);
+
+      const data = await exportResponse.json();
+      setSyncProgress(40);
+      setSyncLogs(prev => [
+        ...prev,
+        `Found ${data.companies?.length || 0} companies`,
+        `Found ${data.signals?.length || 0} signals`,
+        `Found ${data.alerts?.length || 0} alerts`,
+        `Pushing to production: ${productionUrl}...`
+      ]);
+
+      // Step 2: Push to production
+      const prodUrl = productionUrl.replace(/\/$/, ""); // Remove trailing slash
+      const importResponse = await fetch(`${prodUrl}/api/import/all-data`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companies: data.companies || [],
+          signals: data.signals || [],
+          alerts: data.alerts || []
+        }),
+      });
+
+      if (!importResponse.ok) {
+        const errorData = await importResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || `Production import failed with status ${importResponse.status}`);
+      }
+
+      const result: ProductionSyncResult = await importResponse.json();
+      setSyncResult(result);
+      setSyncProgress(100);
+      setSyncLogs(prev => [
+        ...prev,
+        `Push complete!`,
+        `Companies: ${result.companiesImported} new, ${result.companiesUpdated} updated`,
+        `Signals: ${result.signalsImported} new, ${result.signalsUpdated} updated`,
+        ...(result.errors.length > 0 ? [`Errors: ${result.errors.length}`] : [])
+      ]);
+      toast({
+        title: "Push to Production Complete",
+        description: `Synced ${result.companiesImported + result.signalsImported} new records`
+      });
+    } catch (error: unknown) {
+      setSyncProgress(0);
+      const message = error instanceof Error ? error.message : "Unknown error";
+      setSyncLogs(prev => [...prev, `Push failed: ${message}`]);
+      toast({ title: "Push to production failed", description: message, variant: "destructive" });
+    } finally {
+      setIsPushingToProd(false);
+    }
+  };
+
   const handleFileUpload = (
     e: React.ChangeEvent<HTMLInputElement>,
     setter: (val: string) => void
@@ -472,12 +551,41 @@ export function DataManagementPage() {
               <CardTitle>Production Sync</CardTitle>
             </div>
             <CardDescription>
-              Export data from development and import to production
+              Push data from development to production
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="production-url">Production URL</Label>
+                <input
+                  id="production-url"
+                  type="text"
+                  value={productionUrl}
+                  onChange={(e) => handleProductionUrlChange(e.target.value)}
+                  placeholder="https://your-app.replit.app"
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  data-testid="input-production-url"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter your production app URL (saved automatically)
+                </p>
+              </div>
+
               <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={handlePushToProduction}
+                  disabled={isPushingToProd || !productionUrl.trim()}
+                  data-testid="button-push-to-production"
+                >
+                  {isPushingToProd ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4 mr-2" />
+                  )}
+                  Push to Production
+                </Button>
+
                 <Button
                   variant="outline"
                   onClick={handleDownloadExport}
@@ -502,16 +610,16 @@ export function DataManagementPage() {
                     data-testid="input-import-file"
                   />
                   <Button
-                    variant="default"
+                    variant="outline"
                     disabled={importAllDataMutation.isPending}
                     data-testid="button-upload-import"
                   >
                     {importAllDataMutation.isPending ? (
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     ) : (
-                      <Upload className="h-4 w-4 mr-2" />
+                      <Download className="h-4 w-4 mr-2" />
                     )}
-                    Upload Import
+                    Import from File
                   </Button>
                 </div>
               </div>

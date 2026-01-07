@@ -1725,8 +1725,28 @@ export async function registerRoutes(
     }
   });
 
+  // CORS preflight for import endpoint (to allow dev→prod sync)
+  app.options("/api/import/all-data", (req: Request, res: Response) => {
+    const origin = req.headers.origin || "*";
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Max-Age", "86400");
+    res.header("Vary", "Origin");
+    res.sendStatus(204);
+  });
+
   // Import ALL data from JSON export (for production sync)
   app.post("/api/import/all-data", async (req: Request, res: Response) => {
+    // Allow cross-origin requests for dev→prod sync
+    const origin = req.headers.origin || "*";
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Vary", "Origin");
+
     try {
       const { companies, signals } = req.body;
       
