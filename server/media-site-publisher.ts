@@ -183,6 +183,33 @@ export function buildPayloadFromExistingArticle(
   };
 }
 
+/**
+ * Format the body content with a clickable source link at the end
+ */
+function formatBodyWithSourceLink(
+  body: string,
+  sourceAttribution: string | undefined,
+  sourceUrl: string | null
+): string {
+  if (!sourceAttribution) {
+    return body;
+  }
+  
+  // If we have a source URL, format it as a clickable markdown link
+  if (sourceUrl) {
+    // Extract source name from attribution (format: "Source: Name — URL" or "Source: Name")
+    const parts = sourceAttribution.split(" — ");
+    const sourceName = parts[0] || "Source";
+    
+    // Format as markdown link for the CMS
+    const formattedAttribution = `${sourceName} — [${sourceUrl}](${sourceUrl})`;
+    return `${body}\n\n${formattedAttribution}`;
+  }
+  
+  // No URL, just add plain attribution
+  return `${body}\n\n${sourceAttribution}`;
+}
+
 // Map signal types to topic tags for SEO - covers all possible signal types
 const SIGNAL_TYPE_TAGS: Record<string, string> = {
   news: "Industry News",
@@ -277,7 +304,7 @@ export function buildMediaSitePayload(
   return {
     headline: article.headline,
     subheadline: article.subheadline,
-    body: article.body + (article.sourceAttribution ? `\n\n${article.sourceAttribution}` : ""),
+    body: formatBodyWithSourceLink(article.body, article.sourceAttribution, signal.sourceUrl),
     keyTakeaways: article.keyTakeaways,
     seoDescription: article.seoDescription,
     tags: sanitizedTags,
@@ -355,7 +382,7 @@ export async function publishToMediaSite(
       companyName: payload.company?.name || null,
       industry: payload.company?.industry || "Baking & Milling",
       whyItMatters: payload.keyTakeaways?.length > 0 
-        ? payload.keyTakeaways.join(" | ") 
+        ? payload.keyTakeaways.join("\n\n") 
         : null,
     };
 
