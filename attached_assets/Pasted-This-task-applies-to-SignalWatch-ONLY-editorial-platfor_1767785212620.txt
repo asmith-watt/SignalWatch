@@ -1,0 +1,69 @@
+This task applies to SignalWatch ONLY (editorial platform).
+Do NOT modify the public site or ad logic.
+
+GOAL
+Ensure articles generated in SignalWatch map cleanly and consistently to structured editorial sections so they render predictably on the public Baking & Milling site.
+
+--------------------------------------------------
+1) Article JSON structure (NO schema changes)
+--------------------------------------------------
+Continue generating articles in these two formats ONLY:
+
+Standard Article (news / analysis / brief)
+Signal-First Article (enhanced)
+
+Do NOT change field names or add new required fields.
+
+--------------------------------------------------
+2) Field usage guarantees
+--------------------------------------------------
+Ensure that when generating articles:
+
+Standard Article:
+- headline is always present
+- subheadline is always present
+- body is paragraph-separated with double newlines
+- keyTakeaways always has 3–5 items
+- seoDescription is 150–160 characters
+- suggestedTags has 5–10 items
+- sourceAttribution always includes source name + URL
+
+Signal-First Article:
+- headline always present
+- subheadline always present
+- whyItMatters present when business impact exists
+- body 3–6 paragraphs
+- keyDetails has 3–8 concrete facts
+- whatsNext present when forward-looking context exists
+- keyTakeaways always present
+- seoDescription always present
+- suggestedTags always present
+
+--------------------------------------------------
+3) Content quality guardrails
+--------------------------------------------------
+- Headlines: factual, no clickbait, company name when relevant
+- Subheadline: clearly explain what changed and who is affected
+- Why it matters: business impact, not restatement
+- Key details: confirmed facts only (no speculation)
+- What’s next: reasonable next steps or implications
+
+--------------------------------------------------
+4) Tag consistency
+--------------------------------------------------
+- Use canonical entity names for suggestedTags
+- Avoid near-duplicate tags (e.g., “AI” and “Artificial Intelligence”)
+- Prefer industry-standard phrasing
+
+--------------------------------------------------
+5) Source attribution
+--------------------------------------------------
+- Always include a sourceAttribution string
+- Source URL must be preserved exactly as provided by the signal
+
+--------------------------------------------------
+Acceptance criteria
+--------------------------------------------------
+- All generated articles conform to the JSON formats above
+- No empty or placeholder sections
+- Output is deterministic and render-safe

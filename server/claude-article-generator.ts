@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Signal, Company } from "@shared/schema";
 import type { GeneratedArticle } from "./article-generator";
+import { validateAndNormalizeArticle } from "./article-generator";
 
 let anthropicClient: Anthropic | null = null;
 
@@ -113,10 +114,7 @@ OUTPUT (STRICT JSON - output ONLY the JSON, no markdown):
   jsonContent = jsonContent.trim();
 
   const parsed = JSON.parse(jsonContent);
-  return {
-    ...parsed,
-    sourceUrl: signal.sourceUrl || null,
-  } as GeneratedArticle;
+  return validateAndNormalizeArticle(parsed, signal, company, "standard");
 }
 
 async function generateSignalFirstArticle(
@@ -200,8 +198,5 @@ OUTPUT (STRICT JSON - output ONLY the JSON, no markdown):
   jsonContent = jsonContent.trim();
 
   const parsed = JSON.parse(jsonContent);
-  return {
-    ...parsed,
-    sourceUrl: signal.sourceUrl || null,
-  } as GeneratedArticle;
+  return validateAndNormalizeArticle(parsed, signal, company, "signal");
 }

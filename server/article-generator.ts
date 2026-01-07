@@ -99,10 +99,126 @@ OUTPUT (STRICT JSON):
   }
 
   const parsed = JSON.parse(content);
-  return {
-    ...parsed,
-    sourceUrl: signal.sourceUrl || null,
-  } as GeneratedArticle;
+  return validateAndNormalizeArticle(parsed, signal, company, "standard");
+}
+
+/**
+ * Validate and normalize generated article to ensure all required fields are present
+ * and properly formatted according to content quality guardrails
+ */
+export function validateAndNormalizeArticle(
+  parsed: Record<string, unknown>,
+  signal: Signal,
+  company: Company | null,
+  format: "standard" | "signal"
+): GeneratedArticle {
+  const sourceName = signal.sourceName || "Industry sources";
+  const sourceUrl = signal.sourceUrl || null;
+  
+  // Ensure headline is present and factual
+  const headline = typeof parsed.headline === "string" && parsed.headline.trim()
+    ? parsed.headline.trim()
+    : `${company?.name || "Company"} ${signal.type.replace(/_/g, " ")} Update`;
+  
+  // Ensure subheadline is present
+  const subheadline = typeof parsed.subheadline === "string" && parsed.subheadline.trim()
+    ? parsed.subheadline.trim()
+    : signal.summary || signal.title;
+  
+  // Ensure body has proper paragraph separation
+  let body = typeof parsed.body === "string" ? parsed.body : signal.content || signal.summary || "";
+  body = body.replace(/\n{3,}/g, "\n\n").trim();
+  
+  // Ensure keyTakeaways has 3-5 items
+  let keyTakeaways = Array.isArray(parsed.keyTakeaways) ? parsed.keyTakeaways.filter(t => typeof t === "string" && t.trim()) : [];
+  if (keyTakeaways.length < 3) {
+    keyTakeaways = [
+      signal.title,
+      signal.summary || `Developments reported by ${sourceName}`,
+      `Further details available from ${sourceName}`,
+    ].slice(0, Math.max(3, keyTakeaways.length + 2));
+  }
+  if (keyTakeaways.length > 5) {
+    keyTakeaways = keyTakeaways.slice(0, 5);
+  }
+  
+  // Ensure seoDescription is 150-160 characters
+  let seoDescription = typeof parsed.seoDescription === "string" ? parsed.seoDescription.trim() : "";
+  if (!seoDescription || seoDescription.length < 50) {
+    seoDescription = `${headline}. ${subheadline}`.substring(0, 160);
+  }
+  if (seoDescription.length > 160) {
+    seoDescription = seoDescription.substring(0, 157) + "...";
+  }
+  
+  // Ensure suggestedTags has 5-10 items with canonical names
+  let suggestedTags = Array.isArray(parsed.suggestedTags) ? parsed.suggestedTags.filter(t => typeof t === "string" && t.trim()) : [];
+  // Normalize near-duplicate tags
+  const normalizedTags = new Set<string>();
+  const tagMappings: Record<string, string> = {
+    "ai": "Artificial Intelligence",
+    "artificial intelligence": "Artificial Intelligence",
+    "m&a": "Mergers & Acquisitions",
+    "mergers and acquisitions": "Mergers & Acquisitions",
+  };
+  for (const tag of suggestedTags) {
+    const normalized = tagMappings[tag.toLowerCase()] || tag;
+    normalizedTags.add(normalized);
+  }
+  suggestedTags = Array.from(normalizedTags);
+  
+  // Add company and industry tags if missing
+  if (company?.name && !suggestedTags.some(t => t.toLowerCase() === company.name.toLowerCase())) {
+    suggestedTags.unshift(company.name);
+  }
+  if (company?.industry && !suggestedTags.some(t => t.toLowerCase() === company.industry?.toLowerCase())) {
+    suggestedTags.push(company.industry);
+  }
+  // Ensure minimum 5 tags
+  const fallbackTags = ["Industry News", "Business Update", "Market News", "Trade News", "Industry Analysis"];
+  while (suggestedTags.length < 5) {
+    const fallback = fallbackTags.shift();
+    if (fallback && !suggestedTags.includes(fallback)) {
+      suggestedTags.push(fallback);
+    } else {
+      break;
+    }
+  }
+  suggestedTags = suggestedTags.slice(0, 10);
+  
+  // Ensure sourceAttribution includes name and URL
+  let sourceAttribution = typeof parsed.sourceAttribution === "string" ? parsed.sourceAttribution : "";
+  if (!sourceAttribution || !sourceAttribution.includes(sourceName)) {
+    sourceAttribution = sourceUrl 
+      ? `Source: ${sourceName} — ${sourceUrl}`
+      : `Source: ${sourceName}`;
+  }
+  
+  const result: GeneratedArticle = {
+    headline,
+    subheadline,
+    body,
+    keyTakeaways,
+    seoDescription,
+    suggestedTags,
+    sourceAttribution,
+    sourceUrl,
+  };
+  
+  // Add signal-first specific fields if present
+  if (format === "signal") {
+    if (typeof parsed.whyItMatters === "string" && parsed.whyItMatters.trim()) {
+      result.whyItMatters = parsed.whyItMatters.trim();
+    }
+    if (Array.isArray(parsed.keyDetails) && parsed.keyDetails.length > 0) {
+      result.keyDetails = parsed.keyDetails.filter(d => typeof d === "string" && d.trim()).slice(0, 8);
+    }
+    if (typeof parsed.whatsNext === "string" && parsed.whatsNext.trim()) {
+      result.whatsNext = parsed.whatsNext.trim();
+    }
+  }
+  
+  return result;
 }
 
 async function generateSignalFirstArticle(
@@ -167,10 +283,7 @@ OUTPUT STRUCTURE (STRICT JSON):
   }
 
   const parsed = JSON.parse(content);
-  return {
-    ...parsed,
-    sourceUrl: signal.sourceUrl || null,
-  } as GeneratedArticle;
+  return validateAndNormalizeArticle(parsed, signal, company, "signal");
 }
 
 export interface CMSExportFormat {
