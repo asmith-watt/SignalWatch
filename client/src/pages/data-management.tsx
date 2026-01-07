@@ -283,6 +283,8 @@ export function DataManagementPage() {
                     <SelectItem value="Feed">Feed</SelectItem>
                     <SelectItem value="Pet Food">Pet Food</SelectItem>
                     <SelectItem value="Baking & Milling">Baking & Milling</SelectItem>
+                    <SelectItem value="IPPE Exhibitors">IPPE Exhibitors</SelectItem>
+                    <SelectItem value="Feed & Grain">Feed & Grain</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button
