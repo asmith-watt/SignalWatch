@@ -404,6 +404,10 @@ export async function publishToMediaSite(
         signalDate: payload.generatedAt,
         sourceName: payload.signal.sourceName,
         sourceUrl: payload.signal.sourceUrl,
+        // Full source display: "View Source: https://example.com/full-path"
+        sourceDisplay: payload.signal.sourceUrl 
+          ? `View Source: ${payload.signal.sourceUrl}`
+          : null,
       },
     };
 
