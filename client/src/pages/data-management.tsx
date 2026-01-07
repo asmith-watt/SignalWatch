@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle, Sparkles, Calendar, AlertTriangle, Check, RefreshCw, Link2, Brain, Info } from "lucide-react";
+import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle, Sparkles, Calendar, AlertTriangle, Check, RefreshCw, Link2, Brain, Info, Cloud } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScanHistory } from "@/components/scan-history";
 import type { Company, Signal, Article } from "@shared/schema";
@@ -51,6 +52,14 @@ interface SourceVerificationResponse {
   results: SourceVerificationResult[];
 }
 
+interface ProductionSyncResult {
+  companiesImported: number;
+  companiesUpdated: number;
+  signalsImported: number;
+  signalsUpdated: number;
+  errors: string[];
+}
+
 export function DataManagementPage() {
   const { toast } = useToast();
   const [companiesCSV, setCompaniesCSV] = useState("");
@@ -61,6 +70,10 @@ export function DataManagementPage() {
   const [selectedMismatches, setSelectedMismatches] = useState<Set<number>>(new Set());
   const [sourceVerifyLimit, setSourceVerifyLimit] = useState<string>("50");
   const [sourceVerificationResults, setSourceVerificationResults] = useState<SourceVerificationResponse | null>(null);
+  const [syncResult, setSyncResult] = useState<ProductionSyncResult | null>(null);
+  const [syncProgress, setSyncProgress] = useState<number>(0);
+  const [syncLogs, setSyncLogs] = useState<string[]>([]);
+  const [isExporting, setIsExporting] = useState(false);
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
@@ -190,6 +203,124 @@ export function DataManagementPage() {
       toast({ title: "Failed to verify sources", variant: "destructive" });
     },
   });
+
+  const importAllDataMutation = useMutation({
+    mutationFn: async (data: { companies: Company[]; signals: Signal[]; alerts?: unknown[] }): Promise<ProductionSyncResult> => {
+      const response = await fetch("/api/import/all-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Import failed with status ${response.status}`);
+      }
+      return response.json();
+    },
+    onSuccess: (data: ProductionSyncResult) => {
+      setSyncResult(data);
+      setSyncProgress(100);
+      queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      setSyncLogs(prev => [
+        ...prev,
+        `Import complete!`,
+        `Companies: ${data.companiesImported} new, ${data.companiesUpdated} updated`,
+        `Signals: ${data.signalsImported} new, ${data.signalsUpdated} updated`,
+        ...(data.errors.length > 0 ? [`Errors: ${data.errors.length}`] : [])
+      ]);
+      toast({ 
+        title: "Import Complete", 
+        description: `Imported ${data.companiesImported + data.signalsImported} new records` 
+      });
+    },
+    onError: (error: Error) => {
+      setSyncProgress(0);
+      setSyncLogs(prev => [...prev, `Import failed: ${error.message}`]);
+      toast({ title: "Import failed", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleDownloadExport = async () => {
+    setIsExporting(true);
+    setSyncLogs([`Starting export...`]);
+    setSyncResult(null);
+    setSyncProgress(0);
+    
+    try {
+      setSyncLogs(prev => [...prev, `Fetching all data from database...`]);
+      setSyncProgress(30);
+      
+      const response = await fetch("/api/export/all-data");
+      if (!response.ok) throw new Error(`Export failed with status ${response.status}`);
+      
+      const data = await response.json();
+      setSyncProgress(70);
+      setSyncLogs(prev => [
+        ...prev, 
+        `Found ${data.companies?.length || 0} companies`,
+        `Found ${data.signals?.length || 0} signals`,
+        `Found ${data.alerts?.length || 0} alerts`,
+        `Preparing download...`
+      ]);
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `signalwatch-export-${new Date().toISOString().split("T")[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      setSyncProgress(100);
+      setSyncLogs(prev => [...prev, `Export downloaded successfully!`]);
+      toast({ title: "Export downloaded", description: `${data.companies?.length || 0} companies, ${data.signals?.length || 0} signals` });
+    } catch (error: unknown) {
+      setSyncProgress(0);
+      const message = error instanceof Error ? error.message : "Unknown error";
+      setSyncLogs(prev => [...prev, `Export failed: ${message}`]);
+      toast({ title: "Export failed", description: message, variant: "destructive" });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setSyncLogs([`Reading file: ${file.name}...`]);
+    setSyncResult(null);
+    setSyncProgress(10);
+    
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      
+      setSyncProgress(20);
+      setSyncLogs(prev => [
+        ...prev,
+        `Parsed ${data.companies?.length || 0} companies`,
+        `Parsed ${data.signals?.length || 0} signals`,
+        `Parsed ${data.alerts?.length || 0} alerts`,
+        `Starting import...`
+      ]);
+      
+      setSyncProgress(40);
+      importAllDataMutation.mutate({ 
+        companies: data.companies || [], 
+        signals: data.signals || [],
+        alerts: data.alerts || []
+      });
+    } catch (error: unknown) {
+      setSyncProgress(0);
+      const message = error instanceof Error ? error.message : "Unknown error";
+      setSyncLogs(prev => [...prev, `Failed to parse file: ${message}`]);
+      toast({ title: "Invalid file format", variant: "destructive" });
+    }
+    
+    e.target.value = "";
+  };
 
   const handleFileUpload = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -333,6 +464,98 @@ export function DataManagementPage() {
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Cloud className="h-5 w-5 text-muted-foreground" />
+              <CardTitle>Production Sync</CardTitle>
+            </div>
+            <CardDescription>
+              Export data from development and import to production
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  variant="outline"
+                  onClick={handleDownloadExport}
+                  disabled={isExporting}
+                  data-testid="button-download-export"
+                >
+                  {isExporting ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4 mr-2" />
+                  )}
+                  Download Export
+                </Button>
+                
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={handleImportFile}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    disabled={importAllDataMutation.isPending}
+                    data-testid="input-import-file"
+                  />
+                  <Button
+                    variant="default"
+                    disabled={importAllDataMutation.isPending}
+                    data-testid="button-upload-import"
+                  >
+                    {importAllDataMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Upload className="h-4 w-4 mr-2" />
+                    )}
+                    Upload Import
+                  </Button>
+                </div>
+              </div>
+
+              {(syncProgress > 0 || syncLogs.length > 0) && (
+                <div className="space-y-3">
+                  <Progress value={syncProgress} className="h-2" />
+                  
+                  <div className="bg-muted rounded-md p-3 max-h-40 overflow-y-auto">
+                    <div className="space-y-1 font-mono text-xs">
+                      {syncLogs.map((log, i) => (
+                        <div key={i} className="flex items-start gap-2">
+                          <span className="text-muted-foreground">{String(i + 1).padStart(2, "0")}.</span>
+                          <span className={log.includes("complete") || log.includes("success") ? "text-green-600 dark:text-green-400" : log.includes("failed") || log.includes("Error") ? "text-red-600 dark:text-red-400" : ""}>{log}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {syncResult && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="bg-background border rounded-md p-3 text-center">
+                        <div className="text-2xl font-bold text-green-600">{syncResult.companiesImported}</div>
+                        <div className="text-xs text-muted-foreground">Companies Added</div>
+                      </div>
+                      <div className="bg-background border rounded-md p-3 text-center">
+                        <div className="text-2xl font-bold text-blue-600">{syncResult.companiesUpdated}</div>
+                        <div className="text-xs text-muted-foreground">Companies Updated</div>
+                      </div>
+                      <div className="bg-background border rounded-md p-3 text-center">
+                        <div className="text-2xl font-bold text-green-600">{syncResult.signalsImported}</div>
+                        <div className="text-xs text-muted-foreground">Signals Added</div>
+                      </div>
+                      <div className="bg-background border rounded-md p-3 text-center">
+                        <div className="text-2xl font-bold text-blue-600">{syncResult.signalsUpdated}</div>
+                        <div className="text-xs text-muted-foreground">Signals Updated</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
