@@ -364,6 +364,7 @@ export function DataManagementPage() {
       const prodUrl = productionUrl.replace(/\/$/, ""); // Remove trailing slash
       const importResponse = await fetch(`${prodUrl}/api/import/all-data`, {
         method: "POST",
+        mode: "cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           companies: data.companies || [],
