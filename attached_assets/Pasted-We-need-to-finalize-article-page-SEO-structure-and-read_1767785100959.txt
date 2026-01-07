@@ -1,0 +1,124 @@
+We need to finalize article page SEO, structure, and readability in the EXISTING app.
+DO NOT migrate frameworks.
+DO NOT modify ad logic or placements.
+DO NOT change article generation logic.
+
+GOAL
+Make each article page:
+- Properly indexable by search engines
+- Social-share ready (OG/Twitter)
+- Semantically structured to match our article JSON formats
+- More readable and publication-quality
+
+--------------------------------------------------
+1) Dynamic <head> tags per article (CRITICAL)
+--------------------------------------------------
+Implement dynamic head tags for EACH article page using react-helmet-async (or equivalent).
+
+For every article, inject:
+
+<title>
+{headline} | Baking & Milling Industry News
+</title>
+
+<meta name="description" content="{seoDescription}" />
+
+<link rel="canonical" href="{full article URL}" />
+
+<meta name="robots" content="index,follow" />
+
+Open Graph:
+<meta property="og:type" content="article" />
+<meta property="og:title" content="{headline}" />
+<meta property="og:description" content="{seoDescription}" />
+<meta property="og:url" content="{full article URL}" />
+<meta property="og:image" content="{featuredImageUrl if available}" />
+
+Twitter:
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="{headline}" />
+<meta name="twitter:description" content="{seoDescription}" />
+<meta name="twitter:image" content="{featuredImageUrl if available}" />
+
+--------------------------------------------------
+2) Structured data (JSON-LD)
+--------------------------------------------------
+Add a JSON-LD script block to each article page.
+
+Use schema.org type:
+- NewsArticle
+
+Fields to include:
+- headline
+- description (seoDescription)
+- datePublished
+- dateModified
+- author (use “Baking & Milling Staff” if no author)
+- publisher (Baking & Milling Industry News + logo)
+- mainEntityOfPage (canonical URL)
+
+--------------------------------------------------
+3) Semantic article structure (HTML)
+--------------------------------------------------
+Map article JSON fields DIRECTLY to visible sections with semantic headings.
+
+Required structure:
+
+<h1>headline</h1>
+
+<p class="dek">subheadline</p>
+
+Meta row:
+Source • Publication date • Read time
+
+If present:
+<h2>Why it matters</h2>
+whyItMatters text
+
+Article body:
+Render body paragraphs inside a prose container
+(max width ~65ch, comfortable line height)
+
+If present:
+<h2>Key details</h2>
+<ul>keyDetails bullets</ul>
+
+If present:
+<h2>What’s next</h2>
+whatsNext text
+
+If present:
+<h2>Key takeaways</h2>
+<ul>keyTakeaways bullets</ul>
+
+Source attribution:
+Source: <a href="{sourceUrl}" rel="nofollow noopener">Source Name</a>
+
+Tags:
+Render suggestedTags as tag pills at the bottom
+
+Do NOT hide these sections behind accordions.
+Do NOT merge them into generic paragraphs.
+
+--------------------------------------------------
+4) Visual/readability tweaks (no redesign)
+--------------------------------------------------
+- Keep article text in a prose container (Tailwind prose)
+- Ensure paragraph spacing (2–3 sentences per paragraph)
+- Make “Why it matters” visually distinct (subtle background or callout)
+- Reduce heavy card borders around the main article body
+- Preserve existing sidebar and related content
+
+--------------------------------------------------
+5) Acceptance checks (must pass)
+--------------------------------------------------
+- View Source shows unique <title> and <meta description> per article
+- OG preview works when sharing links
+- JSON-LD validates in Google Rich Results Test
+- Headings are visible and semantic (<h1>, <h2>)
+- No ad logic or placement changed
+- No framework migration performed
+
+DELIVERABLE
+- One example article URL confirming correct head tags and structure
+- Screenshot of rendered article sections
