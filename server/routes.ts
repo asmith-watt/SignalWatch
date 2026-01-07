@@ -17,6 +17,7 @@ import { importFeedCompanies } from "./import-feed-companies";
 import { importPetfoodCompanies } from "./import-petfood-companies";
 import { importBakingMillingCompanies } from "./import-baking-milling-companies";
 import { importBakingMillingSignals } from "./import-signals-by-company-name";
+import { importIPPEExhibitors } from "./import-ippe";
 import { generateRssFeed, generateAllSignalsRssFeed, getAvailableFeeds } from "./rss-feeds";
 import { publishToWordPress, testWordPressConnection } from "./wordpress-publisher";
 import { selectStockImage, buildMediaSitePayload, buildPayloadFromExistingArticle, publishToMediaSite, generateAIImage } from "./media-site-publisher";
@@ -1476,6 +1477,23 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error importing Baking & Milling signals:", error);
       res.status(500).json({ error: "Failed to import Baking & Milling signals" });
+    }
+  });
+
+  app.post("/api/companies/import-ippe", async (req: Request, res: Response) => {
+    try {
+      console.log("Starting IPPE Exhibitors import...");
+      const result = await importIPPEExhibitors();
+      res.json({ 
+        success: true, 
+        message: `Import complete. Added ${result.imported} IPPE exhibitor companies, skipped ${result.skipped}.`,
+        imported: result.imported,
+        skipped: result.skipped,
+        errors: result.errors.slice(0, 10)
+      });
+    } catch (error) {
+      console.error("Error importing IPPE exhibitors:", error);
+      res.status(500).json({ error: "Failed to import IPPE exhibitors" });
     }
   });
 
