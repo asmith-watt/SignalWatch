@@ -38,6 +38,7 @@ export interface SignalFilters {
   bookmarked: boolean;
   unread: boolean;
   entityQuery: string;
+  industry: string;
 }
 
 interface SignalFiltersBarProps {
@@ -102,7 +103,8 @@ export function SignalFiltersBar({
     (filters.status !== "all" ? 1 : 0) +
     (filters.bookmarked ? 1 : 0) +
     (filters.unread ? 1 : 0) +
-    (filters.entityQuery ? 1 : 0);
+    (filters.entityQuery ? 1 : 0) +
+    (filters.industry !== "all" ? 1 : 0);
 
   const handleTypeToggle = (type: string) => {
     const newTypes = filters.types.includes(type)
@@ -128,6 +130,7 @@ export function SignalFiltersBar({
       bookmarked: false,
       unread: false,
       entityQuery: "",
+      industry: "all",
     });
   };
 

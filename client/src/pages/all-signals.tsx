@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation, useSearch } from "wouter";
 import { Radio } from "lucide-react";
 import { SignalCard } from "@/components/signal-card";
 import { SignalTimeline } from "@/components/signal-timeline";
@@ -22,6 +23,7 @@ const defaultFilters: SignalFilters = {
   bookmarked: false,
   unread: false,
   entityQuery: "",
+  industry: "all",
 };
 
 function extractEntityNames(entities: unknown): string[] {
@@ -50,11 +52,31 @@ function extractEntityNames(entities: unknown): string[] {
 }
 
 export function AllSignalsPage() {
-  const [filters, setFilters] = useState<SignalFilters>(defaultFilters);
+  const searchString = useSearch();
+  const [, setLocation] = useLocation();
+  
+  const getInitialFilters = (): SignalFilters => {
+    const params = new URLSearchParams(searchString);
+    const industry = params.get("industry");
+    return {
+      ...defaultFilters,
+      industry: industry || "all",
+    };
+  };
+
+  const [filters, setFilters] = useState<SignalFilters>(getInitialFilters);
   const [viewMode, setViewMode] = useState<"list" | "timeline">("list");
   const [expandedSignalId, setExpandedSignalId] = useState<number | null>(null);
   const [wpPublishSignalId, setWpPublishSignalId] = useState<number | null>(null);
   const [mediaSitePublishSignalId, setMediaSitePublishSignalId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchString);
+    const industry = params.get("industry");
+    if (industry && industry !== filters.industry) {
+      setFilters(prev => ({ ...prev, industry }));
+    }
+  }, [searchString]);
 
   const { data: signals = [], isLoading: signalsLoading } = useQuery<Signal[]>({
     queryKey: ["/api/signals"],
@@ -63,6 +85,12 @@ export function AllSignalsPage() {
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
   });
+
+  const companyMap = useMemo(() => {
+    const map = new Map<number, Company>();
+    companies.forEach(c => map.set(c.id, c));
+    return map;
+  }, [companies]);
 
   const updateSignalMutation = useMutation({
     mutationFn: async ({
@@ -116,6 +144,13 @@ export function AllSignalsPage() {
       });
     }
 
+    if (filters.industry !== "all") {
+      result = result.filter((s) => {
+        const company = companyMap.get(s.companyId);
+        return company && company.industry === filters.industry;
+      });
+    }
+
     if (filters.dateRange !== "all") {
       const now = new Date();
       let startDate: Date;
@@ -150,7 +185,7 @@ export function AllSignalsPage() {
       const dateB = b.publishedAt ? new Date(b.publishedAt) : new Date(b.createdAt);
       return dateB.getTime() - dateA.getTime();
     });
-  }, [signals, filters]);
+  }, [signals, filters, companyMap]);
 
   const handleBookmark = (id: number, bookmarked: boolean) => {
     updateSignalMutation.mutate({ id, updates: { isBookmarked: bookmarked } });

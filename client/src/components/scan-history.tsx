@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -99,14 +100,18 @@ export function ScanHistory() {
 
                 <div className="flex flex-wrap gap-2 pl-5">
                   {items.map((item) => (
-                    <Badge
+                    <Link
                       key={`${date}-${item.industry}`}
-                      variant="secondary"
-                      className={`text-xs ${getIndustryColor(item.industry)}`}
-                      data-testid={`scan-badge-${date}-${item.industry}`}
+                      href={`/signals?industry=${encodeURIComponent(item.industry)}`}
                     >
-                      {item.industry}: {item.signalsFound}
-                    </Badge>
+                      <Badge
+                        variant="secondary"
+                        className={`text-xs cursor-pointer ${getIndustryColor(item.industry)}`}
+                        data-testid={`scan-badge-${date}-${item.industry}`}
+                      >
+                        {item.industry}: {item.signalsFound}
+                      </Badge>
+                    </Link>
                   ))}
                 </div>
               </div>
