@@ -267,6 +267,7 @@ export function AppSidebar({
           <div>
             <h1 className="text-base font-semibold">SignalWatch</h1>
             <p className="text-xs text-muted-foreground">Business Intelligence</p>
+            <p className="text-[10px] text-muted-foreground/60" data-testid="text-app-version">v1.0.1</p>
           </div>
         </div>
       </SidebarHeader>
