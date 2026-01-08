@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -27,6 +27,7 @@ const SELECTED_COMPANY_KEY = "signalwatch-selected-company";
 
 function MainLayout() {
   const { toast } = useToast();
+  const [location, setLocation] = useLocation();
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(() => {
     const saved = localStorage.getItem(SELECTED_COMPANY_KEY);
     return saved ? parseInt(saved, 10) : null;
@@ -74,7 +75,11 @@ function MainLayout() {
   }, [signals]);
 
   const handleSelectCompany = (id: number) => {
-    setSelectedCompanyId((prev) => (prev === id ? null : id));
+    setSelectedCompanyId(id);
+    // Navigate to dashboard to see company signals
+    if (location !== "/") {
+      setLocation("/");
+    }
   };
 
   const handleSelectSignal = (signal: Signal) => {
