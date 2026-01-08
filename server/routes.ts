@@ -1453,7 +1453,7 @@ export async function registerRoutes(
       }
       
       const { backfillSignalDates } = await import("./date-verifier");
-      const { companyId, limit = 100, onlySuspicious = true } = req.body;
+      const { companyId, limit = 100, onlySuspicious = false } = req.body;
       
       const result = await backfillSignalDates({
         companyId: companyId ? parseInt(companyId) : undefined,
