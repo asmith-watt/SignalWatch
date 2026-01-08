@@ -63,13 +63,30 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  await registerRoutes(httpServer, app);
+  try {
+    await registerRoutes(httpServer, app);
+  } catch (error) {
+    console.error("Failed to register routes:", error);
+    console.error("Check that DATABASE_URL or PGHOST/PGDATABASE/PGUSER/PGPASSWORD/PGPORT are correctly configured");
+    process.exit(1);
+  }
   
   // Seed database with sample data if empty
-  await seedDatabase();
+  try {
+    await seedDatabase();
+  } catch (error) {
+    console.error("Failed to seed database:", error);
+    console.error("Database initialization failed - check connection settings");
+    // Continue anyway - seeding is optional
+  }
   
   // Initialize scheduled tasks (daily monitoring, cleanup)
-  initializeScheduler();
+  try {
+    initializeScheduler();
+  } catch (error) {
+    console.error("Failed to initialize scheduler:", error);
+    // Continue anyway - scheduler is optional
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
