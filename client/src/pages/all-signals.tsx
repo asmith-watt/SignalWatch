@@ -38,6 +38,7 @@ function getIndustryColor(industry: string): string {
     "Baking & Milling": "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
     "IPPE Exhibitors": "bg-violet-500/10 text-violet-700 dark:text-violet-400 border-violet-500/20",
     "Feed & Grain": "bg-teal-500/10 text-teal-700 dark:text-teal-400 border-teal-500/20",
+    "F&G Equipment / Advertisers": "bg-teal-500/10 text-teal-700 dark:text-teal-400 border-teal-500/20",
     "Data Source": "bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/20",
   };
   return colors[industry] || "bg-muted text-muted-foreground border-muted";
@@ -60,6 +61,7 @@ export function AllSignalsPage() {
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
   const [wpPublishSignalId, setWpPublishSignalId] = useState<number | null>(null);
   const [mediaSitePublishSignalId, setMediaSitePublishSignalId] = useState<number | null>(null);
+  const [daysToShow, setDaysToShow] = useState(7);
 
   useEffect(() => {
     const params = new URLSearchParams(searchString);
@@ -103,7 +105,7 @@ export function AllSignalsPage() {
     },
   });
 
-  const groupedHistory = useMemo(() => {
+  const allGroupedHistory = useMemo(() => {
     const grouped = history.reduce((acc, item) => {
       if (!acc[item.date]) {
         acc[item.date] = [];
@@ -114,13 +116,18 @@ export function AllSignalsPage() {
     
     return Object.keys(grouped)
       .sort((a, b) => b.localeCompare(a))
-      .slice(0, 7)
       .map(date => ({
         date,
         items: grouped[date],
         totalSignals: grouped[date].reduce((sum, i) => sum + i.signalsFound, 0),
       }));
   }, [history]);
+
+  const groupedHistory = useMemo(() => {
+    return allGroupedHistory.slice(0, daysToShow);
+  }, [allGroupedHistory, daysToShow]);
+
+  const hasMoreHistory = allGroupedHistory.length > daysToShow;
 
   const filteredSignals = useMemo(() => {
     if (!selectedFilter) return [];
@@ -263,6 +270,17 @@ export function AllSignalsPage() {
                       </div>
                     </div>
                   ))}
+                  {hasMoreHistory && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full mt-2"
+                      onClick={() => setDaysToShow(prev => prev + 7)}
+                      data-testid="button-show-more-history"
+                    >
+                      Show More
+                    </Button>
+                  )}
                 </div>
               </Card>
             )}

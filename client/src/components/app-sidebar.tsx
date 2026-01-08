@@ -63,7 +63,7 @@ interface AppSidebarProps {
 
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: TrendingUp },
-  { title: "All Signals", url: "/signals", icon: Radio },
+  { title: "Recent Signals", url: "/signals", icon: Radio },
   { title: "Signal Graph", url: "/signal-graph", icon: GitBranch },
   { title: "Industry Map", url: "/industry-map", icon: Network },
   { title: "Alerts", url: "/alerts", icon: Bell },
@@ -78,7 +78,7 @@ const industryGroups: Record<string, string[]> = {
   "Pet Food": ["Pet Food", "Pet", "Dog Food", "Cat Food"],
   "Baking & Milling": ["Baking & Milling", "Baking", "Milling", "Flour", "Mill"],
   "IPPE Exhibitors": ["IPPE Exhibitors", "IPPE"],
-  "Feed & Grain": ["Feed & Grain"],
+  "F&G Equipment / Advertisers": ["Feed & Grain", "F&G Equipment / Advertisers"],
 };
 
 function getIndustryGroup(industry: string | null): string {
@@ -113,7 +113,7 @@ const defaultExpandedGroups: Record<string, boolean> = {
   "Pet Food": true,
   "Baking & Milling": true,
   "IPPE Exhibitors": true,
-  "Feed & Grain": true,
+  "F&G Equipment / Advertisers": true,
   Other: true,
 };
 
