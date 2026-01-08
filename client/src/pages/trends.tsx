@@ -135,7 +135,7 @@ export default function TrendsPage() {
   });
 
   return (
-    <div className="p-6 space-y-6" data-testid="page-trends">
+    <div className="p-6 space-y-6 h-full overflow-auto" data-testid="page-trends">
       <div className="flex items-center gap-3">
         <BarChart3 className="h-7 w-7 text-primary" />
         <div>

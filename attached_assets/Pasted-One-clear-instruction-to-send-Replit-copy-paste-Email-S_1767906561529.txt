@@ -1,0 +1,64 @@
+One clear instruction to send Replit (copy/paste)
+Email
+Subject
+
+Yes — please implement the date quality improvements. This is a blocking data-quality issue because it inflates “recent” activity and creates false trends.
+
+Required changes (in order):
+
+Do NOT default publishedAt to gatheredAt
+
+If a verified publish date cannot be extracted, set publishedAt = null
+
+Add a status/flag on the signal: needs_date_review = true
+
+Keep gatheredAt as the ingestion timestamp (separate from publishedAt)
+
+Run date verification during ingestion
+
+Call the existing date-verifier module for every new signal
+
+Date verifier should attempt, in priority order:
+a) article metadata (schema.org / OpenGraph / meta tags)
+b) source feed timestamp (if RSS)
+c) parsed date from page content (as last resort)
+
+Store a “date_source” field (metadata/rss/content/manual/unknown) and “date_confidence” (0–100)
+
+Freshness guardrails
+
+Add a configurable freshness window, default 60 days:
+
+Signals older than 60 days should not appear in Recent Scans, metrics, or trends by default
+
+They can be accessible via a “Historical” filter or label (historical=true)
+
+If publishedAt is null (needs_date_review), exclude from trends/metrics until corrected OR bucket into an “unknown_date” group (your call—recommend exclude)
+
+Cleanup / backfill existing bad data
+
+Create an admin backfill job:
+
+Re-run date verifier for existing signals where publishedAt ~= gatheredAt OR publishedAt is suspicious
+
+Fix publishedAt when confidence is high
+
+If still unknown, set needs_date_review=true and keep publishedAt null
+
+Start with affected companies (e.g., 2 Sisters) then expand.
+
+Definition of done:
+
+No old articles should surface as “new” due to fallback dates
+
+Trends/metrics stop spiking from timestamp artifacts
+
+We can audit dates via date_source/date_confidence and needs_date_review
+
+Next steps after the fix (so it’s measurable)
+
+Add a dashboard counter: “Signals with unknown publish date” (needs_date_review)
+
+Track weekly KPI: % signals with verified publishedAt (goal: >95%)
+
+Add a quick UI filter: “Unknown date” so an editor can spot-check and correct a few edge cases.

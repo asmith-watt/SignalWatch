@@ -1,5 +1,6 @@
 import * as cheerio from 'cheerio';
 import { storage } from './storage';
+import type { DateSource } from '@shared/schema';
 
 interface DateVerificationResult {
   signalId: number;
@@ -9,6 +10,14 @@ interface DateVerificationResult {
   extractedDate: string | null;
   match: boolean;
   error?: string;
+}
+
+// Result from verifying a date during ingestion
+export interface DateExtractionResult {
+  publishedAt: Date | null;
+  dateSource: DateSource;
+  dateConfidence: number;
+  needsDateReview: boolean;
 }
 
 // Common date patterns to look for
@@ -506,4 +515,254 @@ export async function verifySourceUrls(options?: {
     errors: errorsCount,
     results
   };
+}
+
+// Enhanced date extraction for ingestion pipeline
+// Attempts to verify date from source URL and returns confidence/source info
+export async function extractVerifiedDate(
+  sourceUrl: string | null,
+  perplexityDate: string | null,
+  rssDate?: string | null
+): Promise<DateExtractionResult> {
+  // If no source URL, we can't verify - mark for review
+  if (!sourceUrl || !sourceUrl.startsWith('http')) {
+    // If Perplexity provided a date, use it with low confidence
+    if (perplexityDate) {
+      const parsed = new Date(perplexityDate);
+      if (!isNaN(parsed.getTime())) {
+        return {
+          publishedAt: parsed,
+          dateSource: 'unknown',
+          dateConfidence: 30,
+          needsDateReview: true,
+        };
+      }
+    }
+    return {
+      publishedAt: null,
+      dateSource: 'unknown',
+      dateConfidence: 0,
+      needsDateReview: true,
+    };
+  }
+
+  try {
+    const pageContent = await fetchPageContent(sourceUrl);
+    if (!pageContent) {
+      // Couldn't fetch - fall back to Perplexity date with low confidence
+      if (perplexityDate) {
+        const parsed = new Date(perplexityDate);
+        if (!isNaN(parsed.getTime())) {
+          return {
+            publishedAt: parsed,
+            dateSource: 'unknown',
+            dateConfidence: 25,
+            needsDateReview: true,
+          };
+        }
+      }
+      return {
+        publishedAt: null,
+        dateSource: 'unknown',
+        dateConfidence: 0,
+        needsDateReview: true,
+      };
+    }
+
+    const { $ } = pageContent;
+
+    // Priority 1: Structured metadata (schema.org, OpenGraph, meta tags) - highest confidence
+    const metaDate = $('meta[property="article:published_time"]').attr('content') ||
+                     $('meta[name="date"]').attr('content') ||
+                     $('meta[name="publish-date"]').attr('content') ||
+                     $('meta[name="pubdate"]').attr('content') ||
+                     $('meta[property="og:article:published_time"]').attr('content') ||
+                     $('meta[itemprop="datePublished"]').attr('content') ||
+                     $('[itemprop="datePublished"]').attr('content') ||
+                     $('[itemprop="datePublished"]').attr('datetime');
+
+    if (metaDate) {
+      const parsed = parseExtractedDate(metaDate);
+      if (parsed) {
+        return {
+          publishedAt: new Date(parsed),
+          dateSource: 'metadata',
+          dateConfidence: 95,
+          needsDateReview: false,
+        };
+      }
+      // Try direct ISO extraction
+      const dateOnly = metaDate.split('T')[0];
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
+        return {
+          publishedAt: new Date(dateOnly),
+          dateSource: 'metadata',
+          dateConfidence: 95,
+          needsDateReview: false,
+        };
+      }
+    }
+
+    // Priority 2: Time elements with datetime attribute
+    const timeEl = $('time[datetime]').first().attr('datetime');
+    if (timeEl) {
+      const dateOnly = timeEl.split('T')[0];
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
+        return {
+          publishedAt: new Date(dateOnly),
+          dateSource: 'metadata',
+          dateConfidence: 90,
+          needsDateReview: false,
+        };
+      }
+    }
+
+    // Priority 3: RSS date if provided - moderate confidence
+    if (rssDate) {
+      const parsed = new Date(rssDate);
+      if (!isNaN(parsed.getTime())) {
+        return {
+          publishedAt: parsed,
+          dateSource: 'rss',
+          dateConfidence: 80,
+          needsDateReview: false,
+        };
+      }
+    }
+
+    // Priority 4: Parse from page content - lower confidence
+    const dateSelectors = [
+      '.article-date', '.post-date', '.publish-date', '.date', '.byline-date',
+      '.article-meta time', '.post-meta time', '.entry-date', '.published',
+      '[class*="date"]', '[class*="publish"]', '.timestamp',
+    ];
+
+    for (const selector of dateSelectors) {
+      const text = $(selector).first().text().trim();
+      if (text) {
+        const parsed = parseExtractedDate(text);
+        if (parsed) {
+          return {
+            publishedAt: new Date(parsed),
+            dateSource: 'content',
+            dateConfidence: 70,
+            needsDateReview: false,
+          };
+        }
+      }
+    }
+
+    // Priority 5: Header area text - lowest automated confidence
+    const headerArea = $('header, .article-header, .post-header, h1').first().parent().text();
+    const headerParsed = parseExtractedDate(headerArea.slice(0, 1000));
+    if (headerParsed) {
+      return {
+        publishedAt: new Date(headerParsed),
+        dateSource: 'content',
+        dateConfidence: 50,
+        needsDateReview: true,
+      };
+    }
+
+    // Could not extract date from page - mark for review, don't use Perplexity date
+    return {
+      publishedAt: null,
+      dateSource: 'unknown',
+      dateConfidence: 0,
+      needsDateReview: true,
+    };
+
+  } catch (error) {
+    console.error(`Error extracting date from ${sourceUrl}:`, error);
+    return {
+      publishedAt: null,
+      dateSource: 'unknown',
+      dateConfidence: 0,
+      needsDateReview: true,
+    };
+  }
+}
+
+// Backfill job to re-verify dates on existing signals
+export async function backfillSignalDates(options: {
+  companyId?: number;
+  limit?: number;
+  onlySuspicious?: boolean;
+}): Promise<{
+  processed: number;
+  fixed: number;
+  flaggedForReview: number;
+  errors: number;
+}> {
+  const limit = options.limit || 100;
+  let processed = 0;
+  let fixed = 0;
+  let flaggedForReview = 0;
+  let errors = 0;
+
+  // Get signals to process
+  let signals = await storage.getAllSignals();
+  
+  if (options.companyId) {
+    signals = signals.filter(s => s.companyId === options.companyId);
+  }
+  
+  // Filter to suspicious signals if requested
+  if (options.onlySuspicious) {
+    signals = signals.filter(s => {
+      // Suspicious if publishedAt is very close to gatheredAt (within 1 hour)
+      if (s.publishedAt && s.gatheredAt) {
+        const diff = Math.abs(new Date(s.publishedAt).getTime() - new Date(s.gatheredAt).getTime());
+        return diff < 60 * 60 * 1000; // 1 hour
+      }
+      // Or if no date_source set
+      return !s.dateSource || s.dateSource === 'unknown';
+    });
+  }
+  
+  // Only process signals with source URLs
+  signals = signals.filter(s => s.sourceUrl && s.sourceUrl.startsWith('http'));
+  signals = signals.slice(0, limit);
+
+  console.log(`Backfilling dates for ${signals.length} signals...`);
+
+  for (const signal of signals) {
+    try {
+      const result = await extractVerifiedDate(
+        signal.sourceUrl,
+        signal.publishedAt ? new Date(signal.publishedAt).toISOString().split('T')[0] : null
+      );
+      
+      const updates: any = {
+        dateSource: result.dateSource,
+        dateConfidence: result.dateConfidence,
+        needsDateReview: result.needsDateReview,
+      };
+      
+      // Update publishedAt only if we got a high-confidence result
+      if (result.publishedAt && result.dateConfidence >= 70) {
+        updates.publishedAt = result.publishedAt;
+        fixed++;
+      } else if (!result.publishedAt || result.dateConfidence < 50) {
+        // Clear publishedAt if we couldn't verify it
+        updates.publishedAt = null;
+        updates.needsDateReview = true;
+        flaggedForReview++;
+      }
+      
+      await storage.updateSignal(signal.id, updates);
+      processed++;
+      
+      console.log(`  [${signal.id}] ${signal.title.slice(0, 50)}... -> ${result.dateSource}/${result.dateConfidence}%`);
+      
+      // Rate limiting
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      console.error(`Error processing signal ${signal.id}:`, error);
+      errors++;
+    }
+  }
+
+  console.log(`Backfill complete: ${processed} processed, ${fixed} fixed, ${flaggedForReview} flagged, ${errors} errors`);
+  return { processed, fixed, flaggedForReview, errors };
 }

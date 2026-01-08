@@ -96,6 +96,17 @@ export const signalThemes = [
 
 export type SignalTheme = (typeof signalThemes)[number];
 
+// Date source types for tracking how publishedAt was determined
+export const dateSourceTypes = [
+  "metadata",   // From schema.org, OpenGraph, or meta tags
+  "rss",        // From RSS feed timestamp
+  "content",    // Parsed from page content
+  "manual",     // Manually set by editor
+  "unknown",    // Could not determine source
+] as const;
+
+export type DateSource = (typeof dateSourceTypes)[number];
+
 // Signals table - captured business intelligence
 export const signals = pgTable("signals", {
   id: serial("id").primaryKey(),
@@ -121,6 +132,9 @@ export const signals = pgTable("signals", {
   hash: text("hash"),
   themes: text("themes").array().default([]),
   themesVersion: integer("themes_version").default(1),
+  dateSource: text("date_source").default("unknown"),
+  dateConfidence: integer("date_confidence").default(0),
+  needsDateReview: boolean("needs_date_review").default(false),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
