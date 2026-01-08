@@ -43,6 +43,7 @@ const defaultFilters: SignalFilters = {
   bookmarked: false,
   unread: false,
   entityQuery: "",
+  industry: "all",
 };
 
 function extractEntityNames(entities: unknown): string[] {
