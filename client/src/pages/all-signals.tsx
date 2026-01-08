@@ -114,6 +114,7 @@ export function AllSignalsPage() {
     
     return Object.keys(grouped)
       .sort((a, b) => b.localeCompare(a))
+      .slice(0, 7)
       .map(date => ({
         date,
         items: grouped[date],
