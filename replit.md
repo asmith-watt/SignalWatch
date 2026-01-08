@@ -16,6 +16,11 @@ SignalWatch is a B2B business intelligence platform designed for editorial teams
   - Candidate selection: minimum 10 signals and 25% delta threshold
   - AI explains patterns using themes, signal types, and magnitude
   - Stored in `trends` table with confidence scores
+- **Baseline Guardrails** (cold-start handling):
+  - If prev_30d < 25 signals, treat as "emerging" activity (no delta calculation)
+  - Prevents misleading percentages from low baselines (e.g., 10→120 = 1100%)
+  - Emerging trends show purple "Emerging" badge instead of percentage
+  - UI caps displayed percentages at 500%+ for extreme values
 - **Scheduler integration**:
   - Daily metrics: `ENABLE_METRICS_SCHEDULER=true`, cron via `METRICS_CRON` (default: `0 8 * * *` = 8:00 AM UTC)
   - Weekly trends: `ENABLE_TRENDS_SCHEDULER=true`, cron via `TRENDS_CRON` (default: `0 9 * * 1` = Monday 9:00 AM UTC)

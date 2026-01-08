@@ -508,7 +508,40 @@ export async function generateTrendExplanation(trend: {
   magnitude: number;
   signalCount: number;
   timeWindow: string;
+  isEmerging?: boolean;
 }): Promise<string> {
+  // Handle emerging trends (insufficient baseline data)
+  if (trend.isEmerging) {
+    const prompt = `Write a concise 2-3 sentence summary about emerging signal activity for an editorial intelligence report.
+
+Scope: ${trend.scopeType} - ${trend.scopeId}
+This is a NEW area of activity with ${trend.signalCount} signals detected in the past ${trend.timeWindow}.
+No prior baseline exists for comparison.
+Top themes: ${trend.themes.join(", ") || "general activity"}
+Signal types: ${trend.signalTypes.join(", ") || "various"}
+
+Write a professional, factual summary that:
+1. Highlights this as emerging/new signal activity
+2. Notes the key theme(s) appearing
+3. Suggests this area may warrant continued monitoring
+
+Return ONLY the summary text, no JSON or formatting.`;
+
+    try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        max_completion_tokens: 200,
+      });
+
+      return response.choices[0]?.message?.content?.trim() || 
+        `Emerging signal activity detected in ${trend.scopeId} with ${trend.signalCount} signals in the past ${trend.timeWindow}.`;
+    } catch (error) {
+      console.error("Error generating emerging trend explanation:", error);
+      return `Emerging signal activity detected in ${trend.scopeId} with ${trend.signalCount} signals in the past ${trend.timeWindow}.`;
+    }
+  }
+
   const directionWord = trend.direction === "up" ? "increased" : trend.direction === "down" ? "decreased" : "remained stable";
   const magnitudeStr = trend.magnitude ? `${Math.abs(trend.magnitude).toFixed(0)}%` : "marginally";
   

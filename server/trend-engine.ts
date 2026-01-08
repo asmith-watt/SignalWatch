@@ -205,16 +205,26 @@ export async function generateTrends(): Promise<{
       continue;
     }
     
-    const deltaPercent = data.countPrev30d > 0 
-      ? ((data.count30d - data.countPrev30d) / data.countPrev30d) * 100 
-      : 0;
+    // Baseline guardrail: If prev_30d < 25, treat as "emerging" activity
+    // This prevents misleading percentages from low baselines (e.g., 10→120 = 1100%)
+    const isEmerging = data.countPrev30d < 25;
     
-    if (Math.abs(deltaPercent) < 25) {
-      continue;
+    let deltaPercent: number | null = null;
+    let direction: "up" | "down" | "flat" | "emerging" = "emerging";
+    let confidence = 60; // Base confidence for emerging trends
+    
+    if (!isEmerging) {
+      // Only calculate delta if we have meaningful baseline (>=10 signals in prev period)
+      deltaPercent = ((data.count30d - data.countPrev30d) / data.countPrev30d) * 100;
+      
+      // Skip if change is too small
+      if (Math.abs(deltaPercent) < 25) {
+        continue;
+      }
+      
+      direction = deltaPercent > 0 ? "up" : deltaPercent < 0 ? "down" : "flat";
+      confidence = Math.min(95, 50 + Math.abs(deltaPercent) / 2);
     }
-    
-    const direction = deltaPercent > 0 ? "up" : deltaPercent < 0 ? "down" : "flat";
-    const confidence = Math.min(95, 50 + Math.abs(deltaPercent) / 2);
     
     const topThemes = Object.entries(data.themes)
       .sort((a, b) => b[1] - a[1])
@@ -227,15 +237,19 @@ export async function generateTrends(): Promise<{
       .map(([type]) => type);
     
     try {
+      // Use 0 for magnitude when emerging (no baseline comparison)
+      const magnitudeValue = deltaPercent ?? 0;
+      
       const explanation = await generateTrendExplanation({
         scopeType: "industry",
         scopeId: industry,
         themes: topThemes,
         signalTypes: topSignalTypes,
-        direction,
-        magnitude: deltaPercent,
+        direction: isEmerging ? "emerging" : direction,
+        magnitude: magnitudeValue,
         signalCount: data.count30d,
         timeWindow: "30d",
+        isEmerging,
       });
       
       const trend: InsertTrend = {
@@ -244,15 +258,18 @@ export async function generateTrends(): Promise<{
         signalTypes: topSignalTypes,
         themes: topThemes,
         timeWindow: "30d",
-        direction,
-        magnitude: deltaPercent.toFixed(2),
+        direction: isEmerging ? "emerging" : direction,
+        magnitude: isEmerging ? null : magnitudeValue.toFixed(2),
         confidence: Math.round(confidence),
         explanation,
       };
       
       await storage.createTrend(trend);
       trendsGenerated++;
-      console.log(`  [TrendEngine] Generated trend for ${industry}: ${direction} ${Math.abs(deltaPercent).toFixed(0)}%`);
+      const logMsg = isEmerging 
+        ? `  [TrendEngine] Generated emerging trend for ${industry}: ${data.count30d} signals`
+        : `  [TrendEngine] Generated trend for ${industry}: ${direction} ${Math.abs(magnitudeValue).toFixed(0)}%`;
+      console.log(logMsg);
     } catch (error) {
       console.error(`  [TrendEngine] Error generating trend for ${industry}:`, error);
       errors++;

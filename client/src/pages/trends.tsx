@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, TrendingDown, Activity, BarChart3, Calendar } from "lucide-react";
+import { TrendingUp, TrendingDown, Activity, BarChart3, Calendar, Sparkles } from "lucide-react";
 import type { Trend } from "@shared/schema";
 import { formatDistanceToNow } from "date-fns";
 
@@ -26,13 +26,23 @@ function formatTheme(theme: string): string {
   return THEME_LABELS[theme] || theme.replace(/_/g, " ");
 }
 
+function formatMagnitude(magnitude: number): string {
+  const cappedMagnitude = Math.min(Math.abs(magnitude), 500);
+  const prefix = magnitude > 0 ? "+" : magnitude < 0 ? "-" : "";
+  const suffix = Math.abs(magnitude) > 500 ? "+" : "";
+  return `${prefix}${cappedMagnitude.toFixed(0)}%${suffix}`;
+}
+
 function TrendCard({ trend }: { trend: Trend }) {
   const magnitude = parseFloat(trend.magnitude || "0");
   const isUp = trend.direction === "up";
   const isDown = trend.direction === "down";
+  const isEmerging = trend.direction === "emerging";
   
-  const Icon = isUp ? TrendingUp : isDown ? TrendingDown : Activity;
-  const colorClass = isUp 
+  const Icon = isEmerging ? Sparkles : isUp ? TrendingUp : isDown ? TrendingDown : Activity;
+  const colorClass = isEmerging
+    ? "text-purple-600 dark:text-purple-400"
+    : isUp 
     ? "text-green-600 dark:text-green-400" 
     : isDown 
     ? "text-red-600 dark:text-red-400" 
@@ -47,9 +57,15 @@ function TrendCard({ trend }: { trend: Trend }) {
             <CardTitle className="text-lg">{trend.scopeId}</CardTitle>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className={colorClass}>
-              {isUp ? "+" : ""}{magnitude.toFixed(0)}%
-            </Badge>
+            {isEmerging ? (
+              <Badge variant="outline" className={colorClass}>
+                Emerging
+              </Badge>
+            ) : (
+              <Badge variant="outline" className={colorClass}>
+                {formatMagnitude(magnitude)}
+              </Badge>
+            )}
             <Badge variant="secondary" className="text-xs">
               {trend.confidence}% confidence
             </Badge>
