@@ -4,7 +4,9 @@ import { storage } from "./storage";
 
 const RETENTION_DAYS = 365;
 let isRunning = false;
+let isSyncing = false;
 let scheduledMonitoringTask: ScheduledTask | null = null;
+let scheduledSyncTask: ScheduledTask | null = null;
 
 async function cleanupOldSignals() {
   console.log("[Scheduler] Starting signal cleanup...");
@@ -27,6 +29,86 @@ async function cleanupOldSignals() {
     console.log(`[Scheduler] Cleaned up ${deleted} signals older than ${RETENTION_DAYS} days`);
   } catch (error) {
     console.error("[Scheduler] Error cleaning up signals:", error);
+  }
+}
+
+async function syncToProduction() {
+  const productionUrl = process.env.PRODUCTION_APP_URL;
+  
+  if (!productionUrl) {
+    console.log("[Scheduler] No PRODUCTION_APP_URL set, skipping sync");
+    return;
+  }
+  
+  if (isSyncing) {
+    console.log("[Scheduler] Sync already in progress, skipping");
+    return;
+  }
+  
+  isSyncing = true;
+  console.log(`[Scheduler] Starting scheduled sync to ${productionUrl}...`);
+  const startTime = Date.now();
+  
+  try {
+    // Fetch all local data
+    const companies = await storage.getAllCompanies();
+    const signals = await storage.getAllSignals();
+    
+    console.log(`[Scheduler] Syncing ${companies.length} companies and ${signals.length} signals...`);
+    
+    // Push to production
+    const response = await fetch(`${productionUrl}/api/import/all-data`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ companies, signals }),
+      mode: "cors",
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Production sync failed: ${response.status} - ${errorText}`);
+    }
+    
+    const result = await response.json();
+    const duration = Math.round((Date.now() - startTime) / 1000);
+    
+    console.log(`[Scheduler] Sync complete in ${duration}s:`);
+    console.log(`  - Companies: ${result.companiesImported || 0} new, ${result.companiesUpdated || 0} updated`);
+    console.log(`  - Signals: ${result.signalsImported || 0} new, ${result.signalsUpdated || 0} updated`);
+    
+    // Log the sync activity
+    await storage.createActivityLog({
+      userId: null,
+      action: "scheduled_sync",
+      entityType: "system",
+      entityId: null,
+      details: {
+        productionUrl,
+        companiesImported: result.companiesImported || 0,
+        companiesUpdated: result.companiesUpdated || 0,
+        signalsImported: result.signalsImported || 0,
+        signalsUpdated: result.signalsUpdated || 0,
+        durationSeconds: duration,
+      }
+    });
+    
+  } catch (error) {
+    console.error("[Scheduler] Sync to production failed:", error);
+    
+    await storage.createActivityLog({
+      userId: null,
+      action: "scheduled_sync_failed",
+      entityType: "system",
+      entityId: null,
+      details: {
+        productionUrl,
+        error: error instanceof Error ? error.message : String(error),
+      }
+    });
+  } finally {
+    isSyncing = false;
   }
 }
 
@@ -107,29 +189,52 @@ async function runDailyMonitoring() {
 
 export function initializeScheduler() {
   const enableScheduler = process.env.ENABLE_SCHEDULER === "true";
-  const cronExpression = process.env.MONITOR_CRON || "0 6 * * *";
+  const enableSyncScheduler = process.env.ENABLE_SYNC_SCHEDULER === "true";
+  const monitorCron = process.env.MONITOR_CRON || "0 6 * * *";
+  const syncCron = process.env.SYNC_CRON || "0 7 * * *"; // Default: 1 hour after monitoring
   
-  if (!enableScheduler) {
-    console.log("[Scheduler] Scheduler is disabled (set ENABLE_SCHEDULER=true to enable)");
+  if (!enableScheduler && !enableSyncScheduler) {
+    console.log("[Scheduler] All schedulers disabled (set ENABLE_SCHEDULER=true or ENABLE_SYNC_SCHEDULER=true)");
     return;
   }
   
-  if (!cron.validate(cronExpression)) {
-    console.error(`[Scheduler] Invalid cron expression: ${cronExpression}`);
-    return;
+  console.log("[Scheduler] Initializing scheduled tasks...");
+  
+  // Monitoring scheduler
+  if (enableScheduler) {
+    if (!cron.validate(monitorCron)) {
+      console.error(`[Scheduler] Invalid monitoring cron expression: ${monitorCron}`);
+    } else {
+      scheduledMonitoringTask = cron.schedule(monitorCron, async () => {
+        console.log("[Scheduler] Running scheduled monitoring...");
+        await runDailyMonitoring();
+      }, {
+        timezone: "UTC"
+      });
+      console.log(`  - Monitoring: ${monitorCron} (UTC)`);
+    }
   }
   
-  console.log(`[Scheduler] Initializing with cron: ${cronExpression}`);
+  // Sync scheduler (dev → production)
+  if (enableSyncScheduler) {
+    if (!cron.validate(syncCron)) {
+      console.error(`[Scheduler] Invalid sync cron expression: ${syncCron}`);
+    } else {
+      const productionUrl = process.env.PRODUCTION_APP_URL;
+      if (!productionUrl) {
+        console.log("  - Sync: DISABLED (no PRODUCTION_APP_URL set)");
+      } else {
+        scheduledSyncTask = cron.schedule(syncCron, async () => {
+          console.log("[Scheduler] Running scheduled production sync...");
+          await syncToProduction();
+        }, {
+          timezone: "UTC"
+        });
+        console.log(`  - Sync to production: ${syncCron} (UTC) → ${productionUrl}`);
+      }
+    }
+  }
   
-  scheduledMonitoringTask = cron.schedule(cronExpression, async () => {
-    console.log("[Scheduler] Running scheduled monitoring...");
-    await runDailyMonitoring();
-  }, {
-    timezone: "UTC"
-  });
-  
-  console.log("[Scheduler] Scheduled tasks initialized:");
-  console.log(`  - Monitoring: ${cronExpression} (UTC)`);
   console.log("  - Signal retention: Forever (no automatic cleanup)");
 }
 
@@ -137,16 +242,28 @@ export function stopScheduler() {
   if (scheduledMonitoringTask) {
     scheduledMonitoringTask.stop();
     scheduledMonitoringTask = null;
-    console.log("[Scheduler] Scheduler stopped");
   }
+  if (scheduledSyncTask) {
+    scheduledSyncTask.stop();
+    scheduledSyncTask = null;
+  }
+  console.log("[Scheduler] All scheduled tasks stopped");
 }
 
 export function isSchedulerEnabled(): boolean {
   return process.env.ENABLE_SCHEDULER === "true";
 }
 
+export function isSyncSchedulerEnabled(): boolean {
+  return process.env.ENABLE_SYNC_SCHEDULER === "true";
+}
+
 export function isMonitoringInProgress(): boolean {
   return isRunning;
 }
 
-export { runDailyMonitoring, cleanupOldSignals };
+export function isSyncInProgress(): boolean {
+  return isSyncing;
+}
+
+export { runDailyMonitoring, cleanupOldSignals, syncToProduction };

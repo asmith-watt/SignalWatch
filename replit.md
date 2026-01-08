@@ -16,9 +16,12 @@ SignalWatch is a B2B business intelligence platform designed for editorial teams
   - Weight factors: regulatory (+20), acquisitions (+20), earnings (+15), funding (+10)
   - Recommended editorial format: ignore, brief, news, or analysis
 - **Scheduler improvements** (`server/scheduler.ts`):
-  - Enable with `ENABLE_SCHEDULER=true` environment variable
+  - Enable monitoring with `ENABLE_SCHEDULER=true` environment variable
   - Configurable cron via `MONITOR_CRON` (default: `0 6 * * *` = 6:00 AM UTC)
   - Tracks runs in `monitor_runs` table with full statistics
+  - **Scheduled Production Sync**: Enable with `ENABLE_SYNC_SCHEDULER=true`
+  - Sync cron via `SYNC_CRON` (default: `0 7 * * *` = 7:00 AM UTC, 1 hour after monitoring)
+  - Automatically pushes companies and signals from dev to production URL (`PRODUCTION_APP_URL`)
 - **New endpoints**:
   - `GET /api/monitor/runs` - List recent monitoring runs
   - `GET /api/monitor/runs/:id` - Get specific run details
