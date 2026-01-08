@@ -1,5 +1,5 @@
 import { sql, relations } from "drizzle-orm";
-import { pgTable, text, varchar, serial, integer, timestamp, boolean, jsonb, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, serial, integer, timestamp, boolean, jsonb, uniqueIndex, index, numeric } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -80,6 +80,22 @@ export const signalTypes = [
 
 export type SignalType = (typeof signalTypes)[number];
 
+// Theme taxonomy for signal classification
+export const signalThemes = [
+  "hiring_pressure",
+  "capacity_expansion",
+  "regulatory_risk",
+  "supply_chain",
+  "m_a_activity",
+  "market_expansion",
+  "cost_pressures",
+  "sustainability",
+  "leadership_change",
+  "product_innovation",
+] as const;
+
+export type SignalTheme = (typeof signalThemes)[number];
+
 // Signals table - captured business intelligence
 export const signals = pgTable("signals", {
   id: serial("id").primaryKey(),
@@ -103,6 +119,8 @@ export const signals = pgTable("signals", {
   notes: text("notes"),
   aiAnalysis: jsonb("ai_analysis"),
   hash: text("hash"),
+  themes: text("themes").array().default([]),
+  themesVersion: integer("themes_version").default(1),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
@@ -437,6 +455,73 @@ export const insertSignalEntitySchema = createInsertSchema(signalEntities).omit(
 
 export type InsertSignalEntity = z.infer<typeof insertSignalEntitySchema>;
 export type SignalEntity = typeof signalEntities.$inferSelect;
+
+// Signal metrics table - rolling counts for trend analysis
+export const metricScopeTypes = ["industry", "company", "theme"] as const;
+export type MetricScopeType = (typeof metricScopeTypes)[number];
+
+export const metricPeriods = ["7d", "30d", "prev_30d"] as const;
+export type MetricPeriod = (typeof metricPeriods)[number];
+
+export const signalMetrics = pgTable("signal_metrics", {
+  id: serial("id").primaryKey(),
+  scopeType: text("scope_type").notNull(),
+  scopeId: text("scope_id").notNull(),
+  signalType: text("signal_type"),
+  theme: text("theme"),
+  period: text("period").notNull(),
+  currentCount: integer("current_count").notNull().default(0),
+  prevCount: integer("prev_count"),
+  deltaPercent: numeric("delta_percent"),
+  capturedAt: timestamp("captured_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+  index("signal_metrics_captured_scope_idx").on(table.capturedAt, table.scopeType),
+  index("signal_metrics_scope_period_idx").on(table.scopeType, table.scopeId, table.period),
+  index("signal_metrics_theme_period_idx").on(table.theme, table.period, table.capturedAt),
+]);
+
+export const insertSignalMetricSchema = createInsertSchema(signalMetrics).omit({
+  id: true,
+  capturedAt: true,
+});
+
+export type InsertSignalMetric = z.infer<typeof insertSignalMetricSchema>;
+export type SignalMetric = typeof signalMetrics.$inferSelect;
+
+// Trends table - aggregated intelligence with AI explanations
+export const trendScopeTypes = ["industry", "company", "region", "theme"] as const;
+export type TrendScopeType = (typeof trendScopeTypes)[number];
+
+export const trendTimeWindows = ["7d", "30d", "90d"] as const;
+export type TrendTimeWindow = (typeof trendTimeWindows)[number];
+
+export const trendDirections = ["up", "down", "flat"] as const;
+export type TrendDirection = (typeof trendDirections)[number];
+
+export const trends = pgTable("trends", {
+  id: serial("id").primaryKey(),
+  scopeType: text("scope_type").notNull(),
+  scopeId: text("scope_id").notNull(),
+  signalTypes: text("signal_types").array().default([]),
+  themes: text("themes").array().default([]),
+  timeWindow: text("time_window").notNull(),
+  direction: text("direction").notNull(),
+  magnitude: numeric("magnitude"),
+  confidence: integer("confidence").default(50),
+  explanation: text("explanation"),
+  generatedAt: timestamp("generated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+  index("trends_scope_idx").on(table.scopeType, table.scopeId),
+  index("trends_generated_idx").on(table.generatedAt),
+]);
+
+export const insertTrendSchema = createInsertSchema(trends).omit({
+  id: true,
+  generatedAt: true,
+});
+
+export type InsertTrend = z.infer<typeof insertTrendSchema>;
+export type Trend = typeof trends.$inferSelect;
 
 // Re-export chat models for OpenAI integration
 export * from "./models/chat";

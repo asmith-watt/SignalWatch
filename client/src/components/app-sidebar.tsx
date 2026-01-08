@@ -18,6 +18,7 @@ import {
   Network,
   Square,
   GitBranch,
+  BarChart3,
 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -64,6 +65,7 @@ interface AppSidebarProps {
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: TrendingUp },
   { title: "Recent Signals", url: "/signals", icon: Radio },
+  { title: "Trends", url: "/trends", icon: BarChart3 },
   { title: "Signal Graph", url: "/signal-graph", icon: GitBranch },
   { title: "Industry Map", url: "/industry-map", icon: Network },
   { title: "Alerts", url: "/alerts", icon: Bell },

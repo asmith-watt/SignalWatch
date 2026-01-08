@@ -6,6 +6,29 @@ SignalWatch is a B2B business intelligence platform designed for editorial teams
 
 ## Recent Changes
 
+### Intelligence Layer - Trends & Metrics (January 2026)
+- **Signal Metrics** (`server/trend-engine.ts`):
+  - Daily snapshot capturing rolling 7d and 30d signal counts
+  - Industry-level and theme-level metrics with delta percentages
+  - Stored in `signal_metrics` table for historical analysis
+- **Trend Generation**:
+  - Weekly AI-generated trend summaries for industries with significant changes
+  - Candidate selection: minimum 10 signals and 25% delta threshold
+  - AI explains patterns using themes, signal types, and magnitude
+  - Stored in `trends` table with confidence scores
+- **Scheduler integration**:
+  - Daily metrics: `ENABLE_METRICS_SCHEDULER=true`, cron via `METRICS_CRON` (default: `0 8 * * *` = 8:00 AM UTC)
+  - Weekly trends: `ENABLE_TRENDS_SCHEDULER=true`, cron via `TRENDS_CRON` (default: `0 9 * * 1` = Monday 9:00 AM UTC)
+- **New endpoints**:
+  - `GET /api/trends` - Fetch trends with optional scopeType/timeWindow filters
+  - `GET /api/metrics` - Fetch metrics with optional scopeType/scopeId/period filters
+  - `POST /api/admin/trends/generate` - Manually trigger trend generation (admin)
+  - `POST /api/admin/metrics/capture` - Manually trigger metrics snapshot (admin)
+- **Frontend** (`client/src/pages/trends.tsx`):
+  - Trends page with cards showing direction, magnitude, confidence, themes
+  - Empty state when no trends available yet
+  - Sidebar navigation link added
+
 ### Advanced Monitoring & Deduplication (January 2026)
 - **Deduplication system** (`server/dedupe.ts`):
   - SHA256-based stable hash generation with URL canonicalization

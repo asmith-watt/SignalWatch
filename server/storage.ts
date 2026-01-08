@@ -16,6 +16,10 @@ import {
   type MonitorRun,
   type InsertMonitorRun,
   type Entity,
+  type SignalMetric,
+  type InsertSignalMetric,
+  type Trend,
+  type InsertTrend,
   users,
   companies,
   signals,
@@ -26,6 +30,8 @@ import {
   monitorRuns,
   signalEntities,
   entities,
+  signalMetrics,
+  trends,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike, sql, gt, inArray } from "drizzle-orm";
@@ -97,6 +103,18 @@ export interface IStorage {
   // Signal Graph
   getRelatedSignals(signalId: number, limit?: number, days?: number): Promise<RelatedSignalResult[]>;
   backfillSignalEntities(startAfterId: number, limit: number): Promise<BackfillResult>;
+
+  // Signal Metrics
+  createSignalMetric(metric: InsertSignalMetric): Promise<SignalMetric>;
+  getSignalMetrics(scopeType?: string, scopeId?: string, period?: string): Promise<SignalMetric[]>;
+  getLatestMetrics(scopeType: string, period: string, limit?: number): Promise<SignalMetric[]>;
+  deleteOldMetrics(beforeDate: Date): Promise<number>;
+
+  // Trends
+  createTrend(trend: InsertTrend): Promise<Trend>;
+  getTrends(scopeType?: string, timeWindow?: string, limit?: number): Promise<Trend[]>;
+  getLatestTrends(limit?: number): Promise<Trend[]>;
+  deleteTrend(id: number): Promise<void>;
 }
 
 export interface RelatedSignalResult {
@@ -597,6 +615,76 @@ export class DatabaseStorage implements IStorage {
     }
     
     return result;
+  }
+
+  // Signal Metrics
+  async createSignalMetric(metric: InsertSignalMetric): Promise<SignalMetric> {
+    const [result] = await db.insert(signalMetrics).values(metric).returning();
+    return result;
+  }
+
+  async getSignalMetrics(scopeType?: string, scopeId?: string, period?: string): Promise<SignalMetric[]> {
+    const conditions = [];
+    if (scopeType) conditions.push(eq(signalMetrics.scopeType, scopeType));
+    if (scopeId) conditions.push(eq(signalMetrics.scopeId, scopeId));
+    if (period) conditions.push(eq(signalMetrics.period, period));
+    
+    if (conditions.length === 0) {
+      return db.select().from(signalMetrics).orderBy(desc(signalMetrics.capturedAt)).limit(1000);
+    }
+    
+    return db.select().from(signalMetrics)
+      .where(and(...conditions))
+      .orderBy(desc(signalMetrics.capturedAt))
+      .limit(1000);
+  }
+
+  async getLatestMetrics(scopeType: string, period: string, limit: number = 50): Promise<SignalMetric[]> {
+    return db.select().from(signalMetrics)
+      .where(and(
+        eq(signalMetrics.scopeType, scopeType),
+        eq(signalMetrics.period, period)
+      ))
+      .orderBy(desc(signalMetrics.capturedAt))
+      .limit(limit);
+  }
+
+  async deleteOldMetrics(beforeDate: Date): Promise<number> {
+    const result = await db.delete(signalMetrics)
+      .where(sql`${signalMetrics.capturedAt} < ${beforeDate}`)
+      .returning();
+    return result.length;
+  }
+
+  // Trends
+  async createTrend(trend: InsertTrend): Promise<Trend> {
+    const [result] = await db.insert(trends).values(trend).returning();
+    return result;
+  }
+
+  async getTrends(scopeType?: string, timeWindow?: string, limit: number = 50): Promise<Trend[]> {
+    const conditions = [];
+    if (scopeType) conditions.push(eq(trends.scopeType, scopeType));
+    if (timeWindow) conditions.push(eq(trends.timeWindow, timeWindow));
+    
+    if (conditions.length === 0) {
+      return db.select().from(trends).orderBy(desc(trends.generatedAt)).limit(limit);
+    }
+    
+    return db.select().from(trends)
+      .where(and(...conditions))
+      .orderBy(desc(trends.generatedAt))
+      .limit(limit);
+  }
+
+  async getLatestTrends(limit: number = 50): Promise<Trend[]> {
+    return db.select().from(trends)
+      .orderBy(desc(trends.generatedAt))
+      .limit(limit);
+  }
+
+  async deleteTrend(id: number): Promise<void> {
+    await db.delete(trends).where(eq(trends.id, id));
   }
 }
 

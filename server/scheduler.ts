@@ -1,12 +1,15 @@
 import cron, { ScheduledTask } from "node-cron";
 import { monitorAllCompanies, type CompanyMonitorResult } from "./perplexity-monitor";
 import { storage } from "./storage";
+import { runDailyMetricsJob, runWeeklyTrendsJob } from "./trend-engine";
 
 const RETENTION_DAYS = 365;
 let isRunning = false;
 let isSyncing = false;
 let scheduledMonitoringTask: ScheduledTask | null = null;
 let scheduledSyncTask: ScheduledTask | null = null;
+let scheduledMetricsTask: ScheduledTask | null = null;
+let scheduledTrendsTask: ScheduledTask | null = null;
 
 async function cleanupOldSignals() {
   console.log("[Scheduler] Starting signal cleanup...");
@@ -190,11 +193,15 @@ async function runDailyMonitoring() {
 export function initializeScheduler() {
   const enableScheduler = process.env.ENABLE_SCHEDULER === "true";
   const enableSyncScheduler = process.env.ENABLE_SYNC_SCHEDULER === "true";
+  const enableMetricsScheduler = process.env.ENABLE_METRICS_SCHEDULER === "true";
+  const enableTrendsScheduler = process.env.ENABLE_TRENDS_SCHEDULER === "true";
   const monitorCron = process.env.MONITOR_CRON || "0 6 * * *";
   const syncCron = process.env.SYNC_CRON || "0 7 * * *"; // Default: 1 hour after monitoring
+  const metricsCron = process.env.METRICS_CRON || "0 8 * * *"; // Default: 2 hours after monitoring
+  const trendsCron = process.env.TRENDS_CRON || "0 9 * * 1"; // Default: Every Monday at 9 AM UTC
   
-  if (!enableScheduler && !enableSyncScheduler) {
-    console.log("[Scheduler] All schedulers disabled (set ENABLE_SCHEDULER=true or ENABLE_SYNC_SCHEDULER=true)");
+  if (!enableScheduler && !enableSyncScheduler && !enableMetricsScheduler && !enableTrendsScheduler) {
+    console.log("[Scheduler] All schedulers disabled");
     return;
   }
   
@@ -235,6 +242,36 @@ export function initializeScheduler() {
     }
   }
   
+  // Daily metrics snapshot
+  if (enableMetricsScheduler) {
+    if (!cron.validate(metricsCron)) {
+      console.error(`[Scheduler] Invalid metrics cron expression: ${metricsCron}`);
+    } else {
+      scheduledMetricsTask = cron.schedule(metricsCron, async () => {
+        console.log("[Scheduler] Running daily metrics snapshot...");
+        await runDailyMetricsJob();
+      }, {
+        timezone: "UTC"
+      });
+      console.log(`  - Metrics snapshot: ${metricsCron} (UTC)`);
+    }
+  }
+  
+  // Weekly trend generation
+  if (enableTrendsScheduler) {
+    if (!cron.validate(trendsCron)) {
+      console.error(`[Scheduler] Invalid trends cron expression: ${trendsCron}`);
+    } else {
+      scheduledTrendsTask = cron.schedule(trendsCron, async () => {
+        console.log("[Scheduler] Running weekly trend generation...");
+        await runWeeklyTrendsJob();
+      }, {
+        timezone: "UTC"
+      });
+      console.log(`  - Trend generation: ${trendsCron} (UTC)`);
+    }
+  }
+  
   console.log("  - Signal retention: Forever (no automatic cleanup)");
 }
 
@@ -246,6 +283,14 @@ export function stopScheduler() {
   if (scheduledSyncTask) {
     scheduledSyncTask.stop();
     scheduledSyncTask = null;
+  }
+  if (scheduledMetricsTask) {
+    scheduledMetricsTask.stop();
+    scheduledMetricsTask = null;
+  }
+  if (scheduledTrendsTask) {
+    scheduledTrendsTask.stop();
+    scheduledTrendsTask = null;
   }
   console.log("[Scheduler] All scheduled tasks stopped");
 }

@@ -1,0 +1,208 @@
+What to Ask Replit (Very Specific Instructions)
+1. Relationship Persistence (Industry Map Foundation)
+
+Ask this exactly:
+
+Can we persist company-to-company relationships as first-class records instead of inferring them only at render time?
+
+Required details to include:
+
+New relationships table or collection with:
+
+company_a_id
+
+company_b_id
+
+relationship_type (partner, supplier, competitor, customer, investor, acquirer)
+
+source_signal_id
+
+confidence_score (0–1 or 0–100)
+
+first_seen_at
+
+last_seen_at
+
+Relationships should be upserted, not duplicated
+
+Support multiple relationships between the same companies over time
+
+Why:
+This enables relationship trends, “new partnerships,” and delta-based Industry Maps.
+
+2. Theme Extraction on Signals (Trend Intelligence)
+
+Ask this exactly:
+
+Can we add AI-generated “themes” to each signal so signals can be grouped into higher-level concepts like hiring pressure, capacity expansion, or regulatory risk?
+
+Required details:
+
+Add themes[] field to signals
+
+Themes generated via AI at ingestion or analysis time
+
+Allow multiple themes per signal
+
+Themes must be:
+
+Short
+
+Normalized
+
+Reusable across signals
+
+Ability to backfill themes on existing signals
+
+Why:
+Signal types are too coarse. Themes are how trends are built.
+
+3. Rolling Metrics Storage (Trend Baselines)
+
+Ask this exactly:
+
+Can we persist rolling signal metrics instead of calculating them on the fly so we can track change over time?
+
+Required details:
+
+Store rolling counts per:
+
+Industry
+
+Signal type
+
+Theme
+
+Time windows:
+
+7-day
+
+30-day
+
+Previous 30-day
+
+Persist snapshots daily or weekly
+
+Store deltas (e.g., +42%)
+
+Why:
+You can’t say “activity is up” without a stored baseline.
+
+4. Trend Object (New Intelligence Layer)
+
+Ask this exactly:
+
+Can we introduce a new “Trend” entity that summarizes aggregated signal movement and can be reused across dashboards, digests, and reports?
+
+Required details:
+
+Trend fields:
+
+scope_type (industry, company, region)
+
+scope_id
+
+signal_types[]
+
+themes[]
+
+time_window
+
+direction (up/down/flat)
+
+magnitude
+
+confidence
+
+explanation
+
+generated_at
+
+Trends generated on a schedule (weekly minimum)
+
+Trends stored, not generated ad hoc
+
+Why:
+This is the core “intelligence” object you sell.
+
+5. Company Intelligence Snapshot (Non-Article Output)
+
+Ask this exactly:
+
+Can we generate and store an auto-updating company intelligence snapshot that summarizes what changed for each company over a time window?
+
+Required details:
+
+Snapshot includes:
+
+Key changes (bulleted)
+
+Recent signals grouped by theme
+
+Relationship changes
+
+Risks & opportunities summary
+
+Generated weekly or on demand
+
+Stored with timestamp
+
+Viewable in the company profile
+
+Why:
+This is the fastest monetizable output.
+
+6. Industry Map Delta Mode (UX Instruction)
+
+Ask this exactly:
+
+Can we add a “Delta Mode” to the Industry Map that highlights only new or changed relationships in a selected time window?
+
+Required details:
+
+Filter by:
+
+Relationship type
+
+Time window
+
+Confidence threshold
+
+Default to recent changes, not full graph
+
+Visually distinguish new vs existing edges
+
+Why:
+Static maps are noise. Change is insight.
+
+7. Explicit Non-Goals (Important to Include)
+
+Tell them clearly:
+
+We are not asking for:
+
+Real-time streaming
+
+New external data sources
+
+ML model training
+
+A full UI redesign
+
+Why:
+This keeps scope tight and execution fast.
+
+How to Send This to Replit (Strongly Recommended)
+Option A: One Message, Numbered
+
+Send as a numbered list and say:
+
+Please confirm:
+
+What is already partially implemented
+
+What needs schema changes
+
+Estimated effort per item
+
+Any blockers

@@ -7,7 +7,7 @@ import {
   insertAlertSchema,
 } from "@shared/schema";
 import { z } from "zod";
-import { analyzeSignal, enrichSignal, batchEnrichSignals, extractRelationshipsFromSignal } from "./ai-analysis";
+import { analyzeSignal, enrichSignal, batchEnrichSignals, extractRelationshipsFromSignal, batchExtractThemes, generateTrendExplanation, THEME_TAXONOMY } from "./ai-analysis";
 import { generateArticleFromSignal, exportArticleForCMS } from "./article-generator";
 import { generateArticleWithClaude, type ClaudeModel } from "./claude-article-generator";
 import { monitorPoultryCompanies, monitorAllCompanies, monitorCompany, monitorUSPoultryCompanies, monitorCompaniesByCountry, monitorCompaniesByIndustry, enrichCompanies } from "./perplexity-monitor";
@@ -732,6 +732,109 @@ export async function registerRoutes(
     }
   });
 
+  // Backfill themes on existing signals
+  app.post("/api/signals/backfill-themes", async (req: Request, res: Response) => {
+    try {
+      const { limit = 50, force = false } = req.body;
+      
+      const allSignals = await storage.getAllSignals();
+      const companies = await storage.getAllCompanies();
+      const companyMap = new Map(companies.map(c => [c.id, c]));
+      
+      // Filter signals that need themes
+      const signalsNeedingThemes = force 
+        ? allSignals.slice(0, limit)
+        : allSignals.filter(s => !s.themes || s.themes.length === 0).slice(0, limit);
+      
+      if (signalsNeedingThemes.length === 0) {
+        return res.json({
+          success: true,
+          processed: 0,
+          message: "All signals already have themes"
+        });
+      }
+      
+      console.log(`Starting theme extraction for ${signalsNeedingThemes.length} signals...`);
+      
+      // Prepare signals with company info
+      const signalsWithCompanyInfo = signalsNeedingThemes.map(signal => {
+        const company = companyMap.get(signal.companyId);
+        return {
+          id: signal.id,
+          title: signal.title,
+          content: signal.content,
+          summary: signal.summary,
+          type: signal.type,
+          companyName: company?.name,
+          industry: company?.industry || undefined,
+        };
+      });
+      
+      // Batch extract themes
+      const themeResults = await batchExtractThemes(signalsWithCompanyInfo);
+      
+      // Update signals with themes
+      let updated = 0;
+      let failed = 0;
+      
+      for (const [signalId, result] of Array.from(themeResults.entries())) {
+        try {
+          await storage.updateSignal(signalId, {
+            themes: result.themes,
+            themesVersion: 1,
+          });
+          updated++;
+          console.log(`  Updated themes for signal ${signalId}: ${result.themes.join(", ")}`);
+        } catch (err) {
+          console.error(`  Failed to update signal ${signalId}:`, err);
+          failed++;
+        }
+      }
+      
+      const remaining = allSignals.filter(s => !s.themes || s.themes.length === 0).length - updated;
+      
+      res.json({
+        success: true,
+        processed: updated,
+        failed,
+        remaining: Math.max(0, remaining),
+        message: `Extracted themes for ${updated} signals (${failed} failed, ${remaining} remaining)`
+      });
+    } catch (error) {
+      console.error("Error backfilling themes:", error);
+      res.status(500).json({ error: "Failed to backfill themes" });
+    }
+  });
+
+  // Get theme backfill progress
+  app.get("/api/signals/theme-stats", async (req: Request, res: Response) => {
+    try {
+      const allSignals = await storage.getAllSignals();
+      const withThemes = allSignals.filter(s => s.themes && s.themes.length > 0);
+      const withoutThemes = allSignals.filter(s => !s.themes || s.themes.length === 0);
+      
+      // Count theme occurrences
+      const themeCounts: Record<string, number> = {};
+      for (const signal of withThemes) {
+        for (const theme of signal.themes || []) {
+          themeCounts[theme] = (themeCounts[theme] || 0) + 1;
+        }
+      }
+      
+      res.json({
+        total: allSignals.length,
+        withThemes: withThemes.length,
+        withoutThemes: withoutThemes.length,
+        percentComplete: Math.round((withThemes.length / allSignals.length) * 100),
+        themeCounts,
+        taxonomy: THEME_TAXONOMY,
+      });
+    } catch (error) {
+      console.error("Error getting theme stats:", error);
+      res.status(500).json({ error: "Failed to get theme stats" });
+    }
+  });
+
   // Article Generation - Generate draft article from signal
   app.post("/api/signals/:id/generate-article", async (req: Request, res: Response) => {
     try {
@@ -1251,6 +1354,67 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error backfilling signal entities:", error);
       res.status(500).json({ error: "Failed to backfill signal entities" });
+    }
+  });
+
+  // Trends API endpoints
+  app.get("/api/trends", async (req: Request, res: Response) => {
+    try {
+      const scopeType = req.query.scopeType as string | undefined;
+      const timeWindow = req.query.timeWindow as string | undefined;
+      const limit = parseInt(req.query.limit as string) || 50;
+      
+      const trends = await storage.getTrends(scopeType, timeWindow, limit);
+      res.json(trends);
+    } catch (error) {
+      console.error("Error fetching trends:", error);
+      res.status(500).json({ error: "Failed to fetch trends" });
+    }
+  });
+
+  app.get("/api/metrics", async (req: Request, res: Response) => {
+    try {
+      const scopeType = req.query.scopeType as string | undefined;
+      const scopeId = req.query.scopeId as string | undefined;
+      const period = req.query.period as string | undefined;
+      
+      const metrics = await storage.getSignalMetrics(scopeType, scopeId, period);
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error fetching metrics:", error);
+      res.status(500).json({ error: "Failed to fetch metrics" });
+    }
+  });
+
+  app.post("/api/admin/trends/generate", async (req: Request, res: Response) => {
+    try {
+      const adminToken = req.headers["x-admin-token"];
+      if (!process.env.ADMIN_TOKEN || adminToken !== process.env.ADMIN_TOKEN) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      
+      const { generateTrends } = await import("./trend-engine");
+      const result = await generateTrends();
+      res.json(result);
+    } catch (error) {
+      console.error("Error generating trends:", error);
+      res.status(500).json({ error: "Failed to generate trends" });
+    }
+  });
+
+  app.post("/api/admin/metrics/capture", async (req: Request, res: Response) => {
+    try {
+      const adminToken = req.headers["x-admin-token"];
+      if (!process.env.ADMIN_TOKEN || adminToken !== process.env.ADMIN_TOKEN) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      
+      const { captureSignalMetrics } = await import("./trend-engine");
+      const result = await captureSignalMetrics();
+      res.json(result);
+    } catch (error) {
+      console.error("Error capturing metrics:", error);
+      res.status(500).json({ error: "Failed to capture metrics" });
     }
   });
 
