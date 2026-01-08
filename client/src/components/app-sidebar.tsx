@@ -83,12 +83,22 @@ const industryGroups: Record<string, string[]> = {
 
 function getIndustryGroup(industry: string | null): string {
   if (!industry) return "Other";
-  // Check for exact group name match first (e.g., "Feed & Grain" should not match "Feed")
-  if (industryGroups[industry]) {
-    return industry;
-  }
+  
+  // Check for exact match in any group's array first
   for (const [group, industries] of Object.entries(industryGroups)) {
-    if (industries.some((i) => industry.toLowerCase().includes(i.toLowerCase()))) {
+    if (industries.some((i) => i.toLowerCase() === industry.toLowerCase())) {
+      return group;
+    }
+  }
+  
+  // Then check for partial matches (but skip "Feed" to avoid matching "Feed & Grain")
+  for (const [group, industries] of Object.entries(industryGroups)) {
+    if (industries.some((i) => {
+      if (i.toLowerCase() === "feed" && industry.toLowerCase().includes("grain")) {
+        return false; // Don't match "Feed" for "Feed & Grain"
+      }
+      return industry.toLowerCase().includes(i.toLowerCase());
+    })) {
       return group;
     }
   }
