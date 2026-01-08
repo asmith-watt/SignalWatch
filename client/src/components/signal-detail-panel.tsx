@@ -377,7 +377,7 @@ export function SignalDetailPanel({
   const hasEditorialInsights = keyTakeaways.length > 0 || industryImpact || storyAngles.length > 0 || suggestedFollowUp.length > 0;
 
   return (
-    <div className="h-full flex flex-col border-l bg-background">
+    <div className="h-full flex flex-col border-l bg-background" data-testid="signal-detail-panel">
       <div className="flex items-center justify-between p-4 border-b">
         <h2 className="text-lg font-semibold">Signal Details</h2>
         <Button variant="ghost" size="icon" onClick={onClose} data-testid="button-close-detail" aria-label="Close signal details">
