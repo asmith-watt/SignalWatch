@@ -9,8 +9,9 @@ import { SignalFeedSkeleton } from "@/components/loading-skeleton";
 import { EmptySignals, EmptyFilteredSignals } from "@/components/empty-states";
 import { WordPressPublishDialog } from "@/components/wordpress-publish-dialog";
 import { MediaSitePublishDialog } from "@/components/media-site-publish-dialog";
-import { ExpandedSignalCard } from "@/components/expanded-signal-card";
+import { SignalDetailPanel } from "@/components/signal-detail-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { Company, Signal } from "@shared/schema";
 
@@ -66,7 +67,7 @@ export function AllSignalsPage() {
 
   const [filters, setFilters] = useState<SignalFilters>(getInitialFilters);
   const [viewMode, setViewMode] = useState<"list" | "timeline">("list");
-  const [expandedSignalId, setExpandedSignalId] = useState<number | null>(null);
+  const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
   const [wpPublishSignalId, setWpPublishSignalId] = useState<number | null>(null);
   const [mediaSitePublishSignalId, setMediaSitePublishSignalId] = useState<number | null>(null);
 
@@ -132,22 +133,18 @@ export function AllSignalsPage() {
       result = result.filter((s) => !s.isRead);
     }
 
-    if (filters.entityQuery) {
-      const query = filters.entityQuery.toLowerCase();
-      result = result.filter((s) => {
-        const entityNames = extractEntityNames(s.entities);
-        const titleMatch = s.title.toLowerCase().includes(query);
-        const contentMatch = s.content?.toLowerCase().includes(query) || false;
-        const summaryMatch = s.summary?.toLowerCase().includes(query) || false;
-        const entityMatch = entityNames.some(name => name.includes(query));
-        return titleMatch || contentMatch || summaryMatch || entityMatch;
+    if (filters.entityQuery && filters.entityQuery.trim() !== "") {
+      const query = filters.entityQuery.toLowerCase().trim();
+      result = result.filter((signal) => {
+        const entityNames = extractEntityNames(signal.entities);
+        return entityNames.some(name => name.includes(query));
       });
     }
 
-    if (filters.industry !== "all") {
-      result = result.filter((s) => {
-        const company = companyMap.get(s.companyId);
-        return company && company.industry === filters.industry;
+    if (filters.industry && filters.industry !== "all") {
+      result = result.filter((signal) => {
+        const company = companyMap.get(signal.companyId);
+        return company?.industry === filters.industry;
       });
     }
 
@@ -189,25 +186,37 @@ export function AllSignalsPage() {
 
   const handleBookmark = (id: number, bookmarked: boolean) => {
     updateSignalMutation.mutate({ id, updates: { isBookmarked: bookmarked } });
+    if (selectedSignal?.id === id) {
+      setSelectedSignal({ ...selectedSignal, isBookmarked: bookmarked });
+    }
   };
 
   const handleMarkRead = (id: number, read: boolean) => {
     updateSignalMutation.mutate({ id, updates: { isRead: read } });
+    if (selectedSignal?.id === id) {
+      setSelectedSignal({ ...selectedSignal, isRead: read });
+    }
   };
 
   const handleSignalClick = (signal: Signal) => {
     if (!signal.isRead) {
       handleMarkRead(signal.id, true);
     }
-    setExpandedSignalId(expandedSignalId === signal.id ? null : signal.id);
+    setSelectedSignal(selectedSignal?.id === signal.id ? null : signal);
   };
 
   const handleUpdateStatus = (id: number, status: string) => {
     updateSignalMutation.mutate({ id, updates: { contentStatus: status } });
+    if (selectedSignal?.id === id) {
+      setSelectedSignal({ ...selectedSignal, contentStatus: status });
+    }
   };
 
   const handleUpdateNotes = (id: number, notes: string) => {
     updateSignalMutation.mutate({ id, updates: { notes } });
+    if (selectedSignal?.id === id) {
+      setSelectedSignal({ ...selectedSignal, notes });
+    }
   };
 
   const handleEntitySelect = (entityName: string) => {
@@ -227,107 +236,104 @@ export function AllSignalsPage() {
     filters.unread ||
     filters.entityQuery !== "";
 
+  const selectedCompany = selectedSignal ? companyMap.get(selectedSignal.companyId) : undefined;
+
   return (
     <div className="flex h-full">
-      <div className="flex-1 flex flex-col">
-        <div className="p-6 space-y-6 overflow-auto">
-          <div>
-            <h1 className="text-2xl font-semibold flex items-center gap-2">
-              <Radio className="w-6 h-6" />
-              All Signals
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              View and manage signals from all monitored companies
-            </p>
-          </div>
+      <div className="flex-1 flex flex-col min-w-0">
+        <ScrollArea className="flex-1">
+          <div className="p-6 space-y-6">
+            <div>
+              <h1 className="text-2xl font-semibold flex items-center gap-2">
+                <Radio className="w-6 h-6" />
+                All Signals
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                View and manage signals from all monitored companies
+              </p>
+            </div>
 
-          <SignalFiltersBar
-            filters={filters}
-            onFiltersChange={setFilters}
-            resultCount={filteredSignals.length}
-          />
+            <SignalFiltersBar
+              filters={filters}
+              onFiltersChange={setFilters}
+              resultCount={filteredSignals.length}
+            />
 
-          <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "list" | "timeline")}>
-            <TabsList>
-              <TabsTrigger value="list">List View</TabsTrigger>
-              <TabsTrigger value="timeline">Timeline</TabsTrigger>
-            </TabsList>
+            <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "list" | "timeline")}>
+              <TabsList>
+                <TabsTrigger value="list">List View</TabsTrigger>
+                <TabsTrigger value="timeline">Timeline</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="list" className="mt-4">
-              {signalsLoading ? (
-                <SignalFeedSkeleton />
-              ) : filteredSignals.length === 0 ? (
-                hasActiveFilters ? (
-                  <EmptyFilteredSignals onClearFilters={clearFilters} />
+              <TabsContent value="list" className="mt-4">
+                {signalsLoading ? (
+                  <SignalFeedSkeleton />
+                ) : filteredSignals.length === 0 ? (
+                  hasActiveFilters ? (
+                    <EmptyFilteredSignals onClearFilters={clearFilters} />
+                  ) : (
+                    <EmptySignals />
+                  )
                 ) : (
-                  <EmptySignals />
-                )
-              ) : (
-                <div className="space-y-3">
-                  {filteredSignals.map((signal) => {
-                    const company = companies.find(
-                      (c) => c.id === signal.companyId
-                    );
-                    const isExpanded = expandedSignalId === signal.id;
-                    
-                    if (isExpanded) {
+                  <div className="space-y-3">
+                    {filteredSignals.map((signal) => {
+                      const company = companyMap.get(signal.companyId);
                       return (
-                        <ExpandedSignalCard
+                        <SignalCard
                           key={signal.id}
                           signal={signal}
                           company={company}
-                          onCollapse={() => setExpandedSignalId(null)}
-                          onBookmark={handleBookmark}
-                          onUpdateStatus={handleUpdateStatus}
-                          onUpdateNotes={handleUpdateNotes}
-                          onEntitySelect={handleEntitySelect}
+                          mode="compact"
+                          onOpen={() => handleSignalClick(signal)}
+                          onToggleBookmark={handleBookmark}
+                          onMarkRead={handleMarkRead}
                           onPublishWordPress={(id) => setWpPublishSignalId(id)}
                           onPublishMediaSite={(id) => setMediaSitePublishSignalId(id)}
                         />
                       );
-                    }
-                    
-                    return (
-                      <SignalCard
-                        key={signal.id}
-                        signal={signal}
-                        company={company}
-                        mode="compact"
-                        onOpen={() => handleSignalClick(signal)}
-                        onToggleBookmark={handleBookmark}
-                        onMarkRead={handleMarkRead}
-                        onPublishWordPress={(id) => setWpPublishSignalId(id)}
-                        onPublishMediaSite={(id) => setMediaSitePublishSignalId(id)}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-            </TabsContent>
+                    })}
+                  </div>
+                )}
+              </TabsContent>
 
-            <TabsContent value="timeline" className="mt-4">
-              {signalsLoading ? (
-                <SignalFeedSkeleton />
-              ) : filteredSignals.length === 0 ? (
-                hasActiveFilters ? (
-                  <EmptyFilteredSignals onClearFilters={clearFilters} />
+              <TabsContent value="timeline" className="mt-4">
+                {signalsLoading ? (
+                  <SignalFeedSkeleton />
+                ) : filteredSignals.length === 0 ? (
+                  hasActiveFilters ? (
+                    <EmptyFilteredSignals onClearFilters={clearFilters} />
+                  ) : (
+                    <EmptySignals />
+                  )
                 ) : (
-                  <EmptySignals />
-                )
-              ) : (
-                <SignalTimeline
-                  signals={filteredSignals}
-                  companies={companies}
-                  onBookmark={handleBookmark}
-                  onMarkRead={handleMarkRead}
-                  onSignalClick={handleSignalClick}
-                  onEntitySelect={handleEntitySelect}
-                />
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
+                  <SignalTimeline
+                    signals={filteredSignals}
+                    companies={companies}
+                    onBookmark={handleBookmark}
+                    onMarkRead={handleMarkRead}
+                    onSignalClick={handleSignalClick}
+                    onEntitySelect={handleEntitySelect}
+                  />
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
+        </ScrollArea>
       </div>
+
+      {selectedSignal && (
+        <div className="w-[400px] flex-shrink-0 border-l">
+          <SignalDetailPanel
+            signal={selectedSignal}
+            company={selectedCompany}
+            onClose={() => setSelectedSignal(null)}
+            onBookmark={handleBookmark}
+            onUpdateStatus={handleUpdateStatus}
+            onUpdateNotes={handleUpdateNotes}
+            onEntitySelect={handleEntitySelect}
+          />
+        </div>
+      )}
 
       <WordPressPublishDialog
         signalId={wpPublishSignalId}
