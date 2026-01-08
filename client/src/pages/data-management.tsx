@@ -11,7 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Download, Upload, Database, Building2, Radio, Loader2, CheckCircle, Sparkles, Calendar, AlertTriangle, Check, RefreshCw, Link2, Brain, Info, Cloud } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ScanHistory } from "@/components/scan-history";
 import type { Company, Signal, Article } from "@shared/schema";
 import { format } from "date-fns";
 import { FileText, ExternalLink } from "lucide-react";
@@ -821,8 +820,6 @@ export function DataManagementPage() {
             </Tabs>
           </CardContent>
         </Card>
-
-        <ScanHistory />
 
         <Card>
           <CardHeader>
