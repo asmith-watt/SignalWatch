@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useSearch } from "wouter";
-import { Activity, Calendar, TrendingUp, X } from "lucide-react";
+import { Activity, Calendar, TrendingUp, X, AlertCircle } from "lucide-react";
 import { format, parseISO, isToday, isYesterday } from "date-fns";
 import { SignalCard } from "@/components/signal-card";
 import { SignalFeedSkeleton } from "@/components/loading-skeleton";
@@ -21,6 +21,14 @@ interface ScanHistoryItem {
   date: string;
   industry: string;
   signalsFound: number;
+}
+
+interface DateStats {
+  total: number;
+  withVerifiedDate: number;
+  needsReview: number;
+  bySource: Record<string, number>;
+  avgConfidence: number;
 }
 
 function formatDate(dateStr: string): string {
@@ -58,6 +66,7 @@ export function AllSignalsPage() {
   };
 
   const [selectedFilter, setSelectedFilter] = useState<{ industry: string; date: string | null } | null>(getInitialSelection);
+  const [showUnknownDates, setShowUnknownDates] = useState(false);
   const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
   const [wpPublishSignalId, setWpPublishSignalId] = useState<number | null>(null);
   const [mediaSitePublishSignalId, setMediaSitePublishSignalId] = useState<number | null>(null);
@@ -82,6 +91,10 @@ export function AllSignalsPage() {
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
+  });
+
+  const { data: dateStats } = useQuery<DateStats>({
+    queryKey: ["/api/signals/date-stats"],
   });
 
   const companyMap = useMemo(() => {
@@ -130,6 +143,16 @@ export function AllSignalsPage() {
   const hasMoreHistory = allGroupedHistory.length > daysToShow;
 
   const filteredSignals = useMemo(() => {
+    // Special case: show signals needing date review
+    if (showUnknownDates) {
+      return signals.filter((signal) => signal.needsDateReview === true)
+        .sort((a, b) => {
+          const dateA = new Date(a.gatheredAt);
+          const dateB = new Date(b.gatheredAt);
+          return dateB.getTime() - dateA.getTime();
+        });
+    }
+    
     if (!selectedFilter) return [];
     
     const { industry, date } = selectedFilter;
@@ -152,14 +175,25 @@ export function AllSignalsPage() {
       const dateB = b.publishedAt ? new Date(b.publishedAt) : new Date(b.createdAt);
       return dateB.getTime() - dateA.getTime();
     });
-  }, [signals, selectedFilter, companyMap]);
+  }, [signals, selectedFilter, companyMap, showUnknownDates]);
 
   const handleBadgeClick = (industry: string, date: string) => {
+    setShowUnknownDates(false);
     if (selectedFilter?.industry === industry && selectedFilter?.date === date) {
       setSelectedFilter(null);
       setSelectedSignal(null);
     } else {
       setSelectedFilter({ industry, date });
+      setSelectedSignal(null);
+    }
+  };
+
+  const handleUnknownDatesClick = () => {
+    if (showUnknownDates) {
+      setShowUnknownDates(false);
+    } else {
+      setSelectedFilter(null);
+      setShowUnknownDates(true);
       setSelectedSignal(null);
     }
   };
@@ -285,12 +319,30 @@ export function AllSignalsPage() {
               </Card>
             )}
 
-            {selectedFilter && (
+            {dateStats && dateStats.needsReview > 0 && (
+              <Button
+                variant={showUnknownDates ? "default" : "outline"}
+                className="flex items-center gap-2"
+                onClick={handleUnknownDatesClick}
+                data-testid="button-unknown-dates-filter"
+              >
+                <AlertCircle className="w-4 h-4" />
+                <span>Signals with Unknown Date: {dateStats.needsReview}</span>
+                {showUnknownDates && (
+                  <X className="w-3 h-3 ml-1" />
+                )}
+              </Button>
+            )}
+
+            {(selectedFilter || showUnknownDates) && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <h2 className="text-lg font-medium">
-                      {selectedFilter.industry}{selectedFilter.date ? ` - ${formatDate(selectedFilter.date)}` : " - All Dates"}
+                      {showUnknownDates 
+                        ? "Signals with Unknown Date"
+                        : `${selectedFilter?.industry}${selectedFilter?.date ? ` - ${formatDate(selectedFilter.date)}` : " - All Dates"}`
+                      }
                     </h2>
                     <Badge variant="outline" className="text-xs">
                       {filteredSignals.length} signals
@@ -301,6 +353,7 @@ export function AllSignalsPage() {
                     size="sm"
                     onClick={() => {
                       setSelectedFilter(null);
+                      setShowUnknownDates(false);
                       setSelectedSignal(null);
                     }}
                     data-testid="button-clear-filter"

@@ -1418,6 +1418,53 @@ export async function registerRoutes(
     }
   });
 
+  // Admin endpoint to backfill/fix signal dates
+  app.post("/api/admin/dates/backfill", async (req: Request, res: Response) => {
+    try {
+      const adminToken = req.headers["x-admin-token"];
+      if (!process.env.ADMIN_TOKEN || adminToken !== process.env.ADMIN_TOKEN) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      
+      const { backfillSignalDates } = await import("./date-verifier");
+      const { companyId, limit = 100, onlySuspicious = true } = req.body;
+      
+      const result = await backfillSignalDates({
+        companyId: companyId ? parseInt(companyId) : undefined,
+        limit: parseInt(limit),
+        onlySuspicious,
+      });
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error backfilling dates:", error);
+      res.status(500).json({ error: "Failed to backfill dates" });
+    }
+  });
+
+  // Get date quality stats
+  app.get("/api/signals/date-stats", async (req: Request, res: Response) => {
+    try {
+      const stats = await storage.getDateQualityStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching date stats:", error);
+      res.status(500).json({ error: "Failed to fetch date stats" });
+    }
+  });
+
+  // Get signals that need date review
+  app.get("/api/signals/needs-date-review", async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const signals = await storage.getSignalsNeedingDateReview(limit);
+      res.json(signals);
+    } catch (error) {
+      console.error("Error fetching signals needing date review:", error);
+      res.status(500).json({ error: "Failed to fetch signals needing date review" });
+    }
+  });
+
   app.post("/api/monitor/company/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);

@@ -136,6 +136,15 @@ function deriveEntityChips(signal: Signal, company?: Company | null): EntityChip
   return chips.slice(0, 4);
 }
 
+const FRESHNESS_WINDOW_DAYS = 60;
+
+function isSignalHistorical(signal: Signal): boolean {
+  if (!signal.publishedAt) return false;
+  const freshnessDate = new Date(Date.now() - FRESHNESS_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+  const signalDate = new Date(signal.publishedAt);
+  return signalDate < freshnessDate;
+}
+
 function renderBadges(signal: Signal): JSX.Element[] {
   const badges: JSX.Element[] = [];
   const aiAnalysis = signal.aiAnalysis as AIAnalysis | null;
@@ -145,6 +154,20 @@ function renderBadges(signal: Signal): JSX.Element[] {
       {signal.type.replace(/_/g, " ")}
     </Badge>
   );
+  
+  if (signal.needsDateReview) {
+    badges.push(
+      <Badge key="date-review" variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-500" data-testid={`badge-date-review-${signal.id}`}>
+        Unknown Date
+      </Badge>
+    );
+  } else if (isSignalHistorical(signal)) {
+    badges.push(
+      <Badge key="historical" variant="outline" className="text-muted-foreground" data-testid={`badge-historical-${signal.id}`}>
+        Historical
+      </Badge>
+    );
+  }
   
   if (signal.priority === "high") {
     badges.push(
@@ -185,7 +208,7 @@ function renderBadges(signal: Signal): JSX.Element[] {
     );
   }
   
-  if (aiAnalysis?.priorityScore !== undefined && badges.length < 5) {
+  if (aiAnalysis?.priorityScore !== undefined && badges.length < 6) {
     badges.push(
       <Badge key="score" variant="outline" data-testid={`badge-score-${signal.id}`}>
         Score: {aiAnalysis.priorityScore}
@@ -193,7 +216,7 @@ function renderBadges(signal: Signal): JSX.Element[] {
     );
   }
   
-  return badges.slice(0, 5);
+  return badges.slice(0, 6);
 }
 
 export function SignalCard({

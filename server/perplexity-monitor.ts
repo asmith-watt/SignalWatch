@@ -9,6 +9,7 @@ import {
 } from "./dedupe";
 import { computePriorityScore, getRecommendedFormat } from "./priority-scoring";
 import { linkSignalToEntities } from "./graph";
+import { extractVerifiedDate } from "./date-verifier";
 
 const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
 
@@ -251,7 +252,14 @@ export async function monitorCompany(company: Company): Promise<MonitorResult> {
   
   for (const signal of signals) {
     const gatheredAt = new Date();
-    const publishedAt = signal.publishedAt ? new Date(signal.publishedAt) : null;
+    
+    // Verify the date from the source URL instead of trusting Perplexity blindly
+    const dateVerification = await extractVerifiedDate(
+      signal.sourceUrl,
+      signal.publishedAt || null
+    );
+    
+    const publishedAt = dateVerification.publishedAt;
     
     // Generate new sha256-based stable hash
     const hash = generateStableHash(
@@ -302,10 +310,17 @@ export async function monitorCompany(company: Company): Promise<MonitorResult> {
       isBookmarked: false,
       contentStatus: "new",
       hash,
+      dateSource: dateVerification.dateSource,
+      dateConfidence: dateVerification.dateConfidence,
+      needsDateReview: dateVerification.needsDateReview,
     };
 
     const createdSignal = await storage.createSignal(signalData);
-    console.log(`  Created signal: ${signal.title} (novelty: ${noveltyScore})`);
+    console.log(`  Created signal: ${signal.title} (date: ${dateVerification.dateSource}/${dateVerification.dateConfidence}%, novelty: ${noveltyScore})`);
+    
+    if (dateVerification.needsDateReview) {
+      console.log(`    -> Flagged for date review (publishedAt=${publishedAt ? publishedAt.toISOString().split('T')[0] : 'null'})`);
+    }
     
     // Add the new signal to candidates for subsequent near-dupe checks in this batch
     candidatesForNearDupe.push({

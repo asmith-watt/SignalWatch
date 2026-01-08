@@ -2,6 +2,38 @@ import { storage } from "./storage";
 import { generateTrendExplanation } from "./ai-analysis";
 import type { Signal, InsertSignalMetric, InsertTrend } from "@shared/schema";
 
+// Default freshness window in days - signals older than this are excluded from metrics/trends
+const DEFAULT_FRESHNESS_WINDOW_DAYS = 60;
+
+function getFreshnessWindowDays(): number {
+  const envValue = process.env.FRESHNESS_WINDOW_DAYS;
+  if (envValue) {
+    const parsed = parseInt(envValue, 10);
+    if (!isNaN(parsed) && parsed > 0) return parsed;
+  }
+  return DEFAULT_FRESHNESS_WINDOW_DAYS;
+}
+
+// Filter signals to only include fresh ones with verified dates
+function filterFreshSignals(signals: Signal[]): Signal[] {
+  const freshnessWindowDays = getFreshnessWindowDays();
+  const freshnessDate = new Date(Date.now() - freshnessWindowDays * 24 * 60 * 60 * 1000);
+  
+  return signals.filter(s => {
+    // Exclude signals needing date review from metrics/trends
+    if (s.needsDateReview) return false;
+    
+    // Exclude signals without publishedAt from metrics/trends
+    if (!s.publishedAt) return false;
+    
+    // Exclude signals older than freshness window
+    const signalDate = new Date(s.publishedAt);
+    if (signalDate < freshnessDate) return false;
+    
+    return true;
+  });
+}
+
 interface IndustryMetrics {
   industry: string;
   count7d: number;
@@ -18,9 +50,13 @@ export async function captureSignalMetrics(): Promise<{
 }> {
   console.log("[TrendEngine] Starting metrics snapshot...");
   
-  const signals = await storage.getAllSignals();
+  const allSignals = await storage.getAllSignals();
   const companies = await storage.getAllCompanies();
   const companyMap = new Map(companies.map(c => [c.id, c]));
+  
+  // Filter to only fresh signals with verified dates
+  const signals = filterFreshSignals(allSignals);
+  console.log(`[TrendEngine] Using ${signals.length} fresh signals out of ${allSignals.length} total`);
   
   const now = new Date();
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -152,9 +188,13 @@ export async function generateTrends(): Promise<{
 }> {
   console.log("[TrendEngine] Starting trend generation...");
   
-  const signals = await storage.getAllSignals();
+  const allSignals = await storage.getAllSignals();
   const companies = await storage.getAllCompanies();
   const companyMap = new Map(companies.map(c => [c.id, c]));
+  
+  // Filter to only fresh signals with verified dates for trend analysis
+  const signals = filterFreshSignals(allSignals);
+  console.log(`[TrendEngine] Using ${signals.length} fresh signals out of ${allSignals.length} total for trends`);
   
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);

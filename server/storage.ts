@@ -115,6 +115,16 @@ export interface IStorage {
   getTrends(scopeType?: string, timeWindow?: string, limit?: number): Promise<Trend[]>;
   getLatestTrends(limit?: number): Promise<Trend[]>;
   deleteTrend(id: number): Promise<void>;
+
+  // Date Quality
+  getDateQualityStats(): Promise<{
+    total: number;
+    withVerifiedDate: number;
+    needsReview: number;
+    bySource: Record<string, number>;
+    avgConfidence: number;
+  }>;
+  getSignalsNeedingDateReview(limit?: number): Promise<Signal[]>;
 }
 
 export interface RelatedSignalResult {
@@ -685,6 +695,52 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTrend(id: number): Promise<void> {
     await db.delete(trends).where(eq(trends.id, id));
+  }
+
+  // Date Quality
+  async getDateQualityStats(): Promise<{
+    total: number;
+    withVerifiedDate: number;
+    needsReview: number;
+    bySource: Record<string, number>;
+    avgConfidence: number;
+  }> {
+    const allSignals = await db.select({
+      dateSource: signals.dateSource,
+      dateConfidence: signals.dateConfidence,
+      needsDateReview: signals.needsDateReview,
+      publishedAt: signals.publishedAt,
+    }).from(signals);
+    
+    const total = allSignals.length;
+    const withVerifiedDate = allSignals.filter(s => s.publishedAt && s.dateConfidence && s.dateConfidence >= 70).length;
+    const needsReview = allSignals.filter(s => s.needsDateReview === true).length;
+    
+    const bySource: Record<string, number> = {};
+    for (const s of allSignals) {
+      const source = s.dateSource || 'unknown';
+      bySource[source] = (bySource[source] || 0) + 1;
+    }
+    
+    const confidenceValues = allSignals.filter(s => s.dateConfidence != null).map(s => s.dateConfidence!);
+    const avgConfidence = confidenceValues.length > 0 
+      ? Math.round(confidenceValues.reduce((a, b) => a + b, 0) / confidenceValues.length)
+      : 0;
+    
+    return {
+      total,
+      withVerifiedDate,
+      needsReview,
+      bySource,
+      avgConfidence,
+    };
+  }
+
+  async getSignalsNeedingDateReview(limit: number = 50): Promise<Signal[]> {
+    return db.select().from(signals)
+      .where(eq(signals.needsDateReview, true))
+      .orderBy(desc(signals.gatheredAt))
+      .limit(limit);
   }
 }
 
