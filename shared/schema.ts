@@ -107,6 +107,17 @@ export const dateSourceTypes = [
 
 export type DateSource = (typeof dateSourceTypes)[number];
 
+// Source status types for tracking URL accessibility
+export const sourceStatusTypes = [
+  "accessible",    // URL was reachable and content fetched
+  "inaccessible",  // URL returned 4xx/5xx error or connection failed
+  "timeout",       // URL request timed out
+  "blocked",       // Access blocked by robots/paywall
+  "unknown",       // Not yet checked
+] as const;
+
+export type SourceStatus = (typeof sourceStatusTypes)[number];
+
 // Signals table - captured business intelligence
 export const signals = pgTable("signals", {
   id: serial("id").primaryKey(),
@@ -135,6 +146,7 @@ export const signals = pgTable("signals", {
   dateSource: text("date_source").default("unknown"),
   dateConfidence: integer("date_confidence").default(0),
   needsDateReview: boolean("needs_date_review").default(false),
+  sourceStatus: text("source_status").default("unknown"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 

@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 import { storage } from './storage';
-import type { DateSource } from '@shared/schema';
+import type { DateSource, SourceStatus } from '@shared/schema';
 
 interface DateVerificationResult {
   signalId: number;
@@ -683,21 +683,143 @@ export async function extractVerifiedDate(
   }
 }
 
+// Check source URL accessibility and extract HTML if accessible
+async function checkSourceAccessibility(url: string): Promise<{
+  status: SourceStatus;
+  html: string | null;
+  error?: string;
+}> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; SignalWatch/1.0; Business Intelligence)',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+      redirect: 'follow',
+    });
+    
+    clearTimeout(timeout);
+    
+    if (response.status === 403 || response.status === 401) {
+      return { status: 'blocked', html: null, error: `HTTP ${response.status}` };
+    }
+    
+    if (!response.ok) {
+      return { status: 'inaccessible', html: null, error: `HTTP ${response.status}` };
+    }
+    
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('text/html') && !contentType.includes('application/xhtml')) {
+      return { status: 'inaccessible', html: null, error: 'Not HTML content' };
+    }
+    
+    const html = await response.text();
+    return { status: 'accessible', html };
+    
+  } catch (error: any) {
+    clearTimeout(timeout);
+    if (error.name === 'AbortError') {
+      return { status: 'timeout', html: null, error: 'Request timed out' };
+    }
+    return { status: 'inaccessible', html: null, error: error.message };
+  }
+}
+
+// Extract date from already-fetched HTML
+function extractDateFromHtml(html: string, sourceUrl: string): DateExtractionResult {
+  const $ = cheerio.load(html);
+  
+  // Try structured data (highest confidence)
+  const jsonLdScripts = $('script[type="application/ld+json"]');
+  for (let i = 0; i < jsonLdScripts.length; i++) {
+    try {
+      const content = $(jsonLdScripts[i]).html();
+      if (!content) continue;
+      const data = JSON.parse(content);
+      const items = Array.isArray(data) ? data : [data];
+      for (const item of items) {
+        const dateStr = item.datePublished || item.dateCreated || item.dateModified;
+        if (dateStr) {
+          const parsed = new Date(dateStr);
+          if (!isNaN(parsed.getTime())) {
+            return { publishedAt: parsed, dateSource: 'metadata', dateConfidence: 95, needsDateReview: false };
+          }
+        }
+      }
+    } catch {}
+  }
+  
+  // Try OpenGraph and meta tags (high confidence)
+  const ogDate = $('meta[property="article:published_time"]').attr('content') ||
+                 $('meta[property="og:published_time"]').attr('content') ||
+                 $('meta[name="date"]').attr('content') ||
+                 $('meta[name="DC.date"]').attr('content') ||
+                 $('meta[name="pubdate"]').attr('content');
+  if (ogDate) {
+    const parsed = new Date(ogDate);
+    if (!isNaN(parsed.getTime())) {
+      return { publishedAt: parsed, dateSource: 'metadata', dateConfidence: 90, needsDateReview: false };
+    }
+  }
+  
+  // Try time elements (medium-high confidence)
+  const timeElements = $('time[datetime], time[pubdate]');
+  for (let i = 0; i < timeElements.length; i++) {
+    const datetime = $(timeElements[i]).attr('datetime');
+    if (datetime) {
+      const parsed = new Date(datetime);
+      if (!isNaN(parsed.getTime())) {
+        return { publishedAt: parsed, dateSource: 'content', dateConfidence: 80, needsDateReview: false };
+      }
+    }
+  }
+  
+  // Try date from content (lower confidence)
+  const articleText = $('article, .article, .post, .content, main').first().text().slice(0, 2000);
+  const extractedDate = parseExtractedDate(articleText);
+  if (extractedDate) {
+    const parsed = new Date(extractedDate);
+    if (!isNaN(parsed.getTime())) {
+      return { publishedAt: parsed, dateSource: 'content', dateConfidence: 70, needsDateReview: false };
+    }
+  }
+  
+  // Try page header area (low confidence)
+  const headerText = $('header, .header, .byline, .meta').first().text().slice(0, 500);
+  const headerDate = parseExtractedDate(headerText);
+  if (headerDate) {
+    const parsed = new Date(headerDate);
+    if (!isNaN(parsed.getTime())) {
+      return { publishedAt: parsed, dateSource: 'content', dateConfidence: 50, needsDateReview: true };
+    }
+  }
+  
+  return { publishedAt: null, dateSource: 'unknown', dateConfidence: 0, needsDateReview: true };
+}
+
 // Backfill job to re-verify dates on existing signals
 export async function backfillSignalDates(options: {
   companyId?: number;
   limit?: number;
   onlySuspicious?: boolean;
+  onlyUnverified?: boolean;
+  skipInaccessible?: boolean;
 }): Promise<{
   processed: number;
   fixed: number;
   flaggedForReview: number;
+  inaccessible: number;
   errors: number;
 }> {
   const limit = options.limit || 100;
   let processed = 0;
   let fixed = 0;
   let flaggedForReview = 0;
+  let inaccessible = 0;
   let errors = 0;
 
   // Get signals to process
@@ -707,15 +829,23 @@ export async function backfillSignalDates(options: {
     signals = signals.filter(s => s.companyId === options.companyId);
   }
   
-  // Filter to suspicious signals if requested
+  // Filter to only unverified signals (dateSource='unknown') - this is the key filter
+  if (options.onlyUnverified !== false) {
+    signals = signals.filter(s => !s.dateSource || s.dateSource === 'unknown');
+  }
+  
+  // Skip signals we already know are inaccessible
+  if (options.skipInaccessible !== false) {
+    signals = signals.filter(s => !s.sourceStatus || s.sourceStatus === 'unknown');
+  }
+  
+  // Filter to suspicious signals if requested (legacy support)
   if (options.onlySuspicious) {
     signals = signals.filter(s => {
-      // Suspicious if publishedAt is very close to gatheredAt (within 1 hour)
       if (s.publishedAt && s.gatheredAt) {
         const diff = Math.abs(new Date(s.publishedAt).getTime() - new Date(s.gatheredAt).getTime());
-        return diff < 60 * 60 * 1000; // 1 hour
+        return diff < 60 * 60 * 1000;
       }
-      // Or if no date_source set
       return !s.dateSource || s.dateSource === 'unknown';
     });
   }
@@ -724,28 +854,42 @@ export async function backfillSignalDates(options: {
   signals = signals.filter(s => s.sourceUrl && s.sourceUrl.startsWith('http'));
   signals = signals.slice(0, limit);
 
-  console.log(`Backfilling dates for ${signals.length} signals...`);
+  console.log(`[Backfill] Processing ${signals.length} signals (out of ${limit} limit)...`);
 
   for (const signal of signals) {
     try {
-      const result = await extractVerifiedDate(
-        signal.sourceUrl,
-        signal.publishedAt ? new Date(signal.publishedAt).toISOString().split('T')[0] : null
-      );
+      // Step 1: Verify source URL is accessible
+      const sourceCheck = await checkSourceAccessibility(signal.sourceUrl!);
       
+      // Update source status regardless of accessibility
       const updates: any = {
-        dateSource: result.dateSource,
-        dateConfidence: result.dateConfidence,
-        needsDateReview: result.needsDateReview,
+        sourceStatus: sourceCheck.status,
       };
+      
+      if (sourceCheck.status !== 'accessible') {
+        // Source not accessible - just update status and move on
+        updates.dateSource = 'unknown';
+        updates.dateConfidence = 0;
+        updates.needsDateReview = true;
+        await storage.updateSignal(signal.id, updates);
+        inaccessible++;
+        processed++;
+        console.log(`  [${signal.id}] ${signal.title.slice(0, 40)}... -> ${sourceCheck.status} (${sourceCheck.error})`);
+        continue;
+      }
+      
+      // Step 2: Source is accessible - extract date from HTML
+      const result = extractDateFromHtml(sourceCheck.html!, signal.sourceUrl!);
+      
+      updates.dateSource = result.dateSource;
+      updates.dateConfidence = result.dateConfidence;
+      updates.needsDateReview = result.needsDateReview;
       
       // Update publishedAt only if we got a high-confidence result
       if (result.publishedAt && result.dateConfidence >= 70) {
         updates.publishedAt = result.publishedAt;
         fixed++;
       } else if (!result.publishedAt || result.dateConfidence < 50) {
-        // Clear publishedAt if we couldn't verify it
-        updates.publishedAt = null;
         updates.needsDateReview = true;
         flaggedForReview++;
       }
@@ -753,16 +897,16 @@ export async function backfillSignalDates(options: {
       await storage.updateSignal(signal.id, updates);
       processed++;
       
-      console.log(`  [${signal.id}] ${signal.title.slice(0, 50)}... -> ${result.dateSource}/${result.dateConfidence}%`);
+      console.log(`  [${signal.id}] ${signal.title.slice(0, 40)}... -> ${result.dateSource}/${result.dateConfidence}%`);
       
-      // Rate limiting
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Rate limiting - 300ms between requests
+      await new Promise(resolve => setTimeout(resolve, 300));
     } catch (error) {
       console.error(`Error processing signal ${signal.id}:`, error);
       errors++;
     }
   }
 
-  console.log(`Backfill complete: ${processed} processed, ${fixed} fixed, ${flaggedForReview} flagged, ${errors} errors`);
-  return { processed, fixed, flaggedForReview, errors };
+  console.log(`[Backfill] Complete: ${processed} processed, ${fixed} fixed, ${flaggedForReview} flagged, ${inaccessible} inaccessible, ${errors} errors`);
+  return { processed, fixed, flaggedForReview, inaccessible, errors };
 }
