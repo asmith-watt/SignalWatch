@@ -256,9 +256,35 @@ export async function registerRoutes(
     }
   });
 
+  // Get date quality stats - must come before :id route
+  app.get("/api/signals/date-stats", async (req: Request, res: Response) => {
+    try {
+      const stats = await storage.getDateQualityStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching date stats:", error);
+      res.status(500).json({ error: "Failed to fetch date stats" });
+    }
+  });
+
+  // Get signals that need date review - must come before :id route
+  app.get("/api/signals/needs-date-review", async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const signals = await storage.getSignalsNeedingDateReview(limit);
+      res.json(signals);
+    } catch (error) {
+      console.error("Error fetching signals needing date review:", error);
+      res.status(500).json({ error: "Failed to fetch signals needing date review" });
+    }
+  });
+
   app.get("/api/signals/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid signal ID" });
+      }
       const signal = await storage.getSignal(id);
       if (!signal) {
         return res.status(404).json({ error: "Signal not found" });
@@ -1439,29 +1465,6 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error backfilling dates:", error);
       res.status(500).json({ error: "Failed to backfill dates" });
-    }
-  });
-
-  // Get date quality stats
-  app.get("/api/signals/date-stats", async (req: Request, res: Response) => {
-    try {
-      const stats = await storage.getDateQualityStats();
-      res.json(stats);
-    } catch (error) {
-      console.error("Error fetching date stats:", error);
-      res.status(500).json({ error: "Failed to fetch date stats" });
-    }
-  });
-
-  // Get signals that need date review
-  app.get("/api/signals/needs-date-review", async (req: Request, res: Response) => {
-    try {
-      const limit = parseInt(req.query.limit as string) || 50;
-      const signals = await storage.getSignalsNeedingDateReview(limit);
-      res.json(signals);
-    } catch (error) {
-      console.error("Error fetching signals needing date review:", error);
-      res.status(500).json({ error: "Failed to fetch signals needing date review" });
     }
   });
 
