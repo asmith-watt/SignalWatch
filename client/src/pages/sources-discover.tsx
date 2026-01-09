@@ -65,7 +65,8 @@ export default function SourcesDiscoverPage() {
 
   const discoverDomainMutation = useMutation({
     mutationFn: async (params: { domain?: string; companyId?: number; market?: string }) => {
-      return apiRequest("POST", "/api/sources/discover/domain", params);
+      const response = await apiRequest("POST", "/api/sources/discover/domain", params);
+      return response.json();
     },
     onSuccess: (data: any) => {
       setDiscoveredSources(data.sources || []);
@@ -83,7 +84,8 @@ export default function SourcesDiscoverPage() {
 
   const discoverWebMutation = useMutation({
     mutationFn: async (params: { market: string; keywords: string }) => {
-      return apiRequest("POST", "/api/sources/discover/web", params);
+      const response = await apiRequest("POST", "/api/sources/discover/web", params);
+      return response.json();
     },
     onSuccess: (data: any) => {
       setDiscoveredSources(data.sources || []);
