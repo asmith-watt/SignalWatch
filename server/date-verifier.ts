@@ -388,12 +388,22 @@ export async function fixSignalDates(signalIds: number[]): Promise<{ fixed: numb
     }
 
     try {
-      const extractedDate = await fetchAndExtractDate(signal.sourceUrl);
-      if (extractedDate) {
+      const pageContent = await fetchPageContent(signal.sourceUrl);
+      if (!pageContent) {
+        console.log(`Could not fetch page for signal ${signalId}`);
+        errors++;
+        continue;
+      }
+
+      const result = extractDateFromHtml(pageContent.html, signal.sourceUrl);
+      if (result.publishedAt) {
         await storage.updateSignal(signalId, {
-          publishedAt: new Date(extractedDate),
+          publishedAt: result.publishedAt,
+          dateSource: result.dateSource,
+          dateConfidence: result.dateConfidence,
+          needsDateReview: result.needsDateReview,
         });
-        console.log(`Fixed signal ${signalId}: ${extractedDate}`);
+        console.log(`Fixed signal ${signalId}: ${result.publishedAt.toISOString()} (source: ${result.dateSource}, confidence: ${result.dateConfidence}%)`);
         fixed++;
       } else {
         console.log(`Could not extract date for signal ${signalId}`);
