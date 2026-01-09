@@ -34,6 +34,18 @@ SignalWatch is a B2B business intelligence platform designed for editorial teams
   - Empty state when no trends available yet
   - Sidebar navigation link added
 
+### Date Verification Admin UI (January 2026)
+- **Data Management page** (`client/src/pages/data-management.tsx`):
+  - Date Quality Overview showing verified count, needs review, total signals, avg confidence
+  - Dynamic source breakdown badges (metadata, content, unknown, etc.)
+  - Progress bar showing verification percentage
+  - **Batch Backfill** section with configurable limit (50-500 signals)
+  - Triggers POST `/api/admin/dates/backfill` to extract dates from source URLs
+  - Displays last backfill results: processed, fixed, flagged, inaccessible counts
+  - Manual Date Check section for on-demand verification scans
+- **Stats endpoint**: `GET /api/signals/date-stats` returns quality metrics
+- **Backfill endpoint**: `POST /api/admin/dates/backfill?limit=N` processes signals with unknown date sources
+
 ### Advanced Monitoring & Deduplication (January 2026)
 - **Deduplication system** (`server/dedupe.ts`):
   - SHA256-based stable hash generation with URL canonicalization
