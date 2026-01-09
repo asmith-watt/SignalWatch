@@ -33,6 +33,22 @@ interface DateVerificationResponse {
   results: DateVerificationResult[];
 }
 
+interface DateStats {
+  total: number;
+  withVerifiedDate: number;
+  needsReview: number;
+  bySource: Record<string, number>;
+  avgConfidence: number;
+}
+
+interface BackfillResult {
+  processed: number;
+  fixed: number;
+  flaggedForReview: number;
+  inaccessible: number;
+  errors: number;
+}
+
 interface SourceVerificationResult {
   signalId: number;
   signalTitle: string;
@@ -67,6 +83,8 @@ export function DataManagementPage() {
   const [dateVerifyLimit, setDateVerifyLimit] = useState<string>("50");
   const [dateVerificationResults, setDateVerificationResults] = useState<DateVerificationResponse | null>(null);
   const [selectedMismatches, setSelectedMismatches] = useState<Set<number>>(new Set());
+  const [backfillLimit, setBackfillLimit] = useState<string>("100");
+  const [lastBackfillResult, setLastBackfillResult] = useState<BackfillResult | null>(null);
   const [sourceVerifyLimit, setSourceVerifyLimit] = useState<string>("50");
   const [sourceVerificationResults, setSourceVerificationResults] = useState<SourceVerificationResponse | null>(null);
   const [syncResult, setSyncResult] = useState<ProductionSyncResult | null>(null);
@@ -88,6 +106,10 @@ export function DataManagementPage() {
 
   const { data: articles = [], isLoading: isLoadingArticles } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
+  });
+
+  const { data: dateStats, refetch: refetchDateStats } = useQuery<DateStats>({
+    queryKey: ["/api/signals/date-stats"],
   });
 
   const importCompaniesMutation = useMutation({
@@ -186,6 +208,32 @@ export function DataManagementPage() {
     },
     onError: () => {
       toast({ title: "Failed to fix dates", variant: "destructive" });
+    },
+  });
+
+  const backfillDatesMutation = useMutation({
+    mutationFn: async (limit: number) => {
+      const response = await fetch(`/api/admin/dates/backfill?limit=${limit}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || "Backfill failed");
+      }
+      return response.json() as Promise<BackfillResult>;
+    },
+    onSuccess: (data) => {
+      setLastBackfillResult(data);
+      refetchDateStats();
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      toast({
+        title: "Date Backfill Complete",
+        description: `Processed ${data.processed}: ${data.fixed} fixed, ${data.flaggedForReview} need review, ${data.inaccessible} inaccessible`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Backfill Failed", description: error.message, variant: "destructive" });
     },
   });
 
@@ -828,37 +876,139 @@ export function DataManagementPage() {
               <CardTitle>Date Verification</CardTitle>
             </div>
             <CardDescription>
-              Verify publication dates by checking source articles. Fixes incorrect dates that AI may have extracted.
+              Verify and backfill publication dates from source articles. Track data quality and fix missing dates.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="verify-limit">Signals to check:</Label>
-                <Select value={dateVerifyLimit} onValueChange={setDateVerifyLimit}>
-                  <SelectTrigger className="w-24" data-testid="select-verify-limit">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="20">20</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                    <SelectItem value="200">200</SelectItem>
-                  </SelectContent>
-                </Select>
+          <CardContent className="space-y-6">
+            {dateStats && (
+              <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Date Quality Overview</span>
+                  <Button variant="ghost" size="sm" onClick={() => refetchDateStats()} data-testid="button-refresh-stats">
+                    <RefreshCw className="h-3 w-3" />
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">{dateStats.withVerifiedDate}</div>
+                    <div className="text-xs text-muted-foreground">Verified</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-yellow-600">{dateStats.needsReview}</div>
+                    <div className="text-xs text-muted-foreground">Needs Review</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">{dateStats.total}</div>
+                    <div className="text-xs text-muted-foreground">Total Signals</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">{dateStats.avgConfidence}%</div>
+                    <div className="text-xs text-muted-foreground">Avg Confidence</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
+                  <span>By source:</span>
+                  {Object.entries(dateStats.bySource).sort((a, b) => b[1] - a[1]).map(([source, count]) => (
+                    <Badge key={source} variant="outline" className="text-xs capitalize">
+                      {source}: {count}
+                    </Badge>
+                  ))}
+                </div>
+                <Progress 
+                  value={dateStats.total > 0 ? (dateStats.withVerifiedDate / dateStats.total) * 100 : 0} 
+                  className="h-2"
+                />
+                <div className="text-xs text-muted-foreground text-center">
+                  {dateStats.total > 0 
+                    ? `${((dateStats.withVerifiedDate / dateStats.total) * 100).toFixed(1)}% of signals have verified dates`
+                    : "No signals yet"}
+                </div>
               </div>
-              <Button
-                onClick={() => verifyDatesMutation.mutate(parseInt(dateVerifyLimit))}
-                disabled={verifyDatesMutation.isPending}
-                data-testid="button-verify-dates"
-              >
-                {verifyDatesMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                )}
-                Scan for Mismatches
-              </Button>
+            )}
+
+            <div className="border-t pt-4 space-y-4">
+              <div className="flex items-center gap-2">
+                <Database className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">Batch Backfill</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Automatically extract dates from source URLs for signals with unknown date sources. Checks URL accessibility and extracts publication dates from HTML metadata.
+              </p>
+              <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="backfill-limit">Signals to process:</Label>
+                  <Select value={backfillLimit} onValueChange={setBackfillLimit}>
+                    <SelectTrigger className="w-24" data-testid="select-backfill-limit">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                      <SelectItem value="200">200</SelectItem>
+                      <SelectItem value="500">500</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  onClick={() => backfillDatesMutation.mutate(parseInt(backfillLimit))}
+                  disabled={backfillDatesMutation.isPending}
+                  data-testid="button-backfill-dates"
+                >
+                  {backfillDatesMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Database className="h-4 w-4 mr-2" />
+                  )}
+                  Run Backfill
+                </Button>
+              </div>
+              {lastBackfillResult && (
+                <div className="flex items-center gap-3 flex-wrap text-sm">
+                  <Badge variant="secondary">{lastBackfillResult.processed} processed</Badge>
+                  <Badge className="bg-green-100 text-green-800">{lastBackfillResult.fixed} fixed</Badge>
+                  <Badge variant="outline">{lastBackfillResult.flaggedForReview} flagged</Badge>
+                  <Badge variant="destructive">{lastBackfillResult.inaccessible} inaccessible</Badge>
+                  {lastBackfillResult.errors > 0 && (
+                    <Badge variant="destructive">{lastBackfillResult.errors} errors</Badge>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="border-t pt-4 space-y-4">
+              <div className="flex items-center gap-2">
+                <RefreshCw className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">Manual Date Check</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="verify-limit">Signals to check:</Label>
+                  <Select value={dateVerifyLimit} onValueChange={setDateVerifyLimit}>
+                    <SelectTrigger className="w-24" data-testid="select-verify-limit">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                      <SelectItem value="200">200</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  onClick={() => verifyDatesMutation.mutate(parseInt(dateVerifyLimit))}
+                  disabled={verifyDatesMutation.isPending}
+                  variant="outline"
+                  data-testid="button-verify-dates"
+                >
+                  {verifyDatesMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                  )}
+                  Scan for Mismatches
+                </Button>
+              </div>
             </div>
 
             {dateVerificationResults && (
