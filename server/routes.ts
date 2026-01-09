@@ -1444,14 +1444,9 @@ export async function registerRoutes(
     }
   });
 
-  // Admin endpoint to backfill/fix signal dates
+  // Endpoint to backfill/fix signal dates (accessible from Data Management UI)
   app.post("/api/admin/dates/backfill", async (req: Request, res: Response) => {
     try {
-      const adminToken = req.headers["x-admin-token"];
-      if (!process.env.ADMIN_TOKEN || adminToken !== process.env.ADMIN_TOKEN) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-      
       const { backfillSignalDates } = await import("./date-verifier");
       const { companyId, limit = 100, onlySuspicious = false } = req.body;
       
