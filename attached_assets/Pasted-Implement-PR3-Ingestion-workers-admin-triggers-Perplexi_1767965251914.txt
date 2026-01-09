@@ -1,0 +1,62 @@
+Implement PR3: Ingestion workers + admin triggers + Perplexity→Discovery refactor + migration of existing signals.
+
+A) RSS ingestion
+1) Implement RSS ingestion for sources where sourceType='rss' and isActive=true.
+- Fetch feed URL, parse items.
+- Require: title, link, and publish date.
+- Normalize canonicalUrl: follow redirects where possible, strip tracking params, store in signals.canonicalUrl.
+- Deduplicate: by canonicalUrl first; fallback by hash(title+domain+publishedAtDay).
+- Create signals with:
+  sourceType='rss', verificationStatus='verified', verificationMethod='rss',
+  dateSource='rss', dateConfidence=95, publishedAt=pubDate,
+  providerName='rss', providerItemId=item guid if available,
+  sourceId linked to sources.id.
+- companyId should be nullable for publisher/regulator sources (unassigned).
+
+2) Add admin endpoints protected by x-admin-token == ADMIN_TOKEN:
+- POST /api/admin/ingest/rss/run
+- GET /api/ingest/runs (if ingestion_runs exists)
+
+B) Feedly ingestion
+1) Add support for sources where sourceType='feedly'.
+- Store stream/collection id in sources.url OR providerItemId (choose one and be consistent).
+- Pull recent entries using FEEDLY_ACCESS_TOKEN.
+- Create signals with:
+  sourceType='feedly', verificationStatus='verified', verificationMethod='feedly',
+  dateSource='feedly', dateConfidence=95, publishedAt=feedly published,
+  providerName='feedly', providerItemId=feedly entry id,
+  sourceId linked.
+
+2) Admin endpoints:
+- POST /api/admin/ingest/feedly/run
+
+C) Scheduler hooks (optional, behind env flags)
+- If ENABLE_RSS_SCHEDULER=true, run RSS ingestion on a cron schedule.
+- If ENABLE_FEEDLY_SCHEDULER=true, run Feedly ingestion on a schedule.
+- Ensure disabled by default.
+
+D) Perplexity → Discovery refactor
+- Wherever Perplexity ingestion creates signals, change defaults:
+  sourceType='llm_discovery', verificationStatus='unverified', providerName='perplexity'
+  publishedAt should only be set if verified by your date verifier with confidence >=70.
+- Ensure unverified LLM discovery signals are excluded from metrics/trends by default unless verified.
+
+E) Old data migration script (one-time)
+- Create an admin endpoint or script:
+  POST /api/admin/signals/migrate-llm
+  It should:
+   - find legacy Perplexity-origin signals
+   - set sourceType='llm_discovery'
+   - set verificationStatus='unverified' unless dateConfidence>=70 and publishedAt not null
+   - set providerName='perplexity' when missing
+- Must be idempotent.
+
+F) Verification promotion (optional but very valuable)
+- Add POST /api/signals/:id/attempt-verify:
+  - Try to verify by:
+    1) matching canonicalUrl to an existing verified RSS/Feedly signal
+    2) if match found: copy publishedAt/dateSource/dateConfidence and mark verified
+    3) else run metadata date verifier; if confidence>=70 mark verified
+  - Record verificationMethod.
+
+Return summary + instructions for triggering RSS/Feedly runs.

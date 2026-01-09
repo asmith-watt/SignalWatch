@@ -1470,6 +1470,154 @@ export async function registerRoutes(
   });
 
   // ============================================
+  // Ingestion Admin Endpoints (PR3)
+  // ============================================
+
+  // POST /api/admin/ingest/rss/run - Trigger RSS ingestion
+  app.post("/api/admin/ingest/rss/run", async (req: Request, res: Response) => {
+    try {
+      const adminToken = req.headers["x-admin-token"];
+      if (!process.env.ADMIN_TOKEN || adminToken !== process.env.ADMIN_TOKEN) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      
+      const { runRSSIngestion } = await import("./rss-ingestion");
+      const result = await runRSSIngestion();
+      res.json(result);
+    } catch (error) {
+      console.error("Error running RSS ingestion:", error);
+      res.status(500).json({ error: "Failed to run RSS ingestion" });
+    }
+  });
+
+  // POST /api/admin/ingest/feedly/run - Trigger Feedly ingestion
+  app.post("/api/admin/ingest/feedly/run", async (req: Request, res: Response) => {
+    try {
+      const adminToken = req.headers["x-admin-token"];
+      if (!process.env.ADMIN_TOKEN || adminToken !== process.env.ADMIN_TOKEN) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      
+      const { runFeedlyIngestion } = await import("./feedly-ingestion");
+      const result = await runFeedlyIngestion();
+      res.json(result);
+    } catch (error) {
+      console.error("Error running Feedly ingestion:", error);
+      res.status(500).json({ error: "Failed to run Feedly ingestion" });
+    }
+  });
+
+  // POST /api/admin/signals/migrate-llm - Migrate legacy Perplexity signals
+  app.post("/api/admin/signals/migrate-llm", async (req: Request, res: Response) => {
+    try {
+      const adminToken = req.headers["x-admin-token"];
+      if (!process.env.ADMIN_TOKEN || adminToken !== process.env.ADMIN_TOKEN) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      
+      const allSignals = await storage.getAllSignals();
+      let migratedCount = 0;
+      let alreadyMigratedCount = 0;
+      
+      for (const signal of allSignals) {
+        if (signal.ingestionSourceType === "llm_discovery" && signal.providerName === "perplexity") {
+          alreadyMigratedCount++;
+          continue;
+        }
+        
+        if (!signal.ingestionSourceType || signal.ingestionSourceType === "llm_discovery") {
+          const isVerified = signal.dateConfidence && signal.dateConfidence >= 70 && signal.publishedAt;
+          
+          await storage.updateSignal(signal.id, {
+            ingestionSourceType: "llm_discovery",
+            verificationStatus: isVerified ? "verified" : "unverified",
+            providerName: signal.providerName || "perplexity",
+          });
+          migratedCount++;
+        }
+      }
+      
+      res.json({
+        message: "Migration complete",
+        migratedCount,
+        alreadyMigratedCount,
+        totalSignals: allSignals.length,
+      });
+    } catch (error) {
+      console.error("Error migrating LLM signals:", error);
+      res.status(500).json({ error: "Failed to migrate LLM signals" });
+    }
+  });
+
+  // POST /api/signals/:id/attempt-verify - Attempt to verify a signal
+  app.post("/api/signals/:id/attempt-verify", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const signal = await storage.getSignal(id);
+      
+      if (!signal) {
+        return res.status(404).json({ error: "Signal not found" });
+      }
+      
+      if (signal.verificationStatus === "verified") {
+        return res.json({ status: "already_verified", signal });
+      }
+      
+      if (signal.canonicalUrl) {
+        const allSignals = await storage.getAllSignals();
+        const verifiedMatch = allSignals.find(s => 
+          s.id !== signal.id &&
+          s.canonicalUrl === signal.canonicalUrl &&
+          s.verificationStatus === "verified"
+        );
+        
+        if (verifiedMatch) {
+          const updated = await storage.updateSignal(id, {
+            verificationStatus: "verified",
+            verificationMethod: "url_match",
+            publishedAt: verifiedMatch.publishedAt,
+            dateSource: verifiedMatch.dateSource,
+            dateConfidence: verifiedMatch.dateConfidence,
+          });
+          return res.json({ status: "verified_by_url_match", signal: updated });
+        }
+      }
+      
+      if (signal.sourceUrl) {
+        const { extractVerifiedDate } = await import("./date-verifier");
+        const dateResult = await extractVerifiedDate(signal.sourceUrl);
+        
+        if (dateResult && dateResult.confidence >= 70) {
+          const updated = await storage.updateSignal(id, {
+            verificationStatus: "verified",
+            verificationMethod: "metadata",
+            publishedAt: dateResult.date,
+            dateSource: dateResult.source,
+            dateConfidence: dateResult.confidence,
+          });
+          return res.json({ status: "verified_by_metadata", signal: updated });
+        }
+      }
+      
+      res.json({ status: "unable_to_verify", signal });
+    } catch (error) {
+      console.error("Error attempting signal verification:", error);
+      res.status(500).json({ error: "Failed to attempt verification" });
+    }
+  });
+
+  // GET /api/ingest/runs - List recent ingestion runs
+  app.get("/api/ingest/runs", async (req: Request, res: Response) => {
+    try {
+      const runs = await storage.getIngestionRuns();
+      res.json(runs);
+    } catch (error) {
+      console.error("Error fetching ingestion runs:", error);
+      res.status(500).json({ error: "Failed to fetch ingestion runs" });
+    }
+  });
+
+  // ============================================
   // Sources API Routes (PR1)
   // ============================================
 

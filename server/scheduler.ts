@@ -6,10 +6,14 @@ import { runDailyMetricsJob, runWeeklyTrendsJob } from "./trend-engine";
 const RETENTION_DAYS = 365;
 let isRunning = false;
 let isSyncing = false;
+let isRSSIngesting = false;
+let isFeedlyIngesting = false;
 let scheduledMonitoringTask: ScheduledTask | null = null;
 let scheduledSyncTask: ScheduledTask | null = null;
 let scheduledMetricsTask: ScheduledTask | null = null;
 let scheduledTrendsTask: ScheduledTask | null = null;
+let scheduledRSSTask: ScheduledTask | null = null;
+let scheduledFeedlyTask: ScheduledTask | null = null;
 
 async function cleanupOldSignals() {
   console.log("[Scheduler] Starting signal cleanup...");
@@ -195,12 +199,19 @@ export function initializeScheduler() {
   const enableSyncScheduler = process.env.ENABLE_SYNC_SCHEDULER === "true";
   const enableMetricsScheduler = process.env.ENABLE_METRICS_SCHEDULER === "true";
   const enableTrendsScheduler = process.env.ENABLE_TRENDS_SCHEDULER === "true";
+  const enableRSSScheduler = process.env.ENABLE_RSS_SCHEDULER === "true";
+  const enableFeedlyScheduler = process.env.ENABLE_FEEDLY_SCHEDULER === "true";
   const monitorCron = process.env.MONITOR_CRON || "0 6 * * *";
   const syncCron = process.env.SYNC_CRON || "0 7 * * *"; // Default: 1 hour after monitoring
   const metricsCron = process.env.METRICS_CRON || "0 8 * * *"; // Default: 2 hours after monitoring
   const trendsCron = process.env.TRENDS_CRON || "0 9 * * 1"; // Default: Every Monday at 9 AM UTC
+  const rssCron = process.env.RSS_CRON || "0 5 * * *"; // Default: 5 AM UTC daily
+  const feedlyCron = process.env.FEEDLY_CRON || "30 5 * * *"; // Default: 5:30 AM UTC daily
   
-  if (!enableScheduler && !enableSyncScheduler && !enableMetricsScheduler && !enableTrendsScheduler) {
+  const anySchedulerEnabled = enableScheduler || enableSyncScheduler || enableMetricsScheduler || 
+    enableTrendsScheduler || enableRSSScheduler || enableFeedlyScheduler;
+  
+  if (!anySchedulerEnabled) {
     console.log("[Scheduler] All schedulers disabled");
     return;
   }
@@ -272,6 +283,60 @@ export function initializeScheduler() {
     }
   }
   
+  // RSS ingestion scheduler
+  if (enableRSSScheduler) {
+    if (!cron.validate(rssCron)) {
+      console.error(`[Scheduler] Invalid RSS cron expression: ${rssCron}`);
+    } else {
+      scheduledRSSTask = cron.schedule(rssCron, async () => {
+        if (isRSSIngesting) {
+          console.log("[Scheduler] RSS ingestion already in progress, skipping");
+          return;
+        }
+        isRSSIngesting = true;
+        try {
+          console.log("[Scheduler] Running scheduled RSS ingestion...");
+          const { runRSSIngestion } = await import("./rss-ingestion");
+          await runRSSIngestion();
+        } catch (error) {
+          console.error("[Scheduler] RSS ingestion error:", error);
+        } finally {
+          isRSSIngesting = false;
+        }
+      }, {
+        timezone: "UTC"
+      });
+      console.log(`  - RSS ingestion: ${rssCron} (UTC)`);
+    }
+  }
+  
+  // Feedly ingestion scheduler
+  if (enableFeedlyScheduler) {
+    if (!cron.validate(feedlyCron)) {
+      console.error(`[Scheduler] Invalid Feedly cron expression: ${feedlyCron}`);
+    } else {
+      scheduledFeedlyTask = cron.schedule(feedlyCron, async () => {
+        if (isFeedlyIngesting) {
+          console.log("[Scheduler] Feedly ingestion already in progress, skipping");
+          return;
+        }
+        isFeedlyIngesting = true;
+        try {
+          console.log("[Scheduler] Running scheduled Feedly ingestion...");
+          const { runFeedlyIngestion } = await import("./feedly-ingestion");
+          await runFeedlyIngestion();
+        } catch (error) {
+          console.error("[Scheduler] Feedly ingestion error:", error);
+        } finally {
+          isFeedlyIngesting = false;
+        }
+      }, {
+        timezone: "UTC"
+      });
+      console.log(`  - Feedly ingestion: ${feedlyCron} (UTC)`);
+    }
+  }
+  
   console.log("  - Signal retention: Forever (no automatic cleanup)");
 }
 
@@ -291,6 +356,14 @@ export function stopScheduler() {
   if (scheduledTrendsTask) {
     scheduledTrendsTask.stop();
     scheduledTrendsTask = null;
+  }
+  if (scheduledRSSTask) {
+    scheduledRSSTask.stop();
+    scheduledRSSTask = null;
+  }
+  if (scheduledFeedlyTask) {
+    scheduledFeedlyTask.stop();
+    scheduledFeedlyTask = null;
   }
   console.log("[Scheduler] All scheduled tasks stopped");
 }

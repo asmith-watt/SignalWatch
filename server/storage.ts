@@ -72,6 +72,8 @@ export interface IStorage {
   updateSignal(id: number, signal: Partial<InsertSignal>): Promise<Signal | undefined>;
   deleteSignal(id: number): Promise<void>;
   getSignalByHash(hash: string): Promise<Signal | undefined>;
+  getSignalByCanonicalUrl(canonicalUrl: string): Promise<Signal | undefined>;
+  getRecentSignalsForDedupe(domain: string, lookbackDays?: number, limit?: number): Promise<Array<{ id: number; title: string; sourceUrl: string | null }>>;
 
   // Alerts
   getAlert(id: number): Promise<Alert | undefined>;
@@ -295,6 +297,41 @@ export class DatabaseStorage implements IStorage {
   async getSignalByHash(hash: string): Promise<Signal | undefined> {
     const [signal] = await db.select().from(signals).where(eq(signals.hash, hash));
     return signal || undefined;
+  }
+
+  async getSignalByCanonicalUrl(canonicalUrl: string): Promise<Signal | undefined> {
+    const [signal] = await db
+      .select()
+      .from(signals)
+      .where(eq(signals.canonicalUrl, canonicalUrl));
+    return signal || undefined;
+  }
+
+  async getRecentSignalsForDedupe(
+    domain: string,
+    lookbackDays: number = 14,
+    limit: number = 100
+  ): Promise<Array<{ id: number; title: string; sourceUrl: string | null }>> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - lookbackDays);
+    
+    const results = await db
+      .select({
+        id: signals.id,
+        title: signals.title,
+        sourceUrl: signals.sourceUrl,
+      })
+      .from(signals)
+      .where(
+        and(
+          sql`${signals.sourceUrl} LIKE ${"%" + domain + "%"}`,
+          sql`${signals.createdAt} >= ${cutoffDate}`
+        )
+      )
+      .orderBy(desc(signals.createdAt))
+      .limit(limit);
+    
+    return results;
   }
 
   // Alerts
@@ -581,7 +618,7 @@ export class DatabaseStorage implements IStorage {
         .where(inArray(entities.id, nonSubjectEntityIds))
         .limit(10);
       
-      const company = await this.getCompany(signal.companyId);
+      const company = signal.companyId ? await this.getCompany(signal.companyId) : undefined;
       
       // Deduplicate entity names for preview
       const seenNames = new Set<string>();
@@ -630,6 +667,11 @@ export class DatabaseStorage implements IStorage {
       try {
         const hasLinks = await hasSignalEntityLinks(signal.id);
         if (hasLinks) {
+          result.skipped++;
+          continue;
+        }
+        
+        if (!signal.companyId) {
           result.skipped++;
           continue;
         }
