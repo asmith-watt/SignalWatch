@@ -10,6 +10,11 @@ import {
   ExternalLink,
   User,
   Globe,
+  Rss,
+  Search,
+  CheckCircle,
+  AlertCircle,
+  XCircle,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -145,6 +150,15 @@ function isSignalHistorical(signal: Signal): boolean {
   return signalDate < freshnessDate;
 }
 
+const sourceTypeLabels: Record<string, { label: string; className: string }> = {
+  rss: { label: "RSS", className: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200" },
+  feedly: { label: "Feedly", className: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
+  crawl: { label: "Crawl", className: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" },
+  regulator: { label: "Regulator", className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" },
+  association: { label: "Association", className: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" },
+  llm_discovery: { label: "LLM Discovery", className: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200" },
+};
+
 function renderBadges(signal: Signal): JSX.Element[] {
   const badges: JSX.Element[] = [];
   const aiAnalysis = signal.aiAnalysis as AIAnalysis | null;
@@ -154,6 +168,43 @@ function renderBadges(signal: Signal): JSX.Element[] {
       {signal.type.replace(/_/g, " ")}
     </Badge>
   );
+  
+  // Source Type badge
+  const sourceType = signal.ingestionSourceType || "llm_discovery";
+  const sourceInfo = sourceTypeLabels[sourceType] || sourceTypeLabels.llm_discovery;
+  badges.push(
+    <Badge key="source-type" variant="outline" className={sourceInfo.className} data-testid={`badge-source-type-${signal.id}`}>
+      {sourceType === "rss" && <Rss className="w-3 h-3 mr-1" />}
+      {sourceType === "crawl" && <Search className="w-3 h-3 mr-1" />}
+      {sourceType === "feedly" && <Globe className="w-3 h-3 mr-1" />}
+      {sourceInfo.label}
+    </Badge>
+  );
+  
+  // Verification badge
+  const verificationStatus = signal.verificationStatus || "unverified";
+  if (verificationStatus === "verified") {
+    badges.push(
+      <Badge key="verification" variant="default" className="bg-green-600" data-testid={`badge-verification-${signal.id}`}>
+        <CheckCircle className="w-3 h-3 mr-1" />
+        Verified
+      </Badge>
+    );
+  } else if (verificationStatus === "rejected") {
+    badges.push(
+      <Badge key="verification" variant="destructive" data-testid={`badge-verification-${signal.id}`}>
+        <XCircle className="w-3 h-3 mr-1" />
+        Rejected
+      </Badge>
+    );
+  } else {
+    badges.push(
+      <Badge key="verification" variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-500" data-testid={`badge-verification-${signal.id}`}>
+        <AlertCircle className="w-3 h-3 mr-1" />
+        Unverified
+      </Badge>
+    );
+  }
   
   if (signal.needsDateReview) {
     badges.push(
@@ -208,7 +259,7 @@ function renderBadges(signal: Signal): JSX.Element[] {
     );
   }
   
-  if (aiAnalysis?.priorityScore !== undefined && badges.length < 6) {
+  if (aiAnalysis?.priorityScore !== undefined && badges.length < 8) {
     badges.push(
       <Badge key="score" variant="outline" data-testid={`badge-score-${signal.id}`}>
         Score: {aiAnalysis.priorityScore}
@@ -216,7 +267,7 @@ function renderBadges(signal: Signal): JSX.Element[] {
     );
   }
   
-  return badges.slice(0, 6);
+  return badges.slice(0, 8);
 }
 
 export function SignalCard({

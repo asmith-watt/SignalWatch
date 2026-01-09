@@ -20,6 +20,9 @@ import { SignalGraphPage } from "@/pages/signal-graph";
 import WordPressSettings from "@/pages/wordpress-settings";
 import DataManagementPage from "@/pages/data-management";
 import TrendsPage from "@/pages/trends";
+import SourcesPage from "@/pages/sources";
+import SourcesDiscoverPage from "@/pages/sources-discover";
+import DiscoveryInboxPage from "@/pages/discovery-inbox";
 import NotFound from "@/pages/not-found";
 import { useToast } from "@/hooks/use-toast";
 import type { Company, Signal, InsertCompany } from "@shared/schema";
@@ -68,7 +71,7 @@ function MainLayout() {
   const signalCounts = useMemo(() => {
     const counts: Record<number, number> = {};
     signals.forEach((signal) => {
-      if (!signal.isRead) {
+      if (!signal.isRead && signal.companyId !== null) {
         counts[signal.companyId] = (counts[signal.companyId] || 0) + 1;
       }
     });
@@ -168,6 +171,15 @@ function MainLayout() {
               </Route>
               <Route path="/trends">
                 <TrendsPage />
+              </Route>
+              <Route path="/sources">
+                <SourcesPage />
+              </Route>
+              <Route path="/sources/discover">
+                <SourcesDiscoverPage />
+              </Route>
+              <Route path="/signals/discovery">
+                <DiscoveryInboxPage />
               </Route>
               <Route component={NotFound} />
             </Switch>

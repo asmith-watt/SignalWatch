@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useSearch } from "wouter";
-import { Activity, Calendar, TrendingUp, X, AlertCircle } from "lucide-react";
+import { useSearch, Link } from "wouter";
+import { Activity, Calendar, TrendingUp, X, AlertCircle, Inbox, CheckCircle, Rss, Search, Globe } from "lucide-react";
 import { format, parseISO, isToday, isYesterday } from "date-fns";
 import { SignalCard } from "@/components/signal-card";
 import { SignalFeedSkeleton } from "@/components/loading-skeleton";
@@ -14,6 +14,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { Company, Signal } from "@shared/schema";
 
@@ -71,6 +80,8 @@ export function AllSignalsPage() {
   const [wpPublishSignalId, setWpPublishSignalId] = useState<number | null>(null);
   const [mediaSitePublishSignalId, setMediaSitePublishSignalId] = useState<number | null>(null);
   const [daysToShow, setDaysToShow] = useState(7);
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [sourceTypeFilter, setSourceTypeFilter] = useState<string>("");
 
   useEffect(() => {
     const params = new URLSearchParams(searchString);
@@ -143,9 +154,21 @@ export function AllSignalsPage() {
   const hasMoreHistory = allGroupedHistory.length > daysToShow;
 
   const filteredSignals = useMemo(() => {
+    let result = signals;
+    
+    // Apply verified-only filter
+    if (verifiedOnly) {
+      result = result.filter((signal) => signal.verificationStatus === "verified");
+    }
+    
+    // Apply source type filter
+    if (sourceTypeFilter) {
+      result = result.filter((signal) => signal.ingestionSourceType === sourceTypeFilter);
+    }
+    
     // Special case: show signals needing date review
     if (showUnknownDates) {
-      return signals.filter((signal) => signal.needsDateReview === true)
+      return result.filter((signal) => signal.needsDateReview === true)
         .sort((a, b) => {
           const dateA = new Date(a.gatheredAt);
           const dateB = new Date(b.gatheredAt);
@@ -157,7 +180,8 @@ export function AllSignalsPage() {
     
     const { industry, date } = selectedFilter;
 
-    return signals.filter((signal) => {
+    return result.filter((signal) => {
+      if (!signal.companyId) return false;
       const company = companyMap.get(signal.companyId);
       if (!company || company.industry !== industry) return false;
       
@@ -175,7 +199,7 @@ export function AllSignalsPage() {
       const dateB = b.publishedAt ? new Date(b.publishedAt) : new Date(b.createdAt);
       return dateB.getTime() - dateA.getTime();
     });
-  }, [signals, selectedFilter, companyMap, showUnknownDates]);
+  }, [signals, selectedFilter, companyMap, showUnknownDates, verifiedOnly, sourceTypeFilter]);
 
   const handleBadgeClick = (industry: string, date: string) => {
     setShowUnknownDates(false);
@@ -233,22 +257,91 @@ export function AllSignalsPage() {
     }
   };
 
-  const selectedCompany = selectedSignal ? companyMap.get(selectedSignal.companyId) : undefined;
+  const selectedCompany = selectedSignal && selectedSignal.companyId ? companyMap.get(selectedSignal.companyId) : undefined;
 
   return (
     <div className="flex h-full">
       <div className="flex-1 flex flex-col min-w-0">
         <ScrollArea className="flex-1">
           <div className="p-6 space-y-6">
-            <div>
-              <h1 className="text-2xl font-semibold flex items-center gap-2">
-                <Activity className="w-6 h-6" />
-                Recent Signals
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Browse signals by scan date and industry
-              </p>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-semibold flex items-center gap-2">
+                  <Activity className="w-6 h-6" />
+                  Recent Signals
+                </h1>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Browse signals by scan date and industry
+                </p>
+              </div>
+              <Button asChild variant="outline" data-testid="link-discovery-inbox">
+                <Link href="/signals/discovery">
+                  <Inbox className="w-4 h-4 mr-2" />
+                  Discovery Inbox
+                </Link>
+              </Button>
             </div>
+
+            <Card className="p-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="verified-only"
+                    checked={verifiedOnly}
+                    onCheckedChange={setVerifiedOnly}
+                    data-testid="switch-verified-only"
+                  />
+                  <Label htmlFor="verified-only" className="flex items-center gap-1 text-sm cursor-pointer">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    Verified Only
+                  </Label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="source-type" className="text-sm text-muted-foreground">Source:</Label>
+                  <Select 
+                    value={sourceTypeFilter || "all"} 
+                    onValueChange={(v) => setSourceTypeFilter(v === "all" ? "" : v)}
+                  >
+                    <SelectTrigger className="w-[160px]" data-testid="filter-source-type">
+                      <SelectValue placeholder="All Sources" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Sources</SelectItem>
+                      <SelectItem value="llm_discovery">
+                        <span className="flex items-center gap-1">LLM Discovery</span>
+                      </SelectItem>
+                      <SelectItem value="rss">
+                        <span className="flex items-center gap-1"><Rss className="w-3 h-3" /> RSS</span>
+                      </SelectItem>
+                      <SelectItem value="feedly">
+                        <span className="flex items-center gap-1"><Globe className="w-3 h-3" /> Feedly</span>
+                      </SelectItem>
+                      <SelectItem value="crawl">
+                        <span className="flex items-center gap-1"><Search className="w-3 h-3" /> Crawl</span>
+                      </SelectItem>
+                      <SelectItem value="regulator">Regulator</SelectItem>
+                      <SelectItem value="association">Association</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {(verifiedOnly || sourceTypeFilter) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setVerifiedOnly(false);
+                      setSourceTypeFilter("");
+                    }}
+                    data-testid="button-clear-filters"
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+            </Card>
 
             {historyLoading ? (
               <Card className="p-4">
@@ -370,7 +463,7 @@ export function AllSignalsPage() {
                 ) : (
                   <div className="space-y-3">
                     {filteredSignals.map((signal) => {
-                      const company = companyMap.get(signal.companyId);
+                      const company = signal.companyId ? companyMap.get(signal.companyId) : undefined;
                       return (
                         <SignalCard
                           key={signal.id}

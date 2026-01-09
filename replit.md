@@ -6,6 +6,27 @@ SignalWatch is a B2B business intelligence platform designed for editorial teams
 
 ## Recent Changes
 
+### PR2: Signal Filtering & Discovery (January 2026)
+- **All Signals page filters** (`client/src/pages/all-signals.tsx`):
+  - Verified-only toggle: Show only verified signals
+  - Source type filter: Filter by ingestionSourceType (LLM Discovery, RSS, Feedly, Crawl, Regulator, Association)
+  - Discovery Inbox quick link: Navigate to unverified signals inbox
+  - Clear filters button: Reset all active filters
+- **Signal provenance badges** (`client/src/components/signal-card.tsx`):
+  - SourceType badges: RSS/Feedly/Crawl/Regulator/LLM Discovery with appropriate icons
+  - Verification badges: Verified (green checkmark), Unverified (yellow warning), Rejected (red X)
+  - Badge limit increased from 6 to 8 to accommodate new badges
+- **Sources management UI** (`client/src/pages/sources.tsx`):
+  - Tabs: All/By Industry/By Company views
+  - Filters: sourceType, verificationStatus, isActive
+  - Source cards with verification status, trust score, last ingested timestamp
+- **Source discovery UI** (`client/src/pages/sources-discover.tsx`):
+  - Domain discovery mode: Find RSS feeds from a domain
+  - Web discovery mode: Search for sources across the web (verified sources only)
+- **Discovery Inbox** (`client/src/pages/discovery-inbox.tsx`):
+  - Review unverified signals with approve/reject actions
+  - Bulk verification workflow
+
 ### PR1: Sources Schema + Signal Provenance (January 2026)
 - **New tables** (`shared/schema.ts`):
   - `sources`: Tracks where signals come from (RSS, Feedly, crawl, regulator, association, LLM)

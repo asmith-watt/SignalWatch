@@ -19,6 +19,9 @@ import {
   Square,
   GitBranch,
   BarChart3,
+  Rss,
+  Compass,
+  Inbox,
 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -65,9 +68,12 @@ interface AppSidebarProps {
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: TrendingUp },
   { title: "Recent Signals", url: "/signals", icon: Radio },
+  { title: "Discovery Inbox", url: "/signals/discovery", icon: Inbox },
   { title: "Trends", url: "/trends", icon: BarChart3 },
   { title: "Signal Graph", url: "/signal-graph", icon: GitBranch },
   { title: "Industry Map", url: "/industry-map", icon: Network },
+  { title: "Sources", url: "/sources", icon: Rss },
+  { title: "Discover Sources", url: "/sources/discover", icon: Compass },
   { title: "Alerts", url: "/alerts", icon: Bell },
   { title: "Team", url: "/team", icon: Users },
   { title: "WordPress", url: "/wordpress", icon: Globe },

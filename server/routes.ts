@@ -1603,6 +1603,90 @@ export async function registerRoutes(
     }
   });
 
+  // POST /api/sources/discover/domain - Discover sources from a domain
+  app.post("/api/sources/discover/domain", async (req: Request, res: Response) => {
+    try {
+      const { domain, companyId, market } = req.body;
+      
+      // Stub implementation - returns sample discovered sources
+      // PR3 will implement real discovery logic
+      const sampleSources = [];
+      
+      if (domain || companyId) {
+        // Simulate finding RSS and crawl targets
+        const baseDomain = domain || "example.com";
+        sampleSources.push(
+          {
+            id: `rss-${Date.now()}-1`,
+            name: `${baseDomain} News Feed`,
+            type: "rss",
+            url: `https://${baseDomain}/feed/rss`,
+            domain: baseDomain,
+            verified: false,
+            sampleTitles: ["Latest company announcement", "Industry update"],
+            confidence: 75,
+          },
+          {
+            id: `crawl-${Date.now()}-2`,
+            name: `${baseDomain} Press Releases`,
+            type: "crawl",
+            url: `https://${baseDomain}/news`,
+            domain: baseDomain,
+            verified: false,
+            sampleTitles: ["Press release from yesterday"],
+            confidence: 60,
+          }
+        );
+      }
+      
+      res.json({ sources: sampleSources, message: "Discovery complete (stub implementation)" });
+    } catch (error) {
+      console.error("Error discovering domain sources:", error);
+      res.status(500).json({ error: "Failed to discover sources" });
+    }
+  });
+
+  // POST /api/sources/discover/web - Discover sources from web search
+  app.post("/api/sources/discover/web", async (req: Request, res: Response) => {
+    try {
+      const { market, keywords } = req.body;
+      
+      if (!market || !keywords) {
+        return res.status(400).json({ error: "Market and keywords are required" });
+      }
+      
+      // Stub implementation - returns sample verified sources
+      // PR3 will implement real web discovery logic
+      const sampleSources = [
+        {
+          id: `regulator-${Date.now()}-1`,
+          name: `${market} Industry Regulator`,
+          type: "regulator",
+          url: `https://regulator.example.gov`,
+          domain: "regulator.example.gov",
+          verified: true,
+          sampleTitles: ["New regulations announced", "Compliance updates"],
+          confidence: 90,
+        },
+        {
+          id: `association-${Date.now()}-2`,
+          name: `${market} Trade Association`,
+          type: "association",
+          url: `https://association.example.org`,
+          domain: "association.example.org",
+          verified: true,
+          sampleTitles: ["Industry conference announced", "Market report Q4"],
+          confidence: 85,
+        },
+      ];
+      
+      res.json({ sources: sampleSources, message: "Web discovery complete (stub implementation)" });
+    } catch (error) {
+      console.error("Error discovering web sources:", error);
+      res.status(500).json({ error: "Failed to discover sources" });
+    }
+  });
+
   // GET /api/ingest/runs - List ingestion runs
   app.get("/api/ingest/runs", async (req: Request, res: Response) => {
     try {
