@@ -2,8 +2,63 @@ import { storage } from "./storage";
 import type { Source, InsertSignal, InsertIngestionRun } from "@shared/schema";
 import { generateStableHash, checkNearDuplicate, getHostFromUrl } from "./dedupe";
 
-const FEEDLY_ACCESS_TOKEN = process.env.FEEDLY_ACCESS_TOKEN;
+let FEEDLY_ACCESS_TOKEN = process.env.FEEDLY_ACCESS_TOKEN;
+const FEEDLY_REFRESH_TOKEN = process.env.FEEDLY_REFRESH_TOKEN;
 const FEEDLY_API_BASE = "https://cloud.feedly.com/v3";
+
+// Track token expiry for automatic refresh
+let tokenExpiresAt: number | null = null;
+
+async function refreshAccessToken(): Promise<boolean> {
+  if (!FEEDLY_REFRESH_TOKEN) {
+    console.log("[Feedly] No refresh token configured, cannot refresh access token");
+    return false;
+  }
+  
+  try {
+    console.log("[Feedly] Attempting to refresh access token...");
+    const response = await fetch("https://cloud.feedly.com/v3/auth/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        refresh_token: FEEDLY_REFRESH_TOKEN,
+        client_id: "feedlydev",
+        client_secret: "feedlydev",
+        grant_type: "refresh_token",
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("[Feedly] Token refresh failed:", response.status, errorText);
+      return false;
+    }
+    
+    const data = await response.json();
+    FEEDLY_ACCESS_TOKEN = data.access_token;
+    tokenExpiresAt = Date.now() + (data.expires_in * 1000);
+    console.log("[Feedly] Access token refreshed successfully, expires in", data.expires_in, "seconds");
+    return true;
+  } catch (error) {
+    console.error("[Feedly] Error refreshing token:", error);
+    return false;
+  }
+}
+
+async function ensureValidToken(): Promise<boolean> {
+  if (!FEEDLY_ACCESS_TOKEN) {
+    return false;
+  }
+  
+  // If we have a refresh token and the access token is expired or about to expire (within 5 min)
+  if (FEEDLY_REFRESH_TOKEN && tokenExpiresAt && (Date.now() > tokenExpiresAt - 300000)) {
+    return await refreshAccessToken();
+  }
+  
+  return true;
+}
 
 interface FeedlyEntry {
   id: string;
@@ -125,6 +180,13 @@ export async function runFeedlyIngestion(): Promise<{
   if (!FEEDLY_ACCESS_TOKEN) {
     console.log("[Feedly Ingestion] FEEDLY_ACCESS_TOKEN not configured, skipping");
     return { sourcesProcessed: 0, itemsFound: 0, itemsCreated: 0, errors: ["FEEDLY_ACCESS_TOKEN not configured"] };
+  }
+  
+  // Ensure token is valid (refresh if needed)
+  const tokenValid = await ensureValidToken();
+  if (!tokenValid) {
+    console.log("[Feedly Ingestion] Failed to validate/refresh access token");
+    return { sourcesProcessed: 0, itemsFound: 0, itemsCreated: 0, errors: ["Failed to validate access token"] };
   }
   
   const sources = await storage.getAllSources();
