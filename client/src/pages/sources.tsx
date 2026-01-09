@@ -237,11 +237,11 @@ function SourcesTable({
 export default function SourcesPage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("all");
-  const [typeFilter, setTypeFilter] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
-  const [activeFilter, setActiveFilter] = useState<string>("");
-  const [marketFilter, setMarketFilter] = useState<string>("");
-  const [companyFilter, setCompanyFilter] = useState<string>("");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [marketFilter, setMarketFilter] = useState<string>("all");
+  const [companyFilter, setCompanyFilter] = useState<string>("all");
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [editForm, setEditForm] = useState({
     name: "",
@@ -256,10 +256,10 @@ export default function SourcesPage() {
     queryKey: ["/api/sources", typeFilter, statusFilter, marketFilter, companyFilter],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (typeFilter) params.set("type", typeFilter);
-      if (statusFilter) params.set("status", statusFilter);
-      if (marketFilter) params.set("market", marketFilter);
-      if (companyFilter) params.set("companyId", companyFilter);
+      if (typeFilter && typeFilter !== "all") params.set("type", typeFilter);
+      if (statusFilter && statusFilter !== "all") params.set("status", statusFilter);
+      if (marketFilter && marketFilter !== "all") params.set("market", marketFilter);
+      if (companyFilter && companyFilter !== "all") params.set("companyId", companyFilter);
       const url = `/api/sources${params.toString() ? `?${params}` : ""}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch sources");
@@ -373,7 +373,7 @@ export default function SourcesPage() {
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="rss">RSS Feed</SelectItem>
                 <SelectItem value="feedly">Feedly</SelectItem>
                 <SelectItem value="crawl">Web Crawl</SelectItem>
@@ -388,7 +388,7 @@ export default function SourcesPage() {
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="verified">Verified</SelectItem>
                 <SelectItem value="needs_review">Needs Review</SelectItem>
                 <SelectItem value="broken">Broken</SelectItem>
@@ -400,7 +400,7 @@ export default function SourcesPage() {
                 <SelectValue placeholder="All" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All</SelectItem>
+                <SelectItem value="all">All</SelectItem>
                 <SelectItem value="active">Active Only</SelectItem>
                 <SelectItem value="disabled">Disabled Only</SelectItem>
               </SelectContent>
@@ -412,9 +412,9 @@ export default function SourcesPage() {
                   <SelectValue placeholder="Select Industry" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Industries</SelectItem>
+                  <SelectItem value="all">All Industries</SelectItem>
                   {industries.map(industry => (
-                    <SelectItem key={industry} value={industry || ""}>{industry}</SelectItem>
+                    <SelectItem key={industry} value={industry}>{industry}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -426,7 +426,7 @@ export default function SourcesPage() {
                   <SelectValue placeholder="Select Company" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Companies</SelectItem>
+                  <SelectItem value="all">All Companies</SelectItem>
                   {companies.map(company => (
                     <SelectItem key={company.id} value={String(company.id)}>{company.name}</SelectItem>
                   ))}
