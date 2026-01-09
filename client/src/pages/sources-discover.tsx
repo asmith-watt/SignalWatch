@@ -58,10 +58,17 @@ export default function SourcesDiscoverPage() {
   const [keywordsInput, setKeywordsInput] = useState("");
   const [discoveredSources, setDiscoveredSources] = useState<DiscoveredSource[]>([]);
   const [isDiscovering, setIsDiscovering] = useState(false);
+  const [addedSourceUrls, setAddedSourceUrls] = useState<Set<string>>(new Set());
+  const [addingSourceId, setAddingSourceId] = useState<string | null>(null);
+  const [companySearch, setCompanySearch] = useState("");
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
   });
+
+  const filteredCompanies = companies.filter(company =>
+    company.name.toLowerCase().includes(companySearch.toLowerCase())
+  );
 
   const discoverDomainMutation = useMutation({
     mutationFn: async (params: { domain?: string; companyId?: number; market?: string }) => {
@@ -103,6 +110,7 @@ export default function SourcesDiscoverPage() {
 
   const addSourceMutation = useMutation({
     mutationFn: async (source: DiscoveredSource) => {
+      setAddingSourceId(source.id);
       return apiRequest("POST", "/api/sources", {
         name: source.name,
         sourceType: source.type,
@@ -111,11 +119,14 @@ export default function SourcesDiscoverPage() {
         trustScore: Math.round(source.confidence),
       });
     },
-    onSuccess: () => {
+    onSuccess: (_, source) => {
       queryClient.invalidateQueries({ queryKey: ["/api/sources"] });
+      setAddedSourceUrls(prev => new Set(prev).add(source.url));
+      setAddingSourceId(null);
       toast({ title: "Source added successfully" });
     },
     onError: () => {
+      setAddingSourceId(null);
       toast({ title: "Failed to add source", variant: "destructive" });
     },
   });
@@ -181,12 +192,26 @@ export default function SourcesDiscoverPage() {
                         <SelectValue placeholder="Choose a company" />
                       </SelectTrigger>
                       <SelectContent>
+                        <div className="p-2">
+                          <Input
+                            placeholder="Search companies..."
+                            value={companySearch}
+                            onChange={(e) => setCompanySearch(e.target.value)}
+                            className="h-8"
+                            data-testid="input-company-search"
+                          />
+                        </div>
                         <SelectItem value="none">No company</SelectItem>
-                        {companies.map(company => (
+                        {filteredCompanies.slice(0, 50).map(company => (
                           <SelectItem key={company.id} value={String(company.id)}>
                             {company.name}
                           </SelectItem>
                         ))}
+                        {filteredCompanies.length > 50 && (
+                          <div className="px-2 py-1 text-xs text-muted-foreground">
+                            Showing first 50 of {filteredCompanies.length} results...
+                          </div>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -377,15 +402,31 @@ export default function SourcesDiscoverPage() {
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          size="sm"
-                          onClick={() => addSourceMutation.mutate(source)}
-                          disabled={addSourceMutation.isPending}
-                          data-testid={`button-add-source-${source.id}`}
-                        >
-                          <Plus className="w-4 h-4 mr-1" />
-                          Add Source
-                        </Button>
+                        {addedSourceUrls.has(source.url) ? (
+                          <Badge variant="secondary" className="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Added
+                          </Badge>
+                        ) : (
+                          <Button
+                            size="sm"
+                            onClick={() => addSourceMutation.mutate(source)}
+                            disabled={addingSourceId !== null}
+                            data-testid={`button-add-source-${source.id}`}
+                          >
+                            {addingSourceId === source.id ? (
+                              <>
+                                <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
+                                Adding...
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="w-4 h-4 mr-1" />
+                                Add Source
+                              </>
+                            )}
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
