@@ -22,6 +22,7 @@ import { generateRssFeed, generateAllSignalsRssFeed, getAvailableFeeds } from ".
 import { publishToWordPress, testWordPressConnection } from "./wordpress-publisher";
 import { selectStockImage, buildMediaSitePayload, buildPayloadFromExistingArticle, publishToMediaSite, generateAIImage } from "./media-site-publisher";
 import { verifySignalDates, fixSignalDates, verifySourceUrl, verifySourceUrls } from "./date-verifier";
+import { discoverDomainSources, discoverWebSources } from "./source-discovery";
 import { objectStorageClient } from "./replit_integrations/object_storage";
 import express from "express";
 import path from "path";
@@ -1756,38 +1757,31 @@ export async function registerRoutes(
     try {
       const { domain, companyId, market } = req.body;
       
-      // Stub implementation - returns sample discovered sources
-      // PR3 will implement real discovery logic
-      const sampleSources = [];
+      let targetDomain = domain;
+      let companyName: string | undefined;
       
-      if (domain || companyId) {
-        // Simulate finding RSS and crawl targets
-        const baseDomain = domain || "example.com";
-        sampleSources.push(
-          {
-            id: `rss-${Date.now()}-1`,
-            name: `${baseDomain} News Feed`,
-            type: "rss",
-            url: `https://${baseDomain}/feed/rss`,
-            domain: baseDomain,
-            verified: false,
-            sampleTitles: ["Latest company announcement", "Industry update"],
-            confidence: 75,
-          },
-          {
-            id: `crawl-${Date.now()}-2`,
-            name: `${baseDomain} Press Releases`,
-            type: "crawl",
-            url: `https://${baseDomain}/news`,
-            domain: baseDomain,
-            verified: false,
-            sampleTitles: ["Press release from yesterday"],
-            confidence: 60,
+      if (!targetDomain && companyId) {
+        const company = await storage.getCompany(companyId);
+        if (company) {
+          companyName = company.name;
+          if (company.website) {
+            targetDomain = company.website.replace(/^https?:\/\//, "").replace(/\/$/, "");
           }
-        );
+        }
       }
       
-      res.json({ sources: sampleSources, message: "Discovery complete (stub implementation)" });
+      if (!targetDomain) {
+        return res.status(400).json({ error: "Please provide a domain or select a company with a website" });
+      }
+      
+      const sources = await discoverDomainSources(targetDomain, companyName);
+      
+      res.json({ 
+        sources, 
+        message: sources.length > 0 
+          ? `Found ${sources.length} sources from ${targetDomain}` 
+          : `No RSS feeds or news pages found on ${targetDomain}`
+      });
     } catch (error) {
       console.error("Error discovering domain sources:", error);
       res.status(500).json({ error: "Failed to discover sources" });
@@ -1803,32 +1797,14 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Market and keywords are required" });
       }
       
-      // Stub implementation - returns sample verified sources
-      // PR3 will implement real web discovery logic
-      const sampleSources = [
-        {
-          id: `regulator-${Date.now()}-1`,
-          name: `${market} Industry Regulator`,
-          type: "regulator",
-          url: `https://regulator.example.gov`,
-          domain: "regulator.example.gov",
-          verified: true,
-          sampleTitles: ["New regulations announced", "Compliance updates"],
-          confidence: 90,
-        },
-        {
-          id: `association-${Date.now()}-2`,
-          name: `${market} Trade Association`,
-          type: "association",
-          url: `https://association.example.org`,
-          domain: "association.example.org",
-          verified: true,
-          sampleTitles: ["Industry conference announced", "Market report Q4"],
-          confidence: 85,
-        },
-      ];
+      const sources = await discoverWebSources(market, keywords);
       
-      res.json({ sources: sampleSources, message: "Web discovery complete (stub implementation)" });
+      res.json({ 
+        sources, 
+        message: sources.length > 0 
+          ? `Found ${sources.length} sources for ${market}` 
+          : `No sources found for ${market} - try different keywords`
+      });
     } catch (error) {
       console.error("Error discovering web sources:", error);
       res.status(500).json({ error: "Failed to discover sources" });
