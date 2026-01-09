@@ -86,7 +86,8 @@ function SourcesTable({
   onToggle, 
   onVerify, 
   onRun,
-  isLoading 
+  isLoading,
+  runningSourceId
 }: { 
   sources: Source[];
   onEdit: (source: Source) => void;
@@ -94,6 +95,7 @@ function SourcesTable({
   onVerify: (source: Source) => void;
   onRun: (source: Source) => void;
   isLoading: boolean;
+  runningSourceId: number | null;
 }) {
   if (isLoading) {
     return (
@@ -219,10 +221,14 @@ function SourcesTable({
                     variant="ghost" 
                     size="icon"
                     onClick={() => onRun(source)}
-                    disabled={!source.isActive}
+                    disabled={!source.isActive || runningSourceId !== null}
                     data-testid={`button-run-source-${source.id}`}
                   >
-                    <Play className="w-4 h-4" />
+                    {runningSourceId === source.id ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Play className="w-4 h-4" />
+                    )}
                   </Button>
                 </div>
               </TableCell>
@@ -243,6 +249,7 @@ export default function SourcesPage() {
   const [marketFilter, setMarketFilter] = useState<string>("all");
   const [companyFilter, setCompanyFilter] = useState<string>("all");
   const [editingSource, setEditingSource] = useState<Source | null>(null);
+  const [runningSourceId, setRunningSourceId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState({
     name: "",
     sourceType: "",
@@ -321,11 +328,41 @@ export default function SourcesPage() {
     verifySourceMutation.mutate(source.id);
   };
 
+  const runSourceMutation = useMutation({
+    mutationFn: async (source: Source) => {
+      setRunningSourceId(source.id);
+      const response = await apiRequest("POST", `/api/sources/${source.id}/run`);
+      return response.json();
+    },
+    onSuccess: (data: { message: string; itemsFound: number; itemsCreated: number }) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sources"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      setRunningSourceId(null);
+      toast({ 
+        title: "Ingestion Complete", 
+        description: data.message
+      });
+    },
+    onError: (error: Error) => {
+      setRunningSourceId(null);
+      toast({ 
+        title: "Ingestion Failed", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+  });
+
   const handleRun = (source: Source) => {
-    toast({ 
-      title: "Run Now", 
-      description: "This feature will be available in PR3",
-    });
+    if (source.sourceType !== "rss") {
+      toast({ 
+        title: "Not Supported", 
+        description: `Manual ingestion is only available for RSS sources. ${source.sourceType === "feedly" ? "Feedly sources are ingested through the Feedly API." : ""}`,
+        variant: "destructive"
+      });
+      return;
+    }
+    runSourceMutation.mutate(source);
   };
 
   const handleSaveEdit = () => {
@@ -445,6 +482,7 @@ export default function SourcesPage() {
                   onVerify={handleVerify}
                   onRun={handleRun}
                   isLoading={isLoading}
+                  runningSourceId={runningSourceId}
                 />
               </CardContent>
             </Card>
@@ -460,6 +498,7 @@ export default function SourcesPage() {
                   onVerify={handleVerify}
                   onRun={handleRun}
                   isLoading={isLoading}
+                  runningSourceId={runningSourceId}
                 />
               </CardContent>
             </Card>
@@ -475,6 +514,7 @@ export default function SourcesPage() {
                   onVerify={handleVerify}
                   onRun={handleRun}
                   isLoading={isLoading}
+                  runningSourceId={runningSourceId}
                 />
               </CardContent>
             </Card>

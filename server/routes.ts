@@ -1752,6 +1752,48 @@ export async function registerRoutes(
     }
   });
 
+  // POST /api/sources/:id/run - Run ingestion for a specific source
+  app.post("/api/sources/:id/run", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const source = await storage.getSource(id);
+      
+      if (!source) {
+        return res.status(404).json({ error: "Source not found" });
+      }
+      
+      if (!source.isActive) {
+        return res.status(400).json({ error: "Cannot run ingestion on inactive source" });
+      }
+      
+      let result: { itemsFound: number; itemsCreated: number };
+      
+      if (source.sourceType === "rss") {
+        const { ingestSingleRSSSource } = await import("./rss-ingestion");
+        result = await ingestSingleRSSSource(id);
+      } else if (source.sourceType === "feedly") {
+        return res.status(400).json({ error: "Feedly sources are ingested through the Feedly API, not individually" });
+      } else {
+        return res.status(400).json({ error: `Ingestion not supported for source type: ${source.sourceType}` });
+      }
+      
+      // Update last ingested timestamp
+      await storage.updateSource(id, { lastIngestedAt: new Date() });
+      
+      res.json({
+        success: true,
+        itemsFound: result.itemsFound,
+        itemsCreated: result.itemsCreated,
+        message: result.itemsCreated > 0 
+          ? `Created ${result.itemsCreated} new signals from ${result.itemsFound} items`
+          : `Checked ${result.itemsFound} items, all already collected`
+      });
+    } catch (error) {
+      console.error("Error running source ingestion:", error);
+      res.status(500).json({ error: "Failed to run ingestion" });
+    }
+  });
+
   // POST /api/sources/discover/domain - Discover sources from a domain
   app.post("/api/sources/discover/domain", async (req: Request, res: Response) => {
     try {
