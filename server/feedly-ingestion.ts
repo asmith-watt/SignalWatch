@@ -351,3 +351,121 @@ export async function ingestSingleFeedlySource(sourceId: number): Promise<{
   
   return ingestFeedlySource(source);
 }
+
+// ============================================================================
+// Feedly API Functions for UI Management
+// ============================================================================
+
+export interface FeedlyCollection {
+  id: string;
+  label: string;
+  description?: string;
+  numFeeds?: number;
+}
+
+export interface FeedlySubscription {
+  id: string;
+  title: string;
+  website?: string;
+  subscribers?: number;
+  updated?: number;
+  categories?: Array<{ id: string; label: string }>;
+}
+
+export async function getFeedlyStatus(): Promise<{
+  connected: boolean;
+  hasRefreshToken: boolean;
+  error?: string;
+}> {
+  if (!FEEDLY_ACCESS_TOKEN) {
+    return { connected: false, hasRefreshToken: !!FEEDLY_REFRESH_TOKEN };
+  }
+  
+  try {
+    const response = await fetch(`${FEEDLY_API_BASE}/profile`, {
+      headers: {
+        "Authorization": `Bearer ${FEEDLY_ACCESS_TOKEN}`,
+      },
+    });
+    
+    if (!response.ok) {
+      if (response.status === 401 && FEEDLY_REFRESH_TOKEN) {
+        const refreshed = await refreshAccessToken();
+        if (refreshed) {
+          return { connected: true, hasRefreshToken: true };
+        }
+      }
+      return { connected: false, hasRefreshToken: !!FEEDLY_REFRESH_TOKEN, error: `API error: ${response.status}` };
+    }
+    
+    return { connected: true, hasRefreshToken: !!FEEDLY_REFRESH_TOKEN };
+  } catch (error) {
+    return { connected: false, hasRefreshToken: !!FEEDLY_REFRESH_TOKEN, error: String(error) };
+  }
+}
+
+export async function getFeedlyCollections(): Promise<FeedlyCollection[]> {
+  if (!FEEDLY_ACCESS_TOKEN) {
+    throw new Error("FEEDLY_ACCESS_TOKEN not configured");
+  }
+  
+  const tokenValid = await ensureValidToken();
+  if (!tokenValid) {
+    throw new Error("Feedly token is invalid or expired. Please update your credentials.");
+  }
+  
+  const response = await fetch(`${FEEDLY_API_BASE}/collections`, {
+    headers: {
+      "Authorization": `Bearer ${FEEDLY_ACCESS_TOKEN}`,
+    },
+  });
+  
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Feedly authentication failed. Please refresh your credentials.");
+    }
+    throw new Error(`Feedly API error: ${response.status} ${response.statusText}`);
+  }
+  
+  const data = await response.json();
+  return data.map((c: any) => ({
+    id: c.id,
+    label: c.label,
+    description: c.description,
+    numFeeds: c.feeds?.length || 0,
+  }));
+}
+
+export async function getFeedlySubscriptions(): Promise<FeedlySubscription[]> {
+  if (!FEEDLY_ACCESS_TOKEN) {
+    throw new Error("FEEDLY_ACCESS_TOKEN not configured");
+  }
+  
+  const tokenValid = await ensureValidToken();
+  if (!tokenValid) {
+    throw new Error("Feedly token is invalid or expired. Please update your credentials.");
+  }
+  
+  const response = await fetch(`${FEEDLY_API_BASE}/subscriptions`, {
+    headers: {
+      "Authorization": `Bearer ${FEEDLY_ACCESS_TOKEN}`,
+    },
+  });
+  
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Feedly authentication failed. Please refresh your credentials.");
+    }
+    throw new Error(`Feedly API error: ${response.status} ${response.statusText}`);
+  }
+  
+  const data = await response.json();
+  return data.map((s: any) => ({
+    id: s.id,
+    title: s.title,
+    website: s.website,
+    subscribers: s.subscribers,
+    updated: s.updated,
+    categories: s.categories,
+  }));
+}

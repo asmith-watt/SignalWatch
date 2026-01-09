@@ -46,6 +46,8 @@ import {
   Plus,
   Compass,
   ExternalLink,
+  CloudCog,
+  Loader2,
 } from "lucide-react";
 import type { Source, Company } from "@shared/schema";
 
@@ -366,6 +368,80 @@ export default function SourcesPage() {
   };
 
   const [runningBulk, setRunningBulk] = useState<"industry" | "company" | null>(null);
+  const [feedlySyncing, setFeedlySyncing] = useState(false);
+
+  // Feedly queries
+  const { data: feedlyStatus } = useQuery<{ connected: boolean; hasRefreshToken: boolean; error?: string }>({
+    queryKey: ["/api/feedly/status"],
+  });
+
+  const { data: feedlySubscriptions = [], isLoading: feedlySubscriptionsLoading } = useQuery<Array<{
+    id: string;
+    title: string;
+    website?: string;
+    subscribers?: number;
+    updated?: number;
+    categories?: Array<{ id: string; label: string }>;
+  }>>({
+    queryKey: ["/api/feedly/subscriptions"],
+    enabled: feedlyStatus?.connected === true,
+  });
+
+  const feedlySyncMutation = useMutation({
+    mutationFn: async () => {
+      setFeedlySyncing(true);
+      const response = await apiRequest("POST", "/api/feedly/sync");
+      return response.json();
+    },
+    onSuccess: (data: { sourcesProcessed: number; itemsFound: number; itemsCreated: number }) => {
+      setFeedlySyncing(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      toast({
+        title: "Feedly Sync Complete",
+        description: `Processed ${data.sourcesProcessed} sources, found ${data.itemsFound} items, created ${data.itemsCreated} new signals`,
+      });
+    },
+    onError: (error: Error) => {
+      setFeedlySyncing(false);
+      toast({
+        title: "Feedly Sync Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const addFeedlySourceMutation = useMutation({
+    mutationFn: async (subscription: { id: string; title: string; website?: string }) => {
+      let domain: string | null = null;
+      if (subscription.website) {
+        try {
+          const urlStr = subscription.website.startsWith("http") 
+            ? subscription.website 
+            : `https://${subscription.website}`;
+          domain = new URL(urlStr).hostname;
+        } catch {
+          domain = subscription.website.replace(/^(https?:\/\/)?/, "").split("/")[0];
+        }
+      }
+      return apiRequest("POST", "/api/sources", {
+        name: subscription.title,
+        sourceType: "feedly",
+        url: subscription.id,
+        domain,
+        trustScore: 75,
+        verificationStatus: "verified",
+        isActive: true,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sources"] });
+      toast({ title: "Feedly source added" });
+    },
+    onError: () => {
+      toast({ title: "Failed to add Feedly source", variant: "destructive" });
+    },
+  });
 
   const runIndustrySourcesMutation = useMutation({
     mutationFn: async (industry: string) => {
@@ -440,6 +516,10 @@ export default function SourcesPage() {
             <TabsTrigger value="all" data-testid="tab-all-sources">All Sources</TabsTrigger>
             <TabsTrigger value="by-industry" data-testid="tab-by-industry">By Industry</TabsTrigger>
             <TabsTrigger value="by-company" data-testid="tab-by-company">By Company</TabsTrigger>
+            <TabsTrigger value="feedly" data-testid="tab-feedly">
+              <CloudCog className="w-4 h-4 mr-1" />
+              Feedly
+            </TabsTrigger>
           </TabsList>
 
           <div className="flex flex-wrap gap-3 mt-4">
@@ -600,6 +680,167 @@ export default function SourcesPage() {
                 />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="feedly" className="mt-4">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between gap-2">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <CloudCog className="w-5 h-5" />
+                      Feedly Connection
+                    </CardTitle>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {feedlyStatus?.connected && (
+                      <Button
+                        variant="outline"
+                        onClick={() => feedlySyncMutation.mutate()}
+                        disabled={feedlySyncing}
+                        data-testid="button-feedly-sync"
+                      >
+                        {feedlySyncing ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Syncing...
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            Sync Now
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {feedlyStatus?.connected ? (
+                    <div className="flex items-center gap-2 text-green-600">
+                      <CheckCircle className="w-5 h-5" />
+                      <span>Connected to Feedly</span>
+                      {feedlyStatus.hasRefreshToken && (
+                        <Badge variant="secondary" className="ml-2">Auto-refresh enabled</Badge>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-amber-600">
+                        <AlertCircle className="w-5 h-5" />
+                        <span>Feedly not connected</span>
+                      </div>
+                      {feedlyStatus?.error && (
+                        <p className="text-sm text-muted-foreground">{feedlyStatus.error}</p>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        Add your FEEDLY_ACCESS_TOKEN in the Secrets tab to connect.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {feedlyStatus?.connected && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Your Feedly Subscriptions</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {feedlySubscriptionsLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <RefreshCw className="w-6 h-6 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : feedlySubscriptions.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <p>No subscriptions found in your Feedly account</p>
+                      </div>
+                    ) : (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Feed</TableHead>
+                            <TableHead>Categories</TableHead>
+                            <TableHead>Subscribers</TableHead>
+                            <TableHead className="w-[100px]">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {feedlySubscriptions.map((sub) => {
+                            const isAlreadyAdded = sources.some(s => s.sourceType === "feedly" && s.url === sub.id);
+                            return (
+                              <TableRow key={sub.id}>
+                                <TableCell>
+                                  <div className="flex flex-col gap-1">
+                                    <span className="font-medium">{sub.title}</span>
+                                    {sub.website && (
+                                      <a
+                                        href={sub.website}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-muted-foreground hover:underline flex items-center gap-1"
+                                      >
+                                        {sub.website}
+                                        <ExternalLink className="w-3 h-3" />
+                                      </a>
+                                    )}
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex flex-wrap gap-1">
+                                    {sub.categories?.map((cat) => (
+                                      <Badge key={cat.id} variant="outline" className="text-xs">
+                                        {cat.label}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  {sub.subscribers?.toLocaleString() || "-"}
+                                </TableCell>
+                                <TableCell>
+                                  {isAlreadyAdded ? (
+                                    <Badge variant="secondary">Added</Badge>
+                                  ) : (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => addFeedlySourceMutation.mutate(sub)}
+                                      disabled={addFeedlySourceMutation.isPending}
+                                      data-testid={`button-add-feedly-${sub.id}`}
+                                    >
+                                      <Plus className="w-4 h-4 mr-1" />
+                                      Add
+                                    </Button>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Added Feedly Sources</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <SourcesTable
+                    sources={sources.filter(s => s.sourceType === "feedly")}
+                    onEdit={handleEdit}
+                    onToggle={handleToggle}
+                    onVerify={handleVerify}
+                    onRun={handleRun}
+                    isLoading={isLoading}
+                    runningSourceId={runningSourceId}
+                  />
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
 

@@ -1508,6 +1508,60 @@ export async function registerRoutes(
     }
   });
 
+  // ============================================
+  // Feedly Management Endpoints
+  // ============================================
+
+  // GET /api/feedly/status - Check Feedly connection status
+  app.get("/api/feedly/status", async (req: Request, res: Response) => {
+    try {
+      const { getFeedlyStatus } = await import("./feedly-ingestion");
+      const status = await getFeedlyStatus();
+      res.json(status);
+    } catch (error) {
+      console.error("Error checking Feedly status:", error);
+      res.status(500).json({ error: "Failed to check Feedly status" });
+    }
+  });
+
+  // GET /api/feedly/collections - List Feedly collections
+  app.get("/api/feedly/collections", async (req: Request, res: Response) => {
+    try {
+      const { getFeedlyCollections } = await import("./feedly-ingestion");
+      const collections = await getFeedlyCollections();
+      res.json(collections);
+    } catch (error) {
+      console.error("Error fetching Feedly collections:", error);
+      res.status(500).json({ error: "Failed to fetch Feedly collections" });
+    }
+  });
+
+  // GET /api/feedly/subscriptions - List Feedly subscriptions
+  app.get("/api/feedly/subscriptions", async (req: Request, res: Response) => {
+    try {
+      const { getFeedlySubscriptions } = await import("./feedly-ingestion");
+      const subscriptions = await getFeedlySubscriptions();
+      res.json(subscriptions);
+    } catch (error) {
+      console.error("Error fetching Feedly subscriptions:", error);
+      res.status(500).json({ error: "Failed to fetch Feedly subscriptions" });
+    }
+  });
+
+  // POST /api/feedly/sync - Trigger manual Feedly sync from UI
+  // Note: This is accessible from the UI for user-initiated syncs.
+  // The /api/admin/ingest/feedly/run endpoint remains protected for automated/scheduled calls.
+  app.post("/api/feedly/sync", async (req: Request, res: Response) => {
+    try {
+      const { runFeedlyIngestion } = await import("./feedly-ingestion");
+      const result = await runFeedlyIngestion();
+      res.json(result);
+    } catch (error) {
+      console.error("Error running Feedly sync:", error);
+      res.status(500).json({ error: "Failed to run Feedly sync" });
+    }
+  });
+
   // POST /api/admin/signals/migrate-llm - Migrate legacy Perplexity signals
   app.post("/api/admin/signals/migrate-llm", async (req: Request, res: Response) => {
     try {
