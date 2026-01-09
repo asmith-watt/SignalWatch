@@ -6,6 +6,31 @@ SignalWatch is a B2B business intelligence platform designed for editorial teams
 
 ## Recent Changes
 
+### PR1: Sources Schema + Signal Provenance (January 2026)
+- **New tables** (`shared/schema.ts`):
+  - `sources`: Tracks where signals come from (RSS, Feedly, crawl, regulator, association, LLM)
+    - Fields: id, name, sourceType, url, domain, trustScore, verificationStatus, isActive, lastVerifiedAt, lastIngestedAt
+  - `source_markets`: Links sources to markets/regions they cover
+  - `company_sources`: Maps which companies are covered by which sources
+  - `ingestion_runs`: Tracks batch ingestion jobs with itemsFound, itemsCreated, errors
+- **Signal provenance fields** (extended `signals` table):
+  - `ingestionSourceType`: How the signal was discovered (default: 'llm_discovery')
+  - `verificationStatus`: verified | unverified | rejected (default: 'unverified')
+  - `verificationMethod`: How the signal was verified
+  - `sourceId`: FK to sources table
+  - `providerName`, `providerItemId`: External provider tracking
+  - `canonicalUrl`: Canonical URL for deduplication
+  - `companyId` now nullable (supports unassigned publisher/regulator signals)
+- **Company relationships enhancement**:
+  - Added `firstSeenAt` and `lastSeenAt` timestamps
+- **New API endpoints**:
+  - `GET /api/sources` - List sources with filters (market, companyId, type, status)
+  - `POST /api/sources` - Create a new source
+  - `PATCH /api/sources/:id` - Update a source
+  - `POST /api/sources/:id/verify` - Mark source as verified
+  - `DELETE /api/sources/:id` - Delete a source
+  - `GET /api/ingest/runs` - List ingestion runs
+
 ### Intelligence Layer - Trends & Metrics (January 2026)
 - **Signal Metrics** (`server/trend-engine.ts`):
   - Daily snapshot capturing rolling 7d and 30d signal counts

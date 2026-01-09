@@ -1447,6 +1447,12 @@ export async function registerRoutes(
   // Endpoint to backfill/fix signal dates (accessible from Data Management UI)
   app.post("/api/admin/dates/backfill", async (req: Request, res: Response) => {
     try {
+      // Allow access if ADMIN_TOKEN is set and matches, or if no ADMIN_TOKEN is configured
+      const adminToken = req.headers["x-admin-token"];
+      if (process.env.ADMIN_TOKEN && adminToken !== process.env.ADMIN_TOKEN) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      
       const { backfillSignalDates } = await import("./date-verifier");
       const { companyId, limit = 100, onlySuspicious = false } = req.body;
       
@@ -1462,6 +1468,159 @@ export async function registerRoutes(
       res.status(500).json({ error: "Failed to backfill dates" });
     }
   });
+
+  // ============================================
+  // Sources API Routes (PR1)
+  // ============================================
+
+  // GET /api/sources - List all sources with optional filters
+  app.get("/api/sources", async (req: Request, res: Response) => {
+    try {
+      const { market, companyId, type, status } = req.query;
+      const filters = {
+        market: market as string | undefined,
+        companyId: companyId ? parseInt(companyId as string) : undefined,
+        type: type as string | undefined,
+        status: status as string | undefined,
+      };
+      const sources = await storage.getAllSources(filters);
+      res.json(sources);
+    } catch (error) {
+      console.error("Error fetching sources:", error);
+      res.status(500).json({ error: "Failed to fetch sources" });
+    }
+  });
+
+  // POST /api/sources - Create a new source
+  app.post("/api/sources", async (req: Request, res: Response) => {
+    try {
+      const { name, sourceType, url, domain, trustScore } = req.body;
+      
+      // Validation
+      if (!name || typeof name !== 'string' || name.trim().length === 0) {
+        return res.status(400).json({ error: "Name is required" });
+      }
+      
+      const validSourceTypes = ['rss', 'feedly', 'crawl', 'regulator', 'association', 'llm'];
+      if (!sourceType || !validSourceTypes.includes(sourceType)) {
+        return res.status(400).json({ error: `Invalid sourceType. Must be one of: ${validSourceTypes.join(', ')}` });
+      }
+      
+      // Validate trustScore if provided
+      const validatedTrustScore = trustScore !== undefined 
+        ? Math.max(0, Math.min(100, parseInt(trustScore) || 50))
+        : 50;
+      
+      const source = await storage.createSource({
+        name: name.trim(),
+        sourceType,
+        url: url || null,
+        domain: domain || null,
+        trustScore: validatedTrustScore,
+      });
+      res.status(201).json(source);
+    } catch (error) {
+      console.error("Error creating source:", error);
+      res.status(500).json({ error: "Failed to create source" });
+    }
+  });
+
+  // PATCH /api/sources/:id - Update a source
+  app.patch("/api/sources/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { name, sourceType, url, domain, trustScore, verificationStatus, isActive } = req.body;
+      
+      // Validate fields if provided
+      const validSourceTypes = ['rss', 'feedly', 'crawl', 'regulator', 'association', 'llm'];
+      const validStatuses = ['verified', 'needs_review', 'broken'];
+      
+      if (sourceType && !validSourceTypes.includes(sourceType)) {
+        return res.status(400).json({ error: `Invalid sourceType. Must be one of: ${validSourceTypes.join(', ')}` });
+      }
+      
+      if (verificationStatus && !validStatuses.includes(verificationStatus)) {
+        return res.status(400).json({ error: `Invalid verificationStatus. Must be one of: ${validStatuses.join(', ')}` });
+      }
+      
+      const updates: Record<string, any> = {};
+      if (name !== undefined) updates.name = name.trim();
+      if (sourceType !== undefined) updates.sourceType = sourceType;
+      if (url !== undefined) updates.url = url;
+      if (domain !== undefined) updates.domain = domain;
+      if (trustScore !== undefined) updates.trustScore = Math.max(0, Math.min(100, parseInt(trustScore) || 50));
+      if (verificationStatus !== undefined) updates.verificationStatus = verificationStatus;
+      if (isActive !== undefined) updates.isActive = Boolean(isActive);
+      
+      const source = await storage.updateSource(id, updates);
+      if (!source) {
+        return res.status(404).json({ error: "Source not found" });
+      }
+      res.json(source);
+    } catch (error) {
+      console.error("Error updating source:", error);
+      res.status(500).json({ error: "Failed to update source" });
+    }
+  });
+
+  // POST /api/sources/:id/verify - Mark source as verified
+  app.post("/api/sources/:id/verify", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { verificationMethod } = req.body;
+      
+      // Check if source exists and is active
+      const existingSource = await storage.getSource(id);
+      if (!existingSource) {
+        return res.status(404).json({ error: "Source not found" });
+      }
+      
+      if (!existingSource.isActive) {
+        return res.status(400).json({ error: "Cannot verify inactive source" });
+      }
+      
+      const source = await storage.updateSource(id, {
+        verificationStatus: "verified",
+        lastVerifiedAt: new Date(),
+      });
+      
+      res.json(source);
+    } catch (error) {
+      console.error("Error verifying source:", error);
+      res.status(500).json({ error: "Failed to verify source" });
+    }
+  });
+
+  // DELETE /api/sources/:id - Delete a source
+  app.delete("/api/sources/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteSource(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting source:", error);
+      res.status(500).json({ error: "Failed to delete source" });
+    }
+  });
+
+  // GET /api/ingest/runs - List ingestion runs
+  app.get("/api/ingest/runs", async (req: Request, res: Response) => {
+    try {
+      const { limit, sourceId } = req.query;
+      const runs = await storage.getIngestionRuns(
+        limit ? parseInt(limit as string) : 50,
+        sourceId ? parseInt(sourceId as string) : undefined
+      );
+      res.json(runs);
+    } catch (error) {
+      console.error("Error fetching ingestion runs:", error);
+      res.status(500).json({ error: "Failed to fetch ingestion runs" });
+    }
+  });
+
+  // ============================================
+  // End Sources API Routes
+  // ============================================
 
   app.post("/api/monitor/company/:id", async (req: Request, res: Response) => {
     try {

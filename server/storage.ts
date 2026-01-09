@@ -20,6 +20,12 @@ import {
   type InsertSignalMetric,
   type Trend,
   type InsertTrend,
+  type Source,
+  type InsertSource,
+  type SourceMarket,
+  type InsertSourceMarket,
+  type IngestionRun,
+  type InsertIngestionRun,
   users,
   companies,
   signals,
@@ -32,6 +38,10 @@ import {
   entities,
   signalMetrics,
   trends,
+  sources,
+  sourceMarkets,
+  companySources,
+  ingestionRuns,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, ilike, sql, gt, inArray } from "drizzle-orm";
@@ -125,6 +135,22 @@ export interface IStorage {
     avgConfidence: number;
   }>;
   getSignalsNeedingDateReview(limit?: number): Promise<Signal[]>;
+
+  // Sources (PR1)
+  getSource(id: number): Promise<Source | undefined>;
+  getAllSources(filters?: { market?: string; companyId?: number; type?: string; status?: string }): Promise<Source[]>;
+  createSource(source: InsertSource): Promise<Source>;
+  updateSource(id: number, updates: Partial<InsertSource>): Promise<Source | undefined>;
+  deleteSource(id: number): Promise<void>;
+  getSourceMarkets(sourceId: number): Promise<SourceMarket[]>;
+  addSourceMarket(sourceId: number, market: string): Promise<SourceMarket>;
+  removeSourceMarket(id: number): Promise<void>;
+
+  // Ingestion Runs (PR1)
+  createIngestionRun(run: InsertIngestionRun): Promise<IngestionRun>;
+  updateIngestionRun(id: number, updates: Partial<InsertIngestionRun>): Promise<IngestionRun | undefined>;
+  getIngestionRun(id: number): Promise<IngestionRun | undefined>;
+  getIngestionRuns(limit?: number, sourceId?: number): Promise<IngestionRun[]>;
 }
 
 export interface RelatedSignalResult {
@@ -740,6 +766,132 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(signals)
       .where(eq(signals.needsDateReview, true))
       .orderBy(desc(signals.gatheredAt))
+      .limit(limit);
+  }
+
+  // Sources (PR1)
+  async getSource(id: number): Promise<Source | undefined> {
+    const [result] = await db.select().from(sources).where(eq(sources.id, id));
+    return result;
+  }
+
+  async getAllSources(filters?: { market?: string; companyId?: number; type?: string; status?: string }): Promise<Source[]> {
+    let query = db.select({ source: sources }).from(sources);
+    
+    // Join with source_markets if filtering by market
+    if (filters?.market) {
+      const marketSourceIds = await db.select({ sourceId: sourceMarkets.sourceId })
+        .from(sourceMarkets)
+        .where(eq(sourceMarkets.market, filters.market));
+      
+      if (marketSourceIds.length === 0) {
+        return [];
+      }
+      
+      const sourceIds = marketSourceIds.map(m => m.sourceId);
+      const conditions = [inArray(sources.id, sourceIds)];
+      
+      if (filters.type) conditions.push(eq(sources.sourceType, filters.type));
+      if (filters.status) conditions.push(eq(sources.verificationStatus, filters.status));
+      
+      return db.select().from(sources)
+        .where(and(...conditions))
+        .orderBy(desc(sources.createdAt));
+    }
+    
+    // Join with company_sources if filtering by companyId
+    if (filters?.companyId) {
+      const companySourceIds = await db.select({ sourceId: companySources.sourceId })
+        .from(companySources)
+        .where(eq(companySources.companyId, filters.companyId));
+      
+      if (companySourceIds.length === 0) {
+        return [];
+      }
+      
+      const sourceIds = companySourceIds.map(cs => cs.sourceId);
+      const conditions = [inArray(sources.id, sourceIds)];
+      
+      if (filters.type) conditions.push(eq(sources.sourceType, filters.type));
+      if (filters.status) conditions.push(eq(sources.verificationStatus, filters.status));
+      
+      return db.select().from(sources)
+        .where(and(...conditions))
+        .orderBy(desc(sources.createdAt));
+    }
+    
+    // Simple filtering by type and status
+    const conditions = [];
+    if (filters?.type) conditions.push(eq(sources.sourceType, filters.type));
+    if (filters?.status) conditions.push(eq(sources.verificationStatus, filters.status));
+    
+    if (conditions.length === 0) {
+      return db.select().from(sources).orderBy(desc(sources.createdAt));
+    }
+    
+    return db.select().from(sources)
+      .where(and(...conditions))
+      .orderBy(desc(sources.createdAt));
+  }
+
+  async createSource(source: InsertSource): Promise<Source> {
+    const [result] = await db.insert(sources).values(source).returning();
+    return result;
+  }
+
+  async updateSource(id: number, updates: Partial<InsertSource>): Promise<Source | undefined> {
+    const [result] = await db.update(sources)
+      .set(updates)
+      .where(eq(sources.id, id))
+      .returning();
+    return result;
+  }
+
+  async deleteSource(id: number): Promise<void> {
+    await db.delete(sources).where(eq(sources.id, id));
+  }
+
+  async getSourceMarkets(sourceId: number): Promise<SourceMarket[]> {
+    return db.select().from(sourceMarkets).where(eq(sourceMarkets.sourceId, sourceId));
+  }
+
+  async addSourceMarket(sourceId: number, market: string): Promise<SourceMarket> {
+    const [result] = await db.insert(sourceMarkets).values({ sourceId, market }).returning();
+    return result;
+  }
+
+  async removeSourceMarket(id: number): Promise<void> {
+    await db.delete(sourceMarkets).where(eq(sourceMarkets.id, id));
+  }
+
+  // Ingestion Runs (PR1)
+  async createIngestionRun(run: InsertIngestionRun): Promise<IngestionRun> {
+    const [result] = await db.insert(ingestionRuns).values(run).returning();
+    return result;
+  }
+
+  async updateIngestionRun(id: number, updates: Partial<InsertIngestionRun>): Promise<IngestionRun | undefined> {
+    const [result] = await db.update(ingestionRuns)
+      .set(updates)
+      .where(eq(ingestionRuns.id, id))
+      .returning();
+    return result;
+  }
+
+  async getIngestionRun(id: number): Promise<IngestionRun | undefined> {
+    const [result] = await db.select().from(ingestionRuns).where(eq(ingestionRuns.id, id));
+    return result;
+  }
+
+  async getIngestionRuns(limit: number = 50, sourceId?: number): Promise<IngestionRun[]> {
+    if (sourceId) {
+      return db.select().from(ingestionRuns)
+        .where(eq(ingestionRuns.sourceId, sourceId))
+        .orderBy(desc(ingestionRuns.startedAt))
+        .limit(limit);
+    }
+    return db.select().from(ingestionRuns)
+      .orderBy(desc(ingestionRuns.startedAt))
       .limit(limit);
   }
 }

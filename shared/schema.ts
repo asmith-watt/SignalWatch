@@ -118,10 +118,145 @@ export const sourceStatusTypes = [
 
 export type SourceStatus = (typeof sourceStatusTypes)[number];
 
+// ============================================
+// Sources & Ingestion System (PR1)
+// ============================================
+
+// Source types for the ingestion system
+export const sourceTypes = [
+  "rss",
+  "feedly",
+  "crawl",
+  "regulator",
+  "association",
+  "llm",
+] as const;
+
+export type SourceType = (typeof sourceTypes)[number];
+
+// Verification status for sources
+export const sourceVerificationStatuses = [
+  "verified",
+  "needs_review",
+  "broken",
+] as const;
+
+export type SourceVerificationStatus = (typeof sourceVerificationStatuses)[number];
+
+// Signal verification statuses
+export const signalVerificationStatuses = [
+  "verified",
+  "unverified",
+  "rejected",
+] as const;
+
+export type SignalVerificationStatus = (typeof signalVerificationStatuses)[number];
+
+// Sources table - tracks where signals come from
+export const sources = pgTable("sources", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  sourceType: text("source_type").notNull(),
+  url: text("url"),
+  domain: text("domain"),
+  trustScore: integer("trust_score").default(50),
+  verificationStatus: text("verification_status").default("needs_review"),
+  isActive: boolean("is_active").default(true),
+  lastVerifiedAt: timestamp("last_verified_at"),
+  lastIngestedAt: timestamp("last_ingested_at"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const insertSourceSchema = createInsertSchema(sources).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertSource = z.infer<typeof insertSourceSchema>;
+export type Source = typeof sources.$inferSelect;
+
+// Source markets - what markets/regions a source covers
+export const sourceMarkets = pgTable("source_markets", {
+  id: serial("id").primaryKey(),
+  sourceId: integer("source_id").notNull().references(() => sources.id, { onDelete: "cascade" }),
+  market: text("market").notNull(),
+});
+
+export const sourceMarketsRelations = relations(sourceMarkets, ({ one }) => ({
+  source: one(sources, {
+    fields: [sourceMarkets.sourceId],
+    references: [sources.id],
+  }),
+}));
+
+export const insertSourceMarketSchema = createInsertSchema(sourceMarkets).omit({
+  id: true,
+});
+
+export type InsertSourceMarket = z.infer<typeof insertSourceMarketSchema>;
+export type SourceMarket = typeof sourceMarkets.$inferSelect;
+
+// Company-source relationships (which companies are covered by which sources)
+export const companySources = pgTable("company_sources", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
+  sourceId: integer("source_id").notNull().references(() => sources.id, { onDelete: "cascade" }),
+  relationshipType: text("relationship_type"),
+});
+
+export const companySourcesRelations = relations(companySources, ({ one }) => ({
+  company: one(companies, {
+    fields: [companySources.companyId],
+    references: [companies.id],
+  }),
+  source: one(sources, {
+    fields: [companySources.sourceId],
+    references: [sources.id],
+  }),
+}));
+
+export const insertCompanySourceSchema = createInsertSchema(companySources).omit({
+  id: true,
+});
+
+export type InsertCompanySource = z.infer<typeof insertCompanySourceSchema>;
+export type CompanySource = typeof companySources.$inferSelect;
+
+// Ingestion runs - tracks batch ingestion jobs
+export const ingestionRuns = pgTable("ingestion_runs", {
+  id: serial("id").primaryKey(),
+  sourceId: integer("source_id").references(() => sources.id, { onDelete: "set null" }),
+  sourceType: text("source_type"),
+  startedAt: timestamp("started_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  completedAt: timestamp("completed_at"),
+  itemsFound: integer("items_found").default(0),
+  itemsCreated: integer("items_created").default(0),
+  errors: jsonb("errors"),
+});
+
+export const ingestionRunsRelations = relations(ingestionRuns, ({ one }) => ({
+  source: one(sources, {
+    fields: [ingestionRuns.sourceId],
+    references: [sources.id],
+  }),
+}));
+
+export const insertIngestionRunSchema = createInsertSchema(ingestionRuns).omit({
+  id: true,
+  startedAt: true,
+});
+
+export type InsertIngestionRun = z.infer<typeof insertIngestionRunSchema>;
+export type IngestionRun = typeof ingestionRuns.$inferSelect;
+
+// ============================================
+// End Sources & Ingestion System
+// ============================================
+
 // Signals table - captured business intelligence
 export const signals = pgTable("signals", {
   id: serial("id").primaryKey(),
-  companyId: integer("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
+  companyId: integer("company_id").references(() => companies.id, { onDelete: "cascade" }),
   type: text("type").notNull(),
   title: text("title").notNull(),
   content: text("content"),
@@ -148,6 +283,14 @@ export const signals = pgTable("signals", {
   needsDateReview: boolean("needs_date_review").default(false),
   sourceStatus: text("source_status").default("unknown"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  // PR1: Signal provenance fields
+  ingestionSourceType: text("ingestion_source_type").default("llm_discovery"),
+  verificationStatus: text("verification_status").default("unverified"),
+  verificationMethod: text("verification_method"),
+  sourceId: integer("source_id").references(() => sources.id, { onDelete: "set null" }),
+  providerName: text("provider_name"),
+  providerItemId: text("provider_item_id"),
+  canonicalUrl: text("canonical_url"),
 });
 
 export const signalsRelations = relations(signals, ({ one }) => ({
@@ -244,6 +387,8 @@ export const companyRelationships = pgTable("company_relationships", {
   sourceSignalId: integer("source_signal_id").references(() => signals.id),
   isAiExtracted: boolean("is_ai_extracted").default(false),
   confidence: integer("confidence").default(100),
+  firstSeenAt: timestamp("first_seen_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  lastSeenAt: timestamp("last_seen_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
