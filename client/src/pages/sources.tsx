@@ -365,6 +365,44 @@ export default function SourcesPage() {
     runSourceMutation.mutate(source);
   };
 
+  const [runningBulk, setRunningBulk] = useState<"industry" | "company" | null>(null);
+
+  const runIndustrySourcesMutation = useMutation({
+    mutationFn: async (industry: string) => {
+      setRunningBulk("industry");
+      const response = await apiRequest("POST", `/api/sources/run/industry/${encodeURIComponent(industry)}`);
+      return response.json();
+    },
+    onSuccess: (data: { message: string }) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sources"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      setRunningBulk(null);
+      toast({ title: "Ingestion Complete", description: data.message });
+    },
+    onError: () => {
+      setRunningBulk(null);
+      toast({ title: "Ingestion Failed", variant: "destructive" });
+    },
+  });
+
+  const runCompanySourcesMutation = useMutation({
+    mutationFn: async (companyId: number) => {
+      setRunningBulk("company");
+      const response = await apiRequest("POST", `/api/sources/run/company/${companyId}`);
+      return response.json();
+    },
+    onSuccess: (data: { message: string }) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sources"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      setRunningBulk(null);
+      toast({ title: "Ingestion Complete", description: data.message });
+    },
+    onError: () => {
+      setRunningBulk(null);
+      toast({ title: "Ingestion Failed", variant: "destructive" });
+    },
+  });
+
   const handleSaveEdit = () => {
     if (!editingSource) return;
     updateSourceMutation.mutate({
@@ -444,31 +482,75 @@ export default function SourcesPage() {
             </Select>
 
             {activeTab === "by-industry" && (
-              <Select value={marketFilter} onValueChange={setMarketFilter}>
-                <SelectTrigger className="w-[180px]" data-testid="filter-market">
-                  <SelectValue placeholder="Select Industry" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Industries</SelectItem>
-                  {industries.map(industry => (
-                    <SelectItem key={industry} value={industry}>{industry}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <>
+                <Select value={marketFilter} onValueChange={setMarketFilter}>
+                  <SelectTrigger className="w-[180px]" data-testid="filter-market">
+                    <SelectValue placeholder="Select Industry" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Industries</SelectItem>
+                    {industries.map(industry => (
+                      <SelectItem key={industry} value={industry}>{industry}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {marketFilter && marketFilter !== "all" && (
+                  <Button
+                    variant="outline"
+                    onClick={() => runIndustrySourcesMutation.mutate(marketFilter)}
+                    disabled={runningBulk !== null}
+                    data-testid="button-run-industry-sources"
+                  >
+                    {runningBulk === "industry" ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Running...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Run All Sources
+                      </>
+                    )}
+                  </Button>
+                )}
+              </>
             )}
 
             {activeTab === "by-company" && (
-              <Select value={companyFilter} onValueChange={setCompanyFilter}>
-                <SelectTrigger className="w-[200px]" data-testid="filter-company">
-                  <SelectValue placeholder="Select Company" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Companies</SelectItem>
-                  {companies.map(company => (
-                    <SelectItem key={company.id} value={String(company.id)}>{company.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <>
+                <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                  <SelectTrigger className="w-[200px]" data-testid="filter-company">
+                    <SelectValue placeholder="Select Company" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Companies</SelectItem>
+                    {companies.map(company => (
+                      <SelectItem key={company.id} value={String(company.id)}>{company.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {companyFilter && companyFilter !== "all" && (
+                  <Button
+                    variant="outline"
+                    onClick={() => runCompanySourcesMutation.mutate(parseInt(companyFilter))}
+                    disabled={runningBulk !== null}
+                    data-testid="button-run-company-sources"
+                  >
+                    {runningBulk === "company" ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Running...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Run All Sources
+                      </>
+                    )}
+                  </Button>
+                )}
+              </>
             )}
           </div>
 

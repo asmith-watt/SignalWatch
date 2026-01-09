@@ -1794,6 +1794,117 @@ export async function registerRoutes(
     }
   });
 
+  // POST /api/sources/run/industry/:industry - Run all RSS sources for an industry
+  app.post("/api/sources/run/industry/:industry", async (req: Request, res: Response) => {
+    try {
+      const industry = decodeURIComponent(req.params.industry);
+      
+      // Get all sources, then filter to RSS sources for companies in this industry
+      const allSources = await storage.getSources({ type: "rss" });
+      const companies = await storage.getAllCompanies();
+      const industryCompanyIds = new Set(
+        companies.filter(c => c.industry === industry).map(c => c.id)
+      );
+      
+      // For now, run all active RSS sources (sources may not be company-specific)
+      const activeSources = allSources.filter(s => s.isActive && s.sourceType === "rss");
+      
+      if (activeSources.length === 0) {
+        return res.json({ success: true, message: "No active RSS sources to run", totalFound: 0, totalCreated: 0 });
+      }
+      
+      const { ingestSingleRSSSource } = await import("./rss-ingestion");
+      
+      let totalFound = 0;
+      let totalCreated = 0;
+      let successCount = 0;
+      
+      for (const source of activeSources) {
+        try {
+          const result = await ingestSingleRSSSource(source.id);
+          totalFound += result.itemsFound;
+          totalCreated += result.itemsCreated;
+          successCount++;
+          await storage.updateSource(source.id, { lastIngestedAt: new Date() });
+        } catch (err) {
+          console.error(`Error ingesting source ${source.id}:`, err);
+        }
+      }
+      
+      res.json({
+        success: true,
+        sourcesRun: successCount,
+        totalSources: activeSources.length,
+        totalFound,
+        totalCreated,
+        message: `Ran ${successCount} sources, created ${totalCreated} new signals`
+      });
+    } catch (error) {
+      console.error("Error running industry sources:", error);
+      res.status(500).json({ error: "Failed to run industry sources" });
+    }
+  });
+
+  // POST /api/sources/run/company/:companyId - Run all RSS sources for a company
+  app.post("/api/sources/run/company/:companyId", async (req: Request, res: Response) => {
+    try {
+      const companyId = parseInt(req.params.companyId);
+      const company = await storage.getCompany(companyId);
+      
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      
+      // Get sources linked to this company (by companyId) or with matching domain
+      const allSources = await storage.getSources({ type: "rss" });
+      let companySources = allSources.filter(s => 
+        s.isActive && 
+        s.sourceType === "rss" && 
+        (s.companyId === companyId || 
+         (company.website && s.domain && company.website.includes(s.domain)))
+      );
+      
+      // If no company-specific sources, run all active RSS sources
+      if (companySources.length === 0) {
+        companySources = allSources.filter(s => s.isActive && s.sourceType === "rss");
+      }
+      
+      if (companySources.length === 0) {
+        return res.json({ success: true, message: "No active RSS sources to run", totalFound: 0, totalCreated: 0 });
+      }
+      
+      const { ingestSingleRSSSource } = await import("./rss-ingestion");
+      
+      let totalFound = 0;
+      let totalCreated = 0;
+      let successCount = 0;
+      
+      for (const source of companySources) {
+        try {
+          const result = await ingestSingleRSSSource(source.id);
+          totalFound += result.itemsFound;
+          totalCreated += result.itemsCreated;
+          successCount++;
+          await storage.updateSource(source.id, { lastIngestedAt: new Date() });
+        } catch (err) {
+          console.error(`Error ingesting source ${source.id}:`, err);
+        }
+      }
+      
+      res.json({
+        success: true,
+        sourcesRun: successCount,
+        totalSources: companySources.length,
+        totalFound,
+        totalCreated,
+        message: `Ran ${successCount} sources for ${company.name}, created ${totalCreated} new signals`
+      });
+    } catch (error) {
+      console.error("Error running company sources:", error);
+      res.status(500).json({ error: "Failed to run company sources" });
+    }
+  });
+
   // POST /api/sources/discover/domain - Discover sources from a domain
   app.post("/api/sources/discover/domain", async (req: Request, res: Response) => {
     try {
