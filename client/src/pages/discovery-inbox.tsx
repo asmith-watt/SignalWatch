@@ -76,7 +76,7 @@ function getVerificationBadge(status: string | null) {
 export default function DiscoveryInboxPage() {
   const { toast } = useToast();
   const [selectedSignals, setSelectedSignals] = useState<Set<number>>(new Set());
-  const [sourceTypeFilter, setSourceTypeFilter] = useState<string>("");
+  const [sourceTypeFilter, setSourceTypeFilter] = useState<string>("all");
 
   const { data: signals = [], isLoading } = useQuery<Signal[]>({
     queryKey: ["/api/signals"],
@@ -92,7 +92,7 @@ export default function DiscoveryInboxPage() {
     const isDiscovery = signal.ingestionSourceType === "llm_discovery" || 
                         signal.verificationStatus === "unverified";
     if (!isDiscovery) return false;
-    if (sourceTypeFilter && signal.ingestionSourceType !== sourceTypeFilter) return false;
+    if (sourceTypeFilter && sourceTypeFilter !== "all" && signal.ingestionSourceType !== sourceTypeFilter) return false;
     return true;
   });
 
@@ -189,7 +189,7 @@ export default function DiscoveryInboxPage() {
               <SelectValue placeholder="All Source Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Source Types</SelectItem>
+              <SelectItem value="all">All Source Types</SelectItem>
               <SelectItem value="llm_discovery">LLM Discovery</SelectItem>
               <SelectItem value="rss">RSS</SelectItem>
               <SelectItem value="feedly">Feedly</SelectItem>

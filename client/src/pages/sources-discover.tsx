@@ -52,9 +52,9 @@ interface DiscoveredSource {
 export default function SourcesDiscoverPage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("domain");
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("none");
   const [domainInput, setDomainInput] = useState("");
-  const [marketInput, setMarketInput] = useState("");
+  const [marketInput, setMarketInput] = useState("any");
   const [keywordsInput, setKeywordsInput] = useState("");
   const [discoveredSources, setDiscoveredSources] = useState<DiscoveredSource[]>([]);
   const [isDiscovering, setIsDiscovering] = useState(false);
@@ -124,14 +124,14 @@ export default function SourcesDiscoverPage() {
     
     const params: { domain?: string; companyId?: number; market?: string } = {};
     if (domainInput) params.domain = domainInput;
-    if (selectedCompanyId) params.companyId = parseInt(selectedCompanyId);
-    if (marketInput) params.market = marketInput;
+    if (selectedCompanyId && selectedCompanyId !== "none") params.companyId = parseInt(selectedCompanyId);
+    if (marketInput && marketInput !== "any") params.market = marketInput;
     
     discoverDomainMutation.mutate(params);
   };
 
   const handleWebDiscover = () => {
-    if (!marketInput || !keywordsInput) {
+    if (!marketInput || marketInput === "any" || !keywordsInput) {
       toast({ title: "Please enter market and keywords", variant: "destructive" });
       return;
     }
@@ -179,7 +179,7 @@ export default function SourcesDiscoverPage() {
                         <SelectValue placeholder="Choose a company" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">No company</SelectItem>
+                        <SelectItem value="none">No company</SelectItem>
                         {companies.map(company => (
                           <SelectItem key={company.id} value={String(company.id)}>
                             {company.name}
@@ -207,9 +207,9 @@ export default function SourcesDiscoverPage() {
                         <SelectValue placeholder="Select market" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Any market</SelectItem>
+                        <SelectItem value="any">Any market</SelectItem>
                         {industries.map(industry => (
-                          <SelectItem key={industry} value={industry || ""}>{industry}</SelectItem>
+                          <SelectItem key={industry} value={industry}>{industry}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -218,7 +218,7 @@ export default function SourcesDiscoverPage() {
 
                 <Button 
                   onClick={handleDomainDiscover}
-                  disabled={isDiscovering || (!selectedCompanyId && !domainInput)}
+                  disabled={isDiscovering || ((selectedCompanyId === "none" || !selectedCompanyId) && !domainInput)}
                   data-testid="button-discover-domain"
                 >
                   {isDiscovering ? (
@@ -275,7 +275,7 @@ export default function SourcesDiscoverPage() {
 
                 <Button 
                   onClick={handleWebDiscover}
-                  disabled={isDiscovering || !marketInput || !keywordsInput}
+                  disabled={isDiscovering || !marketInput || marketInput === "any" || !keywordsInput}
                   data-testid="button-discover-web"
                 >
                   {isDiscovering ? (
