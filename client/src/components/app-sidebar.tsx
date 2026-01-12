@@ -65,6 +65,11 @@ interface AppSidebarProps {
   signalCounts: Record<number, number>;
 }
 
+const sourceItems = [
+  { title: "Sources", url: "/sources", icon: Rss },
+  { title: "Discover Sources", url: "/sources/discover", icon: Compass },
+];
+
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: TrendingUp },
   { title: "Recent Signals", url: "/signals", icon: Radio },
@@ -72,8 +77,6 @@ const navigationItems = [
   { title: "Trends", url: "/trends", icon: BarChart3 },
   { title: "Signal Graph", url: "/signal-graph", icon: GitBranch },
   { title: "Industry Map", url: "/industry-map", icon: Network },
-  { title: "Sources", url: "/sources", icon: Rss },
-  { title: "Discover Sources", url: "/sources/discover", icon: Compass },
   { title: "Alerts", url: "/alerts", icon: Bell },
   { title: "Team", url: "/team", icon: Users },
   { title: "WordPress", url: "/wordpress", icon: Globe },
@@ -329,6 +332,29 @@ export function AppSidebar({
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
+            <SidebarMenu>
+              {/* Sources section at top */}
+              {sourceItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location === item.url}
+                  >
+                    <Link 
+                      href={item.url} 
+                      data-testid={`nav-${item.title.toLowerCase().replace(" ", "-")}`}
+                    >
+                      <item.icon className="w-4 h-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+            
+            {/* Divider */}
+            <hr className="my-2 border-sidebar-border" />
+            
             <SidebarMenu>
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
