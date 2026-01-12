@@ -33,6 +33,7 @@ The system leverages a shared schema for type and validation consistency between
 - **Signal Ingestion**: Workers for RSS and Feedly ingestion with URL canonicalization, SHA256-based deduplication, and Jaccard similarity for near-duplicate detection.
 - **Signal Management**: UI for filtering signals by verification status, source type, and a Discovery Inbox for reviewing unverified signals.
 - **Source Management**: UI for managing and discovering sources, including domain and web discovery modes.
+- **Website Lookup**: Batch lookup of company websites from company names via Clearbit Autocomplete API (free, no key needed). Available in Discover Sources > Batch tab.
 - **Intelligence Layer**: Daily signal metrics and weekly AI-generated trend summaries for industries, incorporating baseline guardrails for emerging activities.
 - **Date Verification**: Admin UI for reviewing and backfilling signal dates with quality metrics.
 - **Advanced Monitoring & Deduplication**: Scheduled monitoring runs with detailed statistics and a robust deduplication system.
@@ -63,3 +64,4 @@ The system leverages a shared schema for type and validation consistency between
 
 ### Integrations
 - **Media Site CMS**: External CMS integration for publishing articles via a configurable endpoint, mapping SignalWatch fields to the CMS schema.
+- **Clearbit Autocomplete**: Free API for company name to domain lookup (no API key required). Used in `server/clearbit-service.ts`.
