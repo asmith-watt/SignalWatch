@@ -135,6 +135,9 @@ function MainLayout() {
               <Route path="/signals">
                 <AllSignalsPage />
               </Route>
+              <Route path="/signals/discovery">
+                <DiscoveryInboxPage />
+              </Route>
               <Route path="/signals/:id">
                 <SignalDetailPage />
               </Route>
@@ -177,9 +180,6 @@ function MainLayout() {
               </Route>
               <Route path="/sources/discover">
                 <SourcesDiscoverPage />
-              </Route>
-              <Route path="/signals/discovery">
-                <DiscoveryInboxPage />
               </Route>
               <Route component={NotFound} />
             </Switch>
