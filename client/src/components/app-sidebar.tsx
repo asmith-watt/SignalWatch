@@ -68,12 +68,12 @@ interface AppSidebarProps {
 const sourceItems = [
   { title: "Sources", url: "/sources", icon: Rss },
   { title: "Discover Sources", url: "/sources/discover", icon: Compass },
+  { title: "Discovery Inbox", url: "/signals/discovery", icon: Inbox },
 ];
 
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: TrendingUp },
   { title: "Recent Signals", url: "/signals", icon: Radio },
-  { title: "Discovery Inbox", url: "/signals/discovery", icon: Inbox },
   { title: "Trends", url: "/trends", icon: BarChart3 },
   { title: "Signal Graph", url: "/signal-graph", icon: GitBranch },
   { title: "Industry Map", url: "/industry-map", icon: Network },
