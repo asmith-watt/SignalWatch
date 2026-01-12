@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -48,6 +49,9 @@ import {
   ExternalLink,
   CloudCog,
   Loader2,
+  BarChart3,
+  Filter,
+  ChevronDown,
 } from "lucide-react";
 import type { Source, Company } from "@shared/schema";
 
@@ -89,7 +93,10 @@ function SourcesTable({
   onVerify, 
   onRun,
   isLoading,
-  runningSourceId
+  runningSourceId,
+  selectedIds,
+  onSelectChange,
+  onSelectAll,
 }: { 
   sources: Source[];
   onEdit: (source: Source) => void;
@@ -98,7 +105,14 @@ function SourcesTable({
   onRun: (source: Source) => void;
   isLoading: boolean;
   runningSourceId: number | null;
+  selectedIds?: Set<number>;
+  onSelectChange?: (id: number, selected: boolean) => void;
+  onSelectAll?: (selected: boolean) => void;
 }) {
+  const showCheckboxes = selectedIds !== undefined && onSelectChange !== undefined;
+  const allSelected = showCheckboxes && sources.length > 0 && sources.every(s => selectedIds.has(s.id));
+  const someSelected = showCheckboxes && sources.some(s => selectedIds.has(s.id)) && !allSelected;
+  
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -127,6 +141,18 @@ function SourcesTable({
     <Table>
       <TableHeader>
         <TableRow>
+          {showCheckboxes && (
+            <TableHead className="w-[40px]">
+              <Checkbox
+                checked={allSelected}
+                ref={(el) => {
+                  if (el) (el as any).indeterminate = someSelected;
+                }}
+                onCheckedChange={(checked) => onSelectAll?.(!!checked)}
+                data-testid="checkbox-select-all"
+              />
+            </TableHead>
+          )}
           <TableHead>Name</TableHead>
           <TableHead>Type</TableHead>
           <TableHead>Domain</TableHead>
@@ -140,8 +166,22 @@ function SourcesTable({
       <TableBody>
         {sources.map((source) => {
           const IconComponent = sourceTypeIcons[source.sourceType] || Globe;
+          const isSelected = showCheckboxes && selectedIds.has(source.id);
           return (
-            <TableRow key={source.id} data-testid={`source-row-${source.id}`}>
+            <TableRow 
+              key={source.id} 
+              data-testid={`source-row-${source.id}`}
+              className={isSelected ? "bg-muted/50" : ""}
+            >
+              {showCheckboxes && (
+                <TableCell>
+                  <Checkbox
+                    checked={isSelected}
+                    onCheckedChange={(checked) => onSelectChange?.(source.id, !!checked)}
+                    data-testid={`checkbox-source-${source.id}`}
+                  />
+                </TableCell>
+              )}
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
                   <IconComponent className="w-4 h-4 text-muted-foreground" />
@@ -250,8 +290,11 @@ export default function SourcesPage() {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [marketFilter, setMarketFilter] = useState<string>("all");
   const [companyFilter, setCompanyFilter] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [runningSourceId, setRunningSourceId] = useState<number | null>(null);
+  const [selectedSourceIds, setSelectedSourceIds] = useState<Set<number>>(new Set());
+  const [bulkActionRunning, setBulkActionRunning] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
     name: "",
     sourceType: "",
@@ -489,16 +532,120 @@ export default function SourcesPage() {
 
   const industries = Array.from(new Set(companies.map(c => c.industry).filter((i): i is string => Boolean(i))));
 
-  const filteredSources = sources.filter(source => {
-    if (activeFilter === "active" && !source.isActive) return false;
-    if (activeFilter === "disabled" && source.isActive) return false;
-    return true;
+  // Stats computed from all sources (before filtering)
+  const stats = useMemo(() => {
+    const active = sources.filter(s => s.isActive).length;
+    const inactive = sources.filter(s => !s.isActive).length;
+    const verified = sources.filter(s => s.verificationStatus === "verified").length;
+    const needsReview = sources.filter(s => s.verificationStatus === "needs_review" || !s.verificationStatus).length;
+    const broken = sources.filter(s => s.verificationStatus === "broken").length;
+    return { total: sources.length, active, inactive, verified, needsReview, broken };
+  }, [sources]);
+
+  const filteredSources = useMemo(() => {
+    return sources.filter(source => {
+      if (activeFilter === "active" && !source.isActive) return false;
+      if (activeFilter === "disabled" && source.isActive) return false;
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        if (!source.name.toLowerCase().includes(query) && 
+            !(source.domain && source.domain.toLowerCase().includes(query))) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [sources, activeFilter, searchQuery]);
+
+  // Selection handlers
+  const handleSelectChange = (id: number, selected: boolean) => {
+    setSelectedSourceIds(prev => {
+      const next = new Set(prev);
+      if (selected) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+      return next;
+    });
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    if (selected) {
+      setSelectedSourceIds(new Set(filteredSources.map(s => s.id)));
+    } else {
+      setSelectedSourceIds(new Set());
+    }
+  };
+
+  // Bulk action mutations
+  const bulkToggleMutation = useMutation({
+    mutationFn: async (activate: boolean) => {
+      setBulkActionRunning("toggle");
+      const ids = Array.from(selectedSourceIds);
+      await Promise.all(ids.map(id => 
+        apiRequest("PATCH", `/api/sources/${id}`, { isActive: activate })
+      ));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sources"] });
+      toast({ title: `Updated ${selectedSourceIds.size} sources` });
+      setSelectedSourceIds(new Set());
+      setBulkActionRunning(null);
+    },
+    onError: () => {
+      toast({ title: "Failed to update sources", variant: "destructive" });
+      setBulkActionRunning(null);
+    },
+  });
+
+  const bulkVerifyMutation = useMutation({
+    mutationFn: async () => {
+      setBulkActionRunning("verify");
+      const ids = Array.from(selectedSourceIds);
+      await Promise.all(ids.map(id => 
+        apiRequest("POST", `/api/sources/${id}/verify`)
+      ));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sources"] });
+      toast({ title: `Verified ${selectedSourceIds.size} sources` });
+      setSelectedSourceIds(new Set());
+      setBulkActionRunning(null);
+    },
+    onError: () => {
+      toast({ title: "Failed to verify sources", variant: "destructive" });
+      setBulkActionRunning(null);
+    },
+  });
+
+  const bulkRunMutation = useMutation({
+    mutationFn: async () => {
+      setBulkActionRunning("run");
+      const ids = Array.from(selectedSourceIds);
+      const rssSources = sources.filter(s => ids.includes(s.id) && s.sourceType === "rss");
+      for (const source of rssSources) {
+        await apiRequest("POST", `/api/sources/${source.id}/run`);
+      }
+      return { count: rssSources.length };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sources"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/signals"] });
+      toast({ title: `Ran ingestion for ${data.count} RSS sources` });
+      setSelectedSourceIds(new Set());
+      setBulkActionRunning(null);
+    },
+    onError: () => {
+      toast({ title: "Failed to run ingestion", variant: "destructive" });
+      setBulkActionRunning(null);
+    },
   });
 
   return (
     <div className="h-full overflow-auto">
       <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <h1 className="text-2xl font-semibold">Sources</h1>
             <p className="text-muted-foreground">Manage signal sources and ingestion</p>
@@ -511,6 +658,107 @@ export default function SourcesPage() {
           </Button>
         </div>
 
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <Card className="p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Total</span>
+              <BarChart3 className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <div className="text-2xl font-bold" data-testid="stat-total">{stats.total}</div>
+          </Card>
+          <Card className="p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Active</span>
+              <Power className="w-4 h-4 text-green-600" />
+            </div>
+            <div className="text-2xl font-bold text-green-600" data-testid="stat-active">{stats.active}</div>
+          </Card>
+          <Card className="p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Verified</span>
+              <CheckCircle className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="text-2xl font-bold text-blue-600" data-testid="stat-verified">{stats.verified}</div>
+          </Card>
+          <Card className="p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Needs Review</span>
+              <AlertCircle className="w-4 h-4 text-amber-600" />
+            </div>
+            <div className="text-2xl font-bold text-amber-600" data-testid="stat-needs-review">{stats.needsReview}</div>
+          </Card>
+          <Card className="p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Broken</span>
+              <XCircle className="w-4 h-4 text-red-600" />
+            </div>
+            <div className="text-2xl font-bold text-red-600" data-testid="stat-broken">{stats.broken}</div>
+          </Card>
+        </div>
+
+        {/* Bulk Actions Bar */}
+        {selectedSourceIds.size > 0 && (
+          <Card className="p-3 bg-muted/50">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <span className="font-medium">
+                {selectedSourceIds.size} source{selectedSourceIds.size > 1 ? "s" : ""} selected
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => bulkToggleMutation.mutate(true)}
+                  disabled={bulkActionRunning !== null}
+                  data-testid="button-bulk-enable"
+                >
+                  {bulkActionRunning === "toggle" ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Power className="w-4 h-4 mr-1" />}
+                  Enable
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => bulkToggleMutation.mutate(false)}
+                  disabled={bulkActionRunning !== null}
+                  data-testid="button-bulk-disable"
+                >
+                  {bulkActionRunning === "toggle" ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Power className="w-4 h-4 mr-1" />}
+                  Disable
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => bulkVerifyMutation.mutate()}
+                  disabled={bulkActionRunning !== null}
+                  data-testid="button-bulk-verify"
+                >
+                  {bulkActionRunning === "verify" ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <CheckCircle className="w-4 h-4 mr-1" />}
+                  Verify
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => bulkRunMutation.mutate()}
+                  disabled={bulkActionRunning !== null}
+                  data-testid="button-bulk-run"
+                >
+                  {bulkActionRunning === "run" ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Play className="w-4 h-4 mr-1" />}
+                  Run Ingestion
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setSelectedSourceIds(new Set())}
+                  data-testid="button-clear-selection"
+                >
+                  <XCircle className="w-4 h-4 mr-1" />
+                  Clear
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
+
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="all" data-testid="tab-all-sources">All Sources</TabsTrigger>
@@ -522,7 +770,18 @@ export default function SourcesPage() {
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex flex-wrap gap-3 mt-4">
+          <div className="flex flex-wrap gap-3 mt-4 items-center">
+            {/* Search input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search sources..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 w-[200px]"
+                data-testid="input-search-sources"
+              />
+            </div>
             <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="w-[150px]" data-testid="filter-type">
                 <SelectValue placeholder="All Types" />
@@ -645,6 +904,9 @@ export default function SourcesPage() {
                   onRun={handleRun}
                   isLoading={isLoading}
                   runningSourceId={runningSourceId}
+                  selectedIds={selectedSourceIds}
+                  onSelectChange={handleSelectChange}
+                  onSelectAll={handleSelectAll}
                 />
               </CardContent>
             </Card>
@@ -661,6 +923,9 @@ export default function SourcesPage() {
                   onRun={handleRun}
                   isLoading={isLoading}
                   runningSourceId={runningSourceId}
+                  selectedIds={selectedSourceIds}
+                  onSelectChange={handleSelectChange}
+                  onSelectAll={handleSelectAll}
                 />
               </CardContent>
             </Card>
@@ -677,6 +942,9 @@ export default function SourcesPage() {
                   onRun={handleRun}
                   isLoading={isLoading}
                   runningSourceId={runningSourceId}
+                  selectedIds={selectedSourceIds}
+                  onSelectChange={handleSelectChange}
+                  onSelectAll={handleSelectAll}
                 />
               </CardContent>
             </Card>

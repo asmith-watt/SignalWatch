@@ -5,7 +5,9 @@ import {
   insertCompanySchema,
   insertSignalSchema,
   insertAlertSchema,
+  companySources,
 } from "@shared/schema";
+import { db } from "./db";
 import { z } from "zod";
 import { analyzeSignal, enrichSignal, batchEnrichSignals, extractRelationshipsFromSignal, batchExtractThemes, generateTrendExplanation, THEME_TAXONOMY } from "./ai-analysis";
 import { generateArticleFromSignal, exportArticleForCMS } from "./article-generator";
@@ -2015,6 +2017,49 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error discovering web sources:", error);
       res.status(500).json({ error: "Failed to discover sources" });
+    }
+  });
+
+  // GET /api/sources/coverage - Get source coverage per company
+  app.get("/api/sources/coverage", async (req: Request, res: Response) => {
+    try {
+      const companies = await storage.getAllCompanies();
+      const sources = await storage.getAllSources({});
+      
+      // Get company-source links from the database
+      const companySourceLinks = await db.select({
+        companyId: companySources.companyId,
+        sourceId: companySources.sourceId,
+      }).from(companySources);
+      
+      // Count sources per company
+      const sourceCountMap = new Map<number, number>();
+      for (const link of companySourceLinks) {
+        sourceCountMap.set(link.companyId, (sourceCountMap.get(link.companyId) || 0) + 1);
+      }
+      
+      // Build coverage data
+      const coverage = companies.map(company => ({
+        id: company.id,
+        name: company.name,
+        industry: company.industry,
+        website: company.website,
+        sourceCount: sourceCountMap.get(company.id) || 0,
+        hasWebsite: Boolean(company.website),
+      }));
+      
+      // Sort by source count ascending (least coverage first)
+      coverage.sort((a, b) => a.sourceCount - b.sourceCount);
+      
+      res.json({
+        coverage,
+        totalCompanies: companies.length,
+        companiesWithSources: coverage.filter(c => c.sourceCount > 0).length,
+        companiesWithoutSources: coverage.filter(c => c.sourceCount === 0).length,
+      });
+    } catch (error) {
+      console.error("Error getting source coverage:", error);
+      res.status(500).json({ error: "Failed to get source coverage" });
     }
   });
 
