@@ -220,6 +220,10 @@ export default function SourcesDiscoverPage() {
   // Batch discovery functions
   const addCompanyToQueue = (company: Company) => {
     if (discoveryQueue.some(q => q.companyId === company.id)) return;
+    if (!company.website) {
+      toast({ title: `${company.name} has no website`, variant: "destructive" });
+      return;
+    }
     setDiscoveryQueue(prev => [...prev, {
       id: `company-${company.id}`,
       name: company.name,
@@ -299,9 +303,15 @@ export default function SourcesDiscoverPage() {
     if (selectedIndustry === "none") return;
     const industryCompanies = companies.filter(c => c.industry === selectedIndustry);
     const newItems: QueueItem[] = [];
+    let skippedNoWebsite = 0;
     
     for (const company of industryCompanies) {
       if (!discoveryQueue.some(q => q.companyId === company.id)) {
+        // Skip companies without websites
+        if (!company.website) {
+          skippedNoWebsite++;
+          continue;
+        }
         newItems.push({
           id: `company-${company.id}`,
           name: company.name,
@@ -314,14 +324,20 @@ export default function SourcesDiscoverPage() {
     }
     
     setDiscoveryQueue(prev => [...prev, ...newItems]);
-    toast({ title: `Added ${newItems.length} companies from ${selectedIndustry}` });
+    const skippedMsg = skippedNoWebsite > 0 ? ` (${skippedNoWebsite} skipped - no website)` : "";
+    toast({ title: `Added ${newItems.length} companies from ${selectedIndustry}${skippedMsg}` });
   };
 
   const addSelectedCompaniesToQueue = () => {
     const newItems: QueueItem[] = [];
+    let skippedNoWebsite = 0;
     for (const companyId of Array.from(selectedCompaniesForBatch)) {
       const company = companies.find(c => c.id === companyId);
       if (company && !discoveryQueue.some(q => q.companyId === company.id)) {
+        if (!company.website) {
+          skippedNoWebsite++;
+          continue;
+        }
         newItems.push({
           id: `company-${company.id}`,
           name: company.name,
@@ -334,7 +350,8 @@ export default function SourcesDiscoverPage() {
     }
     setDiscoveryQueue(prev => [...prev, ...newItems]);
     setSelectedCompaniesForBatch(new Set());
-    toast({ title: `Added ${newItems.length} companies to queue` });
+    const skippedMsg = skippedNoWebsite > 0 ? ` (${skippedNoWebsite} skipped - no website)` : "";
+    toast({ title: `Added ${newItems.length} companies to queue${skippedMsg}` });
   };
 
   const stopQueue = () => {
