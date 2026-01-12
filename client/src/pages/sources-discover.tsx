@@ -113,6 +113,12 @@ export default function SourcesDiscoverPage() {
   const [gapIndustryFilter, setGapIndustryFilter] = useState<string>("all");
   const [gapShowOnlyNoCoverage, setGapShowOnlyNoCoverage] = useState(false);
 
+  // Website lookup state
+  const [lookingUpWebsiteId, setLookingUpWebsiteId] = useState<number | null>(null);
+  const [websiteLookupQueue, setWebsiteLookupQueue] = useState<number[]>([]);
+  const [isLookingUpBatch, setIsLookingUpBatch] = useState(false);
+  const [lookupProgress, setLookupProgress] = useState({ current: 0, total: 0, found: 0 });
+
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
   });
@@ -194,6 +200,61 @@ export default function SourcesDiscoverPage() {
       toast({ title: "Failed to add source", variant: "destructive" });
     },
   });
+
+  // Website lookup mutation
+  const lookupWebsiteMutation = useMutation({
+    mutationFn: async (companyId: number) => {
+      setLookingUpWebsiteId(companyId);
+      const response = await apiRequest("POST", `/api/companies/${companyId}/lookup-website`, {});
+      return response.json();
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/sources/coverage"] });
+      setLookingUpWebsiteId(null);
+      if (data.found) {
+        toast({ title: `Found: ${data.domain}`, description: `Matched: ${data.matchedName}` });
+      } else {
+        toast({ title: "No website found", variant: "destructive" });
+      }
+    },
+    onError: () => {
+      setLookingUpWebsiteId(null);
+      toast({ title: "Lookup failed", variant: "destructive" });
+    },
+  });
+
+  // Batch website lookup function
+  const runBatchWebsiteLookup = async (companyIds: number[]) => {
+    if (companyIds.length === 0) return;
+    
+    setIsLookingUpBatch(true);
+    setLookupProgress({ current: 0, total: companyIds.length, found: 0 });
+    let foundCount = 0;
+
+    for (let i = 0; i < companyIds.length; i++) {
+      setLookupProgress(prev => ({ ...prev, current: i + 1 }));
+      
+      try {
+        const response = await apiRequest("POST", `/api/companies/${companyIds[i]}/lookup-website`, {});
+        const data = await response.json();
+        if (data.found) {
+          foundCount++;
+          setLookupProgress(prev => ({ ...prev, found: foundCount }));
+        }
+      } catch (error) {
+        // Continue with next company
+      }
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/sources/coverage"] });
+    setIsLookingUpBatch(false);
+    toast({ 
+      title: "Website lookup complete", 
+      description: `Found ${foundCount} of ${companyIds.length} websites` 
+    });
+  };
 
   const handleDomainDiscover = () => {
     setIsDiscovering(true);
@@ -637,9 +698,9 @@ export default function SourcesDiscoverPage() {
                     />
                     <div className="max-h-[200px] overflow-y-auto border rounded-md">
                       {filteredCompanies.slice(0, 50).map(company => (
-                        <label
+                        <div
                           key={company.id}
-                          className="flex items-center gap-2 px-3 py-2 hover:bg-muted cursor-pointer"
+                          className="flex items-center gap-2 px-3 py-2 hover:bg-muted"
                         >
                           <Checkbox
                             checked={selectedCompaniesForBatch.has(company.id)}
@@ -653,18 +714,71 @@ export default function SourcesDiscoverPage() {
                             }}
                             data-testid={`checkbox-company-${company.id}`}
                           />
-                          <span className="text-sm">{company.name}</span>
-                          {company.industry && (
-                            <Badge variant="outline" className="text-xs ml-auto">{company.industry}</Badge>
+                          <span className="text-sm flex-1">{company.name}</span>
+                          {!company.website ? (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                lookupWebsiteMutation.mutate(company.id);
+                              }}
+                              disabled={lookingUpWebsiteId === company.id}
+                              className="h-6 px-2 text-xs"
+                              data-testid={`button-find-website-${company.id}`}
+                            >
+                              {lookingUpWebsiteId === company.id ? (
+                                <RefreshCw className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <>
+                                  <Search className="w-3 h-3 mr-1" />
+                                  Find
+                                </>
+                              )}
+                            </Button>
+                          ) : (
+                            <Badge variant="outline" className="text-xs bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Has site
+                            </Badge>
                           )}
-                        </label>
+                          {company.industry && (
+                            <Badge variant="outline" className="text-xs">{company.industry}</Badge>
+                          )}
+                        </div>
                       ))}
                     </div>
-                    {selectedCompaniesForBatch.size > 0 && (
-                      <Button onClick={addSelectedCompaniesToQueue} data-testid="button-add-selected-companies">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add {selectedCompaniesForBatch.size} Companies
-                      </Button>
+                    <div className="flex gap-2 flex-wrap">
+                      {selectedCompaniesForBatch.size > 0 && (
+                        <Button onClick={addSelectedCompaniesToQueue} data-testid="button-add-selected-companies">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add {selectedCompaniesForBatch.size} to Queue
+                        </Button>
+                      )}
+                      {(() => {
+                        const noWebsiteCompanies = filteredCompanies.filter(c => !c.website);
+                        if (noWebsiteCompanies.length > 0 && !isLookingUpBatch) {
+                          return (
+                            <Button
+                              variant="outline"
+                              onClick={() => runBatchWebsiteLookup(noWebsiteCompanies.slice(0, 100).map(c => c.id))}
+                              data-testid="button-find-all-websites"
+                            >
+                              <Search className="w-4 h-4 mr-2" />
+                              Find Websites ({Math.min(noWebsiteCompanies.length, 100)})
+                            </Button>
+                          );
+                        }
+                        return null;
+                      })()}
+                    </div>
+                    {isLookingUpBatch && (
+                      <div className="space-y-2">
+                        <Progress value={(lookupProgress.current / lookupProgress.total) * 100} />
+                        <p className="text-xs text-muted-foreground">
+                          Looking up {lookupProgress.current} of {lookupProgress.total}... Found {lookupProgress.found}
+                        </p>
+                      </div>
                     )}
                   </CardContent>
                 </Card>

@@ -25,6 +25,7 @@ import { publishToWordPress, testWordPressConnection } from "./wordpress-publish
 import { selectStockImage, buildMediaSitePayload, buildPayloadFromExistingArticle, publishToMediaSite, generateAIImage } from "./media-site-publisher";
 import { verifySignalDates, fixSignalDates, verifySourceUrl, verifySourceUrls } from "./date-verifier";
 import { discoverDomainSources, discoverWebSources } from "./source-discovery";
+import { lookupCompanyDomain } from "./clearbit-service";
 import { objectStorageClient } from "./replit_integrations/object_storage";
 import express from "express";
 import path from "path";
@@ -152,6 +153,37 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error deleting company:", error);
       res.status(500).json({ error: "Failed to delete company" });
+    }
+  });
+
+  // Lookup company website via Clearbit Autocomplete (free, no API key needed)
+  app.post("/api/companies/:id/lookup-website", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const company = await storage.getCompany(id);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+
+      const result = await lookupCompanyDomain(company.name);
+      
+      if (!result.found || !result.domain) {
+        return res.json({ found: false, company });
+      }
+
+      const website = `https://${result.domain}`;
+      const updatedCompany = await storage.updateCompany(id, { website });
+      
+      res.json({ 
+        found: true, 
+        domain: result.domain,
+        matchedName: result.matchedName,
+        company: updatedCompany,
+        alternatives: result.alternatives
+      });
+    } catch (error) {
+      console.error("Error looking up website:", error);
+      res.status(500).json({ error: "Failed to lookup website" });
     }
   });
 
