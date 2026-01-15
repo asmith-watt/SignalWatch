@@ -140,7 +140,7 @@ export interface IStorage {
 
   // Sources (PR1)
   getSource(id: number): Promise<Source | undefined>;
-  getAllSources(filters?: { market?: string; companyId?: number; type?: string; status?: string }): Promise<Source[]>;
+  getAllSources(filters?: { market?: string; companyId?: number; type?: string; status?: string; category?: string }): Promise<Source[]>;
   createSource(source: InsertSource): Promise<Source>;
   updateSource(id: number, updates: Partial<InsertSource>): Promise<Source | undefined>;
   deleteSource(id: number): Promise<void>;
@@ -817,60 +817,63 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async getAllSources(filters?: { market?: string; companyId?: number; type?: string; status?: string }): Promise<Source[]> {
+  async getAllSources(filters?: { market?: string; companyId?: number; type?: string; status?: string; category?: string }): Promise<Source[]> {
     let query = db.select({ source: sources }).from(sources);
-    
+
     // Join with source_markets if filtering by market
     if (filters?.market) {
       const marketSourceIds = await db.select({ sourceId: sourceMarkets.sourceId })
         .from(sourceMarkets)
         .where(eq(sourceMarkets.market, filters.market));
-      
+
       if (marketSourceIds.length === 0) {
         return [];
       }
-      
+
       const sourceIds = marketSourceIds.map(m => m.sourceId);
       const conditions = [inArray(sources.id, sourceIds)];
-      
+
       if (filters.type) conditions.push(eq(sources.sourceType, filters.type));
       if (filters.status) conditions.push(eq(sources.verificationStatus, filters.status));
-      
+      if (filters.category) conditions.push(eq(sources.category, filters.category));
+
       return db.select().from(sources)
         .where(and(...conditions))
         .orderBy(desc(sources.createdAt));
     }
-    
+
     // Join with company_sources if filtering by companyId
     if (filters?.companyId) {
       const companySourceIds = await db.select({ sourceId: companySources.sourceId })
         .from(companySources)
         .where(eq(companySources.companyId, filters.companyId));
-      
+
       if (companySourceIds.length === 0) {
         return [];
       }
-      
+
       const sourceIds = companySourceIds.map(cs => cs.sourceId);
       const conditions = [inArray(sources.id, sourceIds)];
-      
+
       if (filters.type) conditions.push(eq(sources.sourceType, filters.type));
       if (filters.status) conditions.push(eq(sources.verificationStatus, filters.status));
-      
+      if (filters.category) conditions.push(eq(sources.category, filters.category));
+
       return db.select().from(sources)
         .where(and(...conditions))
         .orderBy(desc(sources.createdAt));
     }
-    
-    // Simple filtering by type and status
+
+    // Simple filtering by type, status, and category
     const conditions = [];
     if (filters?.type) conditions.push(eq(sources.sourceType, filters.type));
     if (filters?.status) conditions.push(eq(sources.verificationStatus, filters.status));
-    
+    if (filters?.category) conditions.push(eq(sources.category, filters.category));
+
     if (conditions.length === 0) {
       return db.select().from(sources).orderBy(desc(sources.createdAt));
     }
-    
+
     return db.select().from(sources)
       .where(and(...conditions))
       .orderBy(desc(sources.createdAt));

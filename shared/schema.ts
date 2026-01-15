@@ -134,6 +134,16 @@ export const sourceTypes = [
 
 export type SourceType = (typeof sourceTypes)[number];
 
+// Source categories for classification
+export const sourceCategories = [
+  "regulatory",
+  "company",
+  "trade_publication",
+  "trade_association",
+] as const;
+
+export type SourceCategory = (typeof sourceCategories)[number];
+
 // Verification status for sources
 export const sourceVerificationStatuses = [
   "verified",
@@ -157,6 +167,7 @@ export const sources = pgTable("sources", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   sourceType: text("source_type").notNull(),
+  category: text("category"),
   url: text("url"),
   domain: text("domain"),
   trustScore: integer("trust_score").default(50),
