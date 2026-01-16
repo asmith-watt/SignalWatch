@@ -1713,12 +1713,13 @@ export async function registerRoutes(
   // GET /api/sources - List all sources with optional filters
   app.get("/api/sources", async (req: Request, res: Response) => {
     try {
-      const { market, companyId, type, status } = req.query;
+      const { market, companyId, type, status, category } = req.query;
       const filters = {
         market: market as string | undefined,
         companyId: companyId ? parseInt(companyId as string) : undefined,
         type: type as string | undefined,
         status: status as string | undefined,
+        category: category as string | undefined,
       };
       const sources = await storage.getAllSources(filters);
       res.json(sources);
@@ -1731,26 +1732,32 @@ export async function registerRoutes(
   // POST /api/sources - Create a new source
   app.post("/api/sources", async (req: Request, res: Response) => {
     try {
-      const { name, sourceType, url, domain, trustScore } = req.body;
-      
+      const { name, sourceType, category, url, domain, trustScore } = req.body;
+
       // Validation
       if (!name || typeof name !== 'string' || name.trim().length === 0) {
         return res.status(400).json({ error: "Name is required" });
       }
-      
+
       const validSourceTypes = ['rss', 'feedly', 'crawl', 'regulator', 'association', 'llm'];
       if (!sourceType || !validSourceTypes.includes(sourceType)) {
         return res.status(400).json({ error: `Invalid sourceType. Must be one of: ${validSourceTypes.join(', ')}` });
       }
-      
+
+      const validCategories = ['regulatory', 'company', 'trade_publication', 'trade_association'];
+      if (category && !validCategories.includes(category)) {
+        return res.status(400).json({ error: `Invalid category. Must be one of: ${validCategories.join(', ')}` });
+      }
+
       // Validate trustScore if provided
-      const validatedTrustScore = trustScore !== undefined 
+      const validatedTrustScore = trustScore !== undefined
         ? Math.max(0, Math.min(100, parseInt(trustScore) || 50))
         : 50;
-      
+
       const source = await storage.createSource({
         name: name.trim(),
         sourceType,
+        category: category || null,
         url: url || null,
         domain: domain || null,
         trustScore: validatedTrustScore,
@@ -1766,29 +1773,35 @@ export async function registerRoutes(
   app.patch("/api/sources/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const { name, sourceType, url, domain, trustScore, verificationStatus, isActive } = req.body;
-      
+      const { name, sourceType, category, url, domain, trustScore, verificationStatus, isActive } = req.body;
+
       // Validate fields if provided
       const validSourceTypes = ['rss', 'feedly', 'crawl', 'regulator', 'association', 'llm'];
       const validStatuses = ['verified', 'needs_review', 'broken'];
-      
+      const validCategories = ['regulatory', 'company', 'trade_publication', 'trade_association'];
+
       if (sourceType && !validSourceTypes.includes(sourceType)) {
         return res.status(400).json({ error: `Invalid sourceType. Must be one of: ${validSourceTypes.join(', ')}` });
       }
-      
+
       if (verificationStatus && !validStatuses.includes(verificationStatus)) {
         return res.status(400).json({ error: `Invalid verificationStatus. Must be one of: ${validStatuses.join(', ')}` });
       }
-      
+
+      if (category && !validCategories.includes(category)) {
+        return res.status(400).json({ error: `Invalid category. Must be one of: ${validCategories.join(', ')}` });
+      }
+
       const updates: Record<string, any> = {};
       if (name !== undefined) updates.name = name.trim();
       if (sourceType !== undefined) updates.sourceType = sourceType;
+      if (category !== undefined) updates.category = category;
       if (url !== undefined) updates.url = url;
       if (domain !== undefined) updates.domain = domain;
       if (trustScore !== undefined) updates.trustScore = Math.max(0, Math.min(100, parseInt(trustScore) || 50));
       if (verificationStatus !== undefined) updates.verificationStatus = verificationStatus;
       if (isActive !== undefined) updates.isActive = Boolean(isActive);
-      
+
       const source = await storage.updateSource(id, updates);
       if (!source) {
         return res.status(404).json({ error: "Source not found" });
@@ -2107,6 +2120,49 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching ingestion runs:", error);
       res.status(500).json({ error: "Failed to fetch ingestion runs" });
+    }
+  });
+
+  // GET /api/sources/distribution - Get source distribution by category
+  app.get("/api/sources/distribution", async (req: Request, res: Response) => {
+    try {
+      const allSources = await storage.getAllSources({});
+
+      const distribution = {
+        regulatory: 0,
+        company: 0,
+        trade_publication: 0,
+        trade_association: 0,
+        uncategorized: 0,
+        total: allSources.length,
+      };
+
+      for (const source of allSources) {
+        const cat = source.category as keyof typeof distribution;
+        if (cat && cat in distribution) {
+          distribution[cat]++;
+        } else {
+          distribution.uncategorized++;
+        }
+      }
+
+      res.json(distribution);
+    } catch (error) {
+      console.error("Error getting source distribution:", error);
+      res.status(500).json({ error: "Failed to get source distribution" });
+    }
+  });
+
+  // POST /api/sources/seed - Seed sources from the predefined list
+  app.post("/api/sources/seed", async (req: Request, res: Response) => {
+    try {
+      const { seedSources, updateExistingSourceCategories } = await import("./seed-sources");
+      await seedSources();
+      await updateExistingSourceCategories();
+      res.json({ success: true, message: "Sources seeded successfully" });
+    } catch (error) {
+      console.error("Error seeding sources:", error);
+      res.status(500).json({ error: "Failed to seed sources" });
     }
   });
 
